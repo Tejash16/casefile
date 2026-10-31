@@ -1,0 +1,203 @@
+"""Stage 2: propose 3 to 8 typed hypotheses from the tip, ledger statistics and the masters.
+
+The model sees statistics, never ledger rows. It may only use typologies from the menu and test ids
+from the registry; anything else fails validation and is retried with the error fed back.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from collections.abc import Iterable, Sequence
+from typing import Any
+
+from casefile.agents import client
+from casefile.agents._audit import AuditSink
+from casefile.agents.models import ProposeOutput, registry_test_ids
+from casefile.audit.log import jsonable
+from casefile.schemas import Hypothesis, StaffRecord, Tip, Typology, VendorRecord
+
+MIN_HYPOTHESES = 3
+MAX_HYPOTHESES = 8
+# Keys under which ingest.ledger_stats may carry per-vendor aggregates (spend, invoice count).
+PER_VENDOR_KEYS = ("per_vendor", "vendors", "by_vendor")
+
+
+class LedgerRowsInPrompt(ValueError):
+    """Raised if anything resembling a raw ledger row would reach the prompt."""
+
+
+def _assert_no_rows(obj: Any, path: str = "ledger_stats") -> None:
+    if isinstance(obj, dict):
+        if "row_id" in obj:
+            raise LedgerRowsInPrompt(f"{path} contains a ledger row (has row_id)")
+        for k, v in obj.items():
+            _assert_no_rows(v, f"{path}.{k}")
+    elif isinstance(obj, (list, tuple)):
+        for i, v in enumerate(obj):
+            _assert_no_rows(v, f"{path}[{i}]")
+
+
+def _per_vendor(ledger_stats: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Split per-vendor aggregates out of ledger_stats: ({vendor_id: stats}, remaining stats)."""
+    rest = dict(ledger_stats)
+    for key in PER_VENDOR_KEYS:
+        if key in rest:
+            raw = rest.pop(key)
+            if isinstance(raw, dict):
+                return {
+                    str(k): v if isinstance(v, dict) else {"value": v} for k, v in raw.items()
+                }, rest
+            if isinstance(raw, list):
+                out = {}
+                for item in raw:
+                    if isinstance(item, dict) and item.get("vendor_id"):
+                        out[str(item["vendor_id"])] = {
+                            k: v for k, v in item.items() if k != "vendor_id"
+                        }
+                return out, rest
+    return {}, rest
+
+
+def _jsonl(rows: Iterable[dict[str, Any]]) -> str:
+    return "\n".join(json.dumps(jsonable(r), ensure_ascii=False) for r in rows)
+
+
+def _typology_menu(typologies: Sequence[str] | None) -> str:
+    menu = client.load_reference("typologies")
+    if not typologies:
+        return menu
+    allowed = {str(t) for t in typologies}
+    keep = []
+    for line in menu.splitlines():
+        m = re.match(r"\| `([a-z_]+)` \|", line)
+        if m and m.group(1) not in allowed:
+            continue
+        keep.append(line)
+    return "\n".join(keep)
+
+
+def build_request(
+    tip: Tip | str,
+    ledger_stats: dict[str, Any],
+    vendors: Sequence[VendorRecord],
+    staff: Sequence[StaffRecord],
+    typologies: Sequence[str] | None = None,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    """System blocks and messages for the propose call (exposed for tests and prompt review)."""
+    stats = dict(ledger_stats or {})
+    _assert_no_rows(stats)
+    per_vendor, stats = _per_vendor(stats)
+    system_text, instructions = client.load_prompt("propose")
+    system_blocks = [
+        system_text,
+        f"<typologies>\n{_typology_menu(typologies)}\n</typologies>",
+        f"<tests>\n{client.load_reference('tests')}\n</tests>",
+    ]
+    tip_text = tip.text if isinstance(tip, Tip) else str(tip)
+    vendor_rows = []
+    for v in vendors:
+        agg = per_vendor.get(v.vendor_id, {})
+        vendor_rows.append(
+            {
+                "id": v.vendor_id,
+                "name_norm": v.name_norm,
+                "created_on": v.created_on,
+                "address_type": v.address_type,
+                "city": v.city,
+                "spend_inr": agg.get("spend", agg.get("spend_inr", agg.get("total"))),
+                "invoice_count": agg.get("invoice_count", agg.get("count", agg.get("n"))),
+            }
+        )
+    staff_rows = [
+        {
+            "id": s.staff_id,
+            "name_norm": s.name_norm,
+            "title": s.title,
+            "department": s.department,
+            "approval_limit_inr": s.approval_limit,
+        }
+        for s in staff
+    ]
+    stats_json = json.dumps(jsonable(stats), indent=1, ensure_ascii=False)
+    user = (
+        f"<tip>\n{tip_text.strip()}\n</tip>\n\n"
+        f"<ledger_stats>\n{stats_json}\n</ledger_stats>\n\n"
+        f"<vendors>\n{_jsonl(vendor_rows)}\n</vendors>\n\n"
+        f"<staff>\n{_jsonl(staff_rows)}\n</staff>\n\n"
+        f"{instructions}"
+    )
+    return system_blocks, [{"role": "user", "content": user}]
+
+
+def _validator(vendor_ids: set[str], staff_ids: set[str], typologies: set[str], test_ids: set[str]):
+    def validate(out: ProposeOutput) -> None:
+        errors = []
+        n = len(out.hypotheses)
+        if not MIN_HYPOTHESES <= n <= MAX_HYPOTHESES:
+            errors.append(f"expected {MIN_HYPOTHESES}-{MAX_HYPOTHESES} hypotheses, got {n}")
+        for i, h in enumerate(out.hypotheses, 1):
+            if typologies and str(h.typology) not in typologies:
+                errors.append(f"hypothesis {i}: typology {h.typology} not in menu")
+            if not h.tests_to_run:
+                errors.append(f"hypothesis {i}: tests_to_run is empty")
+            bad_tests = [t for t in h.tests_to_run if t not in test_ids]
+            if bad_tests:
+                errors.append(f"hypothesis {i}: unknown test ids {bad_tests}")
+            bad_s = [s for s in h.subjects if s not in staff_ids]
+            if bad_s:
+                errors.append(f"hypothesis {i}: unknown staff ids {bad_s}")
+            bad_o = [o for o in h.objects if o not in vendor_ids]
+            if bad_o:
+                errors.append(f"hypothesis {i}: unknown vendor ids {bad_o}")
+            if not h.subjects and not h.objects:
+                errors.append(f"hypothesis {i}: names neither a staff id nor a vendor id")
+        if errors:
+            raise ValueError("; ".join(errors))
+
+    return validate
+
+
+def propose(
+    tip: Tip | str,
+    ledger_stats: dict[str, Any],
+    vendors: Sequence[VendorRecord],
+    staff: Sequence[StaffRecord],
+    typologies: Sequence[str] | None = None,
+    *,
+    audit: AuditSink | None = None,
+) -> list[Hypothesis]:
+    typologies = list(typologies) if typologies else [t.value for t in Typology]
+    system_blocks, messages = build_request(tip, ledger_stats, vendors, staff, typologies)
+    validate = _validator(
+        {v.vendor_id for v in vendors},
+        {s.staff_id for s in staff},
+        {str(t) for t in typologies},
+        set(registry_test_ids()),
+    )
+    result = client.call(
+        "propose",
+        system_blocks,
+        messages,
+        model=client.MODEL_STRONG,
+        output_schema=ProposeOutput,
+        validate=validate,
+        temperature=0.3,
+        effort="high",
+        audit=audit,
+    )
+    out: ProposeOutput = result.output
+    return [
+        Hypothesis(
+            hypothesis_id=f"H{i}",
+            typology=h.typology,
+            statement=h.statement.strip(),
+            subjects=list(dict.fromkeys(h.subjects)),
+            objects=list(dict.fromkeys(h.objects)),
+            tests_to_run=list(dict.fromkeys(h.tests_to_run)),
+            prior_score=h.prior_score,
+            origin=h.origin,
+            rationale=h.rationale.strip(),
+        )
+        for i, h in enumerate(out.hypotheses, 1)
+    ]
