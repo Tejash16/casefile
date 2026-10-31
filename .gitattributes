@@ -1,0 +1,3 @@
+# Rendered case files and logs are hashed into the audit log; keep their bytes exact on every
+# checkout (autocrlf on Windows would otherwise rewrite them and fail verify.py's file hashes).
+out/** -text

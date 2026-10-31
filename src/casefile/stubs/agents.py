@@ -89,6 +89,7 @@ def write_case_file(
             evidence_ids=f.supporting_evidence + f.counter_evidence,
         )
         for f in findings
+        if f.supporting_evidence + f.counter_evidence  # an uncited sentence would block render
     ]
     cited = {i for f in findings for i in f.supporting_evidence + f.counter_evidence}
     cited |= {i for f in findings for s in f.rationale for i in s.evidence_ids}

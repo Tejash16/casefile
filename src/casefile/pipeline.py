@@ -322,6 +322,8 @@ def run(
                 staff = resolve_staff(staff, client, judge=judge)
             n_res = sum(x.resolution.status == "resolved" for x in [*vendors, *staff])
             stage("resolve", f"{n_res}/{len(vendors) + len(staff)} entities resolved")
+            # b2's notes, e.g. records cited at fetch time; read again after enrich in `test`
+            client_notes: list[str] = getattr(client, "notes", [])
 
         # 4. test: rules + graph
         with _timed("test"):
@@ -438,7 +440,7 @@ def run(
                     f"Run deterministic tests: {', '.join(test_ids) or 'none'}; graph paths (T16)",
                     "Fresh-context critique; deterministic gate decides each verdict",
                 ],
-                "data_quality": data_quality,
+                "data_quality": [*data_quality, *(f"Crustdata: {n}" for n in client_notes)],
                 "assumptions": _assumptions(thresholds),
                 "metrics": metrics,
                 "merkle_root": audit.merkle_root(),
