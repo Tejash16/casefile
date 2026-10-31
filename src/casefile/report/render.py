@@ -30,6 +30,7 @@ METRIC_LABELS = {
     "tokens_in": "Model tokens in",
     "tokens_out": "Model tokens out",
     "log_records": "Audit log records",
+    "rule_tests": "Rule tests run",
 }
 
 
