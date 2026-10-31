@@ -61,14 +61,14 @@ Six planted cases (`cases/README.md`), three runs each: run 1 live against Crust
 
 | case | fakes caught (per run) | honest businesses turned away | allegations correct | precision | citation validity | log verifies | wall time (s) | credits | result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| career_overlap | 1/1, 1/1, 1/1 | 0 | 3/3 | 100% | 100% | 3/3 | 64.5 | 23.82 | **pass 3/3** |
-| clean_controls | 0/0, 0/0, 0/0 | 0 | 0/0 | n/a | 100% | 3/3 | 50.6 | 4.71 | **pass 3/3** |
-| duplicate_billing | 1/1, 1/1, 1/1 | 0 | 3/3 | 100% | 100% | 3/3 | 45.8 | 2.03 | **pass 3/3** |
-| false_lead | 0/0, 0/0, 0/0 | 0 | 3/3 | n/a | 100% | 3/3 | 54.6 | 3.03 | **pass 3/3** |
-| shared_office_honest | 0/0, 0/0, 0/0 | 0 | 0/0 | n/a | 100% | 3/3 | 51.6 | 6.09 | **pass 3/3** |
-| shell_vendor | 2/2, 2/2, 2/2 | 0 | 6/6 | 70% | 100% | 3/3 | 55.5 | 0 | **pass 3/3** |
+| career_overlap | 1/1, 1/1, 1/1 | 0 | 3/3 | 100% | 100% | 3/3 | 63.4 | 23.82 | **pass 3/3** |
+| clean_controls | 0/0, 0/0, 0/0 | 0 | 0/0 | n/a | 100% | 3/3 | 55.2 | 4.71 | **pass 3/3** |
+| duplicate_billing | 1/1, 1/1, 1/1 | 0 | 3/3 | 100% | 100% | 3/3 | 43.5 | 2.03 | **pass 3/3** |
+| false_lead | 0/0, 0/0, 0/0 | 0 | 3/3 | n/a | 100% | 3/3 | 50.8 | 3.03 | **pass 3/3** |
+| shared_office_honest | 0/0, 0/0, 0/0 | 0 | 0/0 | n/a | 100% | 3/3 | 57.2 | 6.09 | **pass 3/3** |
+| shell_vendor | 2/2, 2/2, 2/2 | 0 | 6/6 | 100% | 100% | 3/3 | 56.5 | 0 | **pass 3/3** |
 
-**Fakes caught**: planted allegations found Substantiated. **Honest businesses turned away**: vendors that must be cleared but got any Substantiated finding (target 0). **Allegations correct** counts every expected verdict, including the expected **Unfounded** for the tip's false lead. **Precision**: share of Substantiated findings that match a planted allegation; `shell_vendor`'s 70% is an extra "kickback" finding on the planted shell, where the vendor is the approver's own company (shared phone and address), not a third party paying him; T01 now refutes kickback in that case, and this row will be re-run with it. Wall time is per run, credits are for the cold run 1 (`shell_vendor` reuses companies already fetched by earlier cases). Run on commit `4283519`; `shell_vendor` re-scored against its final `case.json` (`d0ffe03`, inputs unchanged).
+**Fakes caught**: planted allegations found Substantiated. **Honest businesses turned away**: vendors that must be cleared but got any Substantiated finding (target 0). **Allegations correct** counts every expected verdict, including the expected **Unfounded** for the tip's false lead. **Precision**: share of Substantiated findings that match a planted allegation; every Substantiated finding in every run is a planted one. Wall time is per run; credits are for the cold run 1 (`shell_vendor` reuses companies already fetched by earlier cases), 39.68 in total. Run on commit `9be7026`.
 
 ## Verify the log
 
