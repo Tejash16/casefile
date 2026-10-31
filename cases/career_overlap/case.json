@@ -1,0 +1,32 @@
+{
+  "name": "career_overlap",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [
+    {
+      "typology": "conflict_of_interest",
+      "subjects": [
+        "S004"
+      ],
+      "objects": [
+        "V017"
+      ],
+      "verdict": "Substantiated"
+    }
+  ],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V003",
+    "V005",
+    "V006",
+    "V010",
+    "V012",
+    "V013"
+  ],
+  "notes": "seed 1000. S004 Tejash Chauhan (team member, consent) is Co-Founder at DocRack, Crustdata company 71095782, from 2026-03-01 (person 177265563). V017's six invoices run 2025-06 to 2026-03, all approved by S004; the last overlaps the employment, all are within 365 days of its start. V017 has no website on purpose: docrack.ai resolves to another record."
+}

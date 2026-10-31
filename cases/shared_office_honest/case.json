@@ -1,0 +1,23 @@
+{
+  "name": "shared_office_honest",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V003",
+    "V004",
+    "V006",
+    "V007",
+    "V010",
+    "V011",
+    "V041",
+    "V042"
+  ],
+  "notes": "seed 1005. Honest shared office: TechLadd (958646) and E Giraffes Digital (615149) are real, unrelated tenants of WeWork Futura, Magarpatta Road, Pune; no shared phone, bank, tax id or staff link."
+}

@@ -1,0 +1,28 @@
+{
+  "name": "duplicate_billing",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [
+    {
+      "typology": "duplicate_billing",
+      "objects": [
+        "V003"
+      ],
+      "verdict": "Substantiated"
+    }
+  ],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V005",
+    "V006",
+    "V009",
+    "V011",
+    "V013"
+  ],
+  "notes": "seed 1003. V003 invoice SFL/52429 for 2,85,293.00 paid on 2025-05-01 and again on 2025-05-12; the vendor is real and otherwise clean."
+}

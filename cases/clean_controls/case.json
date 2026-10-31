@@ -1,0 +1,22 @@
+{
+  "name": "clean_controls",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V003",
+    "V005",
+    "V006",
+    "V007",
+    "V010",
+    "V011",
+    "V013"
+  ],
+  "notes": "seed 1004. Clean controls: every vendor is real or plainly unresolved, invoices follow normal patterns, and no staff member links to any vendor."
+}

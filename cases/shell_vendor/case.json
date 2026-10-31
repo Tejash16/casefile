@@ -1,0 +1,29 @@
+{
+  "name": "shell_vendor",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [
+    {
+      "typology": "shell_company",
+      "objects": [
+        "V023"
+      ],
+      "verdict": "Substantiated"
+    }
+  ],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V003",
+    "V005",
+    "V007",
+    "V009",
+    "V010",
+    "V012"
+  ],
+  "notes": "seed 1001. V023 Brindora Engineering Traders Pvt Ltd is fictional (Crustdata identify: no match). Address and phone equal S003's (spelled differently); created 2025-01-10 by anil.deshpande, who also posts and approves its 8 round invoices just under S003's 5,00,000 limit, half of them after 22:00."
+}

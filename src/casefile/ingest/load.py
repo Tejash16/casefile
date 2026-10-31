@@ -7,6 +7,7 @@ human sentence. Rows that cannot carry a date or an amount are dropped and named
 from __future__ import annotations
 
 import hashlib
+import re
 from collections import defaultdict
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -130,7 +131,8 @@ def classify_address(address: str | None) -> AddressType:
     if not address or not address.strip():
         return AddressType.unknown
     s = " " + " ".join(address.lower().replace(",", " ").split()) + " "
-    if any(m in s for m in _coworking_markers()):
+    compact = re.sub(r"[^a-z0-9]", "", s)  # "We Work" and "WeWork" alike
+    if any(re.sub(r"[^a-z0-9]", "", m) in compact for m in _coworking_markers()):
         return AddressType.coworking
     if any(f" {m} " in s or s.strip().startswith(m) for m in _PO_BOX):
         return AddressType.po_box

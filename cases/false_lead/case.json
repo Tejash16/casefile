@@ -1,0 +1,33 @@
+{
+  "name": "false_lead",
+  "inputs": {
+    "tip": "tip.txt",
+    "ledger": "ledger.csv",
+    "vendors": "vendors.csv",
+    "staff": "staff.csv"
+  },
+  "expected": [
+    {
+      "typology": "conflict_of_interest",
+      "subjects": [
+        "S005"
+      ],
+      "objects": [
+        "V031"
+      ],
+      "verdict": "Unfounded"
+    }
+  ],
+  "must_clear": [
+    "V001",
+    "V002",
+    "V003",
+    "V005",
+    "V006",
+    "V007",
+    "V011",
+    "V013",
+    "V031"
+  ],
+  "notes": "seed 1002. False lead: a namesake Kedar Sharma in Noida (Crustdata person 6677240) worked at HCLTech (company 1910) 2023-02 to 2025-03. Our S005 (person 420958731, resolved by LinkedIn URL) never did, approves nothing, and appears on no V031 row."
+}
