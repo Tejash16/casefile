@@ -39,24 +39,41 @@ def _assert_no_rows(obj: Any, path: str = "ledger_stats") -> None:
 
 
 def _per_vendor(ledger_stats: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    """Split per-vendor aggregates out of ledger_stats: ({vendor_id: stats}, remaining stats)."""
+    """Split per-vendor aggregates out of ledger_stats: ({vendor_id: stats}, remaining stats).
+
+    Accepts nested shapes under PER_VENDOR_KEYS and flat `<metric>_per_vendor: {vendor_id: value}`
+    maps (ingest.ledger_stats), merged into one dict per vendor keyed by metric name.
+    """
     rest = dict(ledger_stats)
-    for key in PER_VENDOR_KEYS:
-        if key in rest:
-            raw = rest.pop(key)
+    out: dict[str, dict[str, Any]] = {}
+    for key in list(rest):
+        raw = rest[key]
+        if key.endswith("_per_vendor") and isinstance(raw, dict):
+            metric = key.removesuffix("_per_vendor")
+            for vid, v in raw.items():
+                out.setdefault(str(vid), {})[metric] = v
+            rest.pop(key)
+        elif key in PER_VENDOR_KEYS:
             if isinstance(raw, dict):
-                return {
-                    str(k): v if isinstance(v, dict) else {"spend": v} for k, v in raw.items()
-                }, rest
-            if isinstance(raw, list):
-                out = {}
+                for vid, v in raw.items():
+                    out.setdefault(str(vid), {}).update(v if isinstance(v, dict) else {"spend": v})
+                rest.pop(key)
+            elif isinstance(raw, list):
                 for item in raw:
                     if isinstance(item, dict) and item.get("vendor_id"):
-                        out[str(item["vendor_id"])] = {
-                            k: v for k, v in item.items() if k != "vendor_id"
-                        }
-                return out, rest
-    return {}, rest
+                        out.setdefault(str(item["vendor_id"]), {}).update(
+                            {k: v for k, v in item.items() if k != "vendor_id"}
+                        )
+                rest.pop(key)
+    return out, rest
+
+
+def _first(agg: dict[str, Any], *keys: str) -> Any:
+    """Pop and return the first present key (so it is not repeated under its raw name)."""
+    for k in keys:
+        if k in agg:
+            return agg.pop(k)
+    return None
 
 
 def _jsonl(rows: Iterable[dict[str, Any]]) -> str:
@@ -97,18 +114,22 @@ def build_request(
     tip_text = tip.text if isinstance(tip, Tip) else str(tip)
     vendor_rows = []
     for v in vendors:
-        agg = per_vendor.get(v.vendor_id, {})
-        vendor_rows.append(
-            {
-                "id": v.vendor_id,
-                "name_norm": v.name_norm,
-                "created_on": v.created_on,
-                "address_type": v.address_type,
-                "city": v.city,
-                "spend_inr": agg.get("spend", agg.get("spend_inr", agg.get("total"))),
-                "invoice_count": agg.get("invoice_count", agg.get("count", agg.get("n"))),
-            }
-        )
+        agg = dict(per_vendor.get(v.vendor_id, {}))
+        row = {
+            "id": v.vendor_id,
+            "name_norm": v.name_norm,
+            "created_on": v.created_on,
+            "address_type": v.address_type,
+            "city": v.city,
+            "spend_inr": _first(agg, "spend", "spend_inr", "total"),
+            "invoice_count": _first(agg, "invoices", "invoice_count", "count", "n"),
+        }
+        row.update(agg)  # remaining per-vendor metrics, e.g. approvers, round_amount_share
+        vendor_rows.append(row)
+    known = {v.vendor_id for v in vendors}
+    unlinked = {k: v for k, v in per_vendor.items() if k not in known}
+    if unlinked:
+        stats["unlinked_vendor_keys"] = unlinked
     staff_rows = [
         {
             "id": s.staff_id,

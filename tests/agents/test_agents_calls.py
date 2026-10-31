@@ -67,6 +67,27 @@ def test_propose_reads_scalar_spend_per_vendor():
     assert '"spend_inr": "988000"' in user and "spend_per_vendor" not in user
 
 
+def test_propose_merges_ingest_per_vendor_maps():
+    stats = {
+        "row_count": 4,
+        "spend_per_vendor": {"V017": "988000", "orbital fastnrs": "5"},
+        "invoices_per_vendor": {"V017": 2},
+        "approvers_per_vendor": {"V017": ["S004"]},
+        "round_amount_share_per_vendor": {"V017": 0.5},
+    }
+    _, messages = propose.build_request(TIP, stats, VENDORS, STAFF)
+    user = messages[0]["content"]
+    line = next(x for x in user.splitlines() if '"id": "V017"' in x)
+    for frag in (
+        '"spend_inr": "988000"',
+        '"invoice_count": 2',
+        '"approvers": ["S004"]',
+        '"round_amount_share": 0.5',
+    ):
+        assert frag in line, frag
+    assert "invoices_per_vendor" not in user and "unlinked_vendor_keys" in user
+
+
 def test_propose_refuses_raw_rows():
     with pytest.raises(propose.LedgerRowsInPrompt):
         propose.build_request(TIP, {"sample": [{"row_id": "L1", "amount": 5}]}, VENDORS, STAFF)
