@@ -397,3 +397,19 @@ def test_t01_tenants_of_one_coworking_building_are_neutral():
         ("neutral", STRENGTH["t01_coworking"], ["V041", "V042"])
     ]
     assert "share a coworking address" in evs[0].summary
+
+
+def test_t13_tiny_company_with_website_is_only_a_lead():
+    """DocRack case: two people and a website is a real startup, not by itself a shell."""
+    cd = company(
+        "71095782",
+        "DocRack",
+        headcount_total=th("shell_headcount_max"),
+        primary_domain="docrack.ai",
+    )
+    v = vendor("V017", resolution=resolved(), crustdata=cd)
+    evs = t13_existence.run(ctx_for(_book("V017"), [v]))
+    assert [(e.direction, e.strength) for e in evs] == [
+        ("supports", STRENGTH["t13_tiny_with_website"])
+    ]
+    assert "website docrack.ai" in evs[0].summary

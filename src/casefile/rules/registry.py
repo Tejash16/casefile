@@ -50,7 +50,6 @@ NAV, DUP, THRESH, GHOST = (
     "threshold_structuring",
     "ghost_vendor",
 )
-ALL = (SHELL, PASS, COI, KICK, NAV, DUP, THRESH, GHOST)
 
 _TESTS = [
     Test(
@@ -119,11 +118,12 @@ _TESTS = [
         "T15",
         "career_overlap",
         ("identity",),
-        (COI, PASS, KICK),
+        (COI, PASS),  # not kickback: a career link is the interest itself, not a bribe
         t15_career_overlap.run,
         refutes=(COI,),
     ),
-    Test("T16", "graph_path", ("graph",), ALL, t16_graph_path.run),
+    # a staff-vendor relationship bears on the typologies defined by one (docs/typologies.md)
+    Test("T16", "graph_path", ("graph",), (SHELL, PASS, COI), t16_graph_path.run),
     Test("T17", "founders_match", ("identity",), (SHELL, PASS, COI), t17_founders.run),
 ]
 

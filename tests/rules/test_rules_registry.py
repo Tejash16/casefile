@@ -25,20 +25,32 @@ def test_all_seventeen_tests_registered_with_families_and_typologies():
         assert set(t.refutes) <= set(t.typologies) or t.id == "T13"
 
 
+#  Menu pairings deliberately not registered: a career link is the interest itself (conflict of
+#  interest), not evidence that the vendor paid the approver; kickback rests on billing anomalies.
+NOT_SUPPORTING = {("T15", "kickback")}
+
+
 def test_registry_covers_the_typology_menu():
     """The proposer picks tests from docs/typologies.md and the pipeline drops supporting evidence
-    whose test does not list the hypothesis's typology, so every menu pairing must be registered."""
+    whose test does not list the hypothesis's typology, so every menu pairing must be registered
+    (bar the documented exceptions) and T16 bears only on the menu's relationship typologies."""
     import re
     from pathlib import Path
 
     menu = Path(__file__).resolve().parents[2] / "docs" / "typologies.md"
+    t16: set[str] = set()
     for line in menu.read_text("utf-8").splitlines():
         if not line.startswith("| `"):
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         typ = cells[0].strip("`")
         for tid in re.findall(r"T\d\d", cells[5]):
-            assert typ in TESTS[tid].typologies, f"{tid} must list {typ}"
+            if (tid, typ) not in NOT_SUPPORTING:
+                assert typ in TESTS[tid].typologies, f"{tid} must list {typ}"
+            if tid == "T16":
+                t16.add(typ)
+    assert set(TESTS["T16"].typologies) == t16
+    assert "kickback" not in TESTS["T15"].typologies
 
 
 def test_t16_leaves_hypothesis_pairs_to_the_pipeline():
