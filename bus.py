@@ -45,15 +45,25 @@ def git(*args: str, data: bytes | None = None, env: dict | None = None) -> bytes
 
 
 def fetch(me: str) -> str | None:
-    """Fetch the bus branch into a private ref (no lock contention between worktrees)."""
+    """Fetch the bus branch into a private ref (no lock contention between worktrees).
+
+    `--refmap=` (empty) stops git from also updating refs/remotes/origin/<branch>: every
+    session on a laptop shares that ref, and concurrent fetches raced on its lock ("cannot
+    lock ref"). A lock error that still happens (e.g. two commands of one session at once)
+    is retried.
+    """
     ref = f"refs/bus/{me}"
-    r = run("fetch", "-q", "origin", f"+refs/heads/{BRANCH}:{ref}")
-    if r.returncode == 0:
-        return ref
-    err = r.stderr.decode(errors="replace")
-    if "couldn't find remote ref" in err:
-        return None
-    raise RuntimeError(f"fetch: {err.strip()}")
+    for attempt in range(5):
+        r = run("fetch", "-q", "--refmap=", "origin", f"+refs/heads/{BRANCH}:{ref}")
+        if r.returncode == 0:
+            return ref
+        err = r.stderr.decode(errors="replace")
+        if "couldn't find remote ref" in err:
+            return None
+        if "cannot lock ref" not in err or attempt == 4:
+            raise RuntimeError(f"fetch: {err.strip()}")
+        time.sleep(0.5 + attempt + random.random())
+    return None
 
 
 def read(ref: str | None, path: str) -> bytes:
@@ -132,7 +142,12 @@ def cmd_send(a: argparse.Namespace) -> int:
     }
     line = (json.dumps(msg, ensure_ascii=False) + "\n").encode("utf-8")
     for attempt in range(8):
-        ref = fetch(a.me)
+        try:  # own private ref, so a send never races this session's watcher on refs/bus/<me>
+            ref = fetch(f"{a.me}-send")
+        except RuntimeError as e:  # nothing pushed yet, so a retry cannot duplicate
+            print(f"retrying after: {e}", file=sys.stderr)
+            time.sleep(1 + attempt + random.random())
+            continue
         files = {}
         for t in targets:
             cur = read(ref, f"inbox/{t}.jsonl")
@@ -146,7 +161,7 @@ def cmd_send(a: argparse.Namespace) -> int:
 
 def cmd_inbox(a: argparse.Namespace) -> int:
     seen = load_seen(a.me)
-    msgs = messages(fetch(a.me), a.me)
+    msgs = messages(fetch(f"{a.me}-inbox"), a.me)
     shown = msgs if a.all else [m for m in msgs if m["id"] not in seen]
     if not shown:
         print("no new messages")
