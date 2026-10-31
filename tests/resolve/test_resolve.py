@@ -404,3 +404,51 @@ def test_vendor_people_founders_first_deduplicated() -> None:
     assert [p.name for p in vendor_people(v)] == ["Anil Deshpande", "X Y"]
     assert [p.name for p in vendor_people(v, include_decision_makers=False)] == ["Anil Deshpande"]
     assert vendor_people(vendor("V2", "Ghost")) == []
+
+
+# ---------------------------------------------------------------- review regressions
+
+
+def test_enrich_failure_downgrades_resolved_vendor() -> None:
+    c = FakeClient(
+        by_domain={"tatasteel.com": [cand("5042", "Tata Steel", 1.0, "tatasteel.com")]},
+        fail={"enrich"},
+    )
+    v = resolve_vendors([vendor("V1", "Tata Steel", "tatasteel.com")], c)[0]
+    assert v.resolution.status == "unresolved" and v.crustdata is None
+
+
+def test_enrich_failure_downgrades_resolved_staff() -> None:
+    url = "https://www.linkedin.com/in/rohan"
+    c = FakeClient(
+        search={("Rohan Joshi", "Halvexa"): [pc("Rohan Joshi", url)]}, fail={"enrich_persons"}
+    )
+    s = resolve_staff([staff("S4", "Rohan Joshi", "rohan@halvexa.example")], c)[0]
+    assert s.resolution.status == "unresolved" and s.crustdata is None
+
+
+def test_lone_leader_with_a_looser_name_goes_to_the_judge() -> None:
+    c = FakeClient(by_name={("Acme", True): [cand("1", "Acme Global Holdings", 1.0)]})
+    judge = judge_says("no")
+    v = resolve_vendors([vendor("V1", "Acme")], c, judge=judge)[0]
+    assert v.resolution.status == "unresolved" and len(judge.calls) == 1
+
+
+def test_name_match_in_another_country_is_ambiguous(monkeypatch) -> None:
+    c = FakeClient(by_name={("Acme Tools", True): [cand("1", "Acme Tools", 1.0)]})
+    real_enrich = c.enrich_companies
+
+    def enrich_abroad(ids, fields=None):
+        return [f.model_copy(update={"hq_country": "USA"}) for f in real_enrich(ids)]
+
+    monkeypatch.setattr(c, "enrich_companies", enrich_abroad)
+    v = vendor("V1", "Acme Tools").model_copy(update={"country": "India"})
+    out = resolve_vendors([v], c)[0]
+    assert out.resolution.status == "ambiguous" and out.crustdata is None
+
+
+def test_judge_index_out_of_range_is_not_a_match() -> None:
+    tie = [cand("1", "Acme", 1.0), cand("2", "Acme", 1.0)]
+    c = FakeClient(by_name={("Acme", True): tie})
+    v = resolve_vendors([vendor("V1", "Acme")], c, judge=judge_says("yes", 7))[0]
+    assert v.resolution.status == "ambiguous"

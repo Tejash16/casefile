@@ -14,6 +14,7 @@ from casefile.crustdata.client import (
     COMPANY_FIELDS,
     CreditsExhausted,
     CrustdataClient,
+    CrustdataError,
     OfflineMiss,
     PermissionDenied,
     RateLimited,
@@ -421,3 +422,89 @@ def test_person_updated_at_never_empty_and_fetch_time_fallback_is_noted(tmp_path
     assert p.updated_at and p.updated_at.endswith("Z")
     assert p.citation == f"crustdata:person:5@{p.updated_at}"
     assert any("person record 5 has no updated_at" in n and "p-9" in n for n in client.notes)
+
+
+# ---------------------------------------------------------------- review regressions
+
+
+def test_non_crustdata_failure_still_posts_and_is_typed(tmp_path: Path) -> None:
+    def broken(_: httpx.Request) -> httpx.Response:
+        raise httpx.DecodingError("bad gzip")
+
+    log = AuditLog(tmp_path / "log.jsonl")
+    client, _ = make(tmp_path, Fake({"/company/identify": broken}), audit=log)
+    with pytest.raises(CrustdataError):
+        client.identify_companies(["Acme"])
+    recs = records(log)
+    assert [r["record_phase"] for r in recs] == ["pre_execution", "post_execution"]
+    assert "DecodingError" in recs[1]["outcome"]["error"]
+
+
+def test_attempts_are_logged_when_retries_run_out(tmp_path: Path) -> None:
+    log = AuditLog(tmp_path / "log.jsonl")
+    fake = Fake({"/company/identify": lambda r: httpx.Response(503)})
+    client, _ = make(tmp_path, fake, audit=log)
+    with pytest.raises(CrustdataError):
+        client.identify_companies(["Acme"])
+    assert records(log)[-1]["outcome"]["attempts"] == 5
+
+
+def test_corrupt_cache_entry_is_a_miss(tmp_path: Path) -> None:
+    body = {"names": ["Acme"], "exact_match": True}
+    (tmp_path / "cache").mkdir()
+    (tmp_path / "cache" / f"{cache_key('POST', '/company/identify', body)}.json").write_text("{")
+    fake = Fake({"/company/identify": ok([_identify_row("Acme")])})
+    client, _ = make(tmp_path, fake)
+    assert not client.identify_companies(["Acme"])[0].cache_hit
+    assert len(fake.requests) == 1
+
+
+def test_locked_cache_file_does_not_lose_the_response(tmp_path: Path, monkeypatch) -> None:
+    def locked(*_: object) -> None:
+        raise PermissionError("WinError 32")
+
+    monkeypatch.setattr("casefile.crustdata.client.os.replace", locked)
+    monkeypatch.setattr("casefile.crustdata.client.time.sleep", lambda s: None)
+    client, _ = make(tmp_path, Fake({"/company/identify": ok([_identify_row("Acme")])}))
+    assert client.identify_companies(["Acme"])[0].query == "Acme"
+    assert any("cache write failed" in n for n in client.notes)
+    assert not list((tmp_path / "cache").glob("*.tmp"))
+
+
+def _enrich_echo(req: httpx.Request) -> httpx.Response:
+    ids = json.loads(req.content)["crustdata_company_ids"]
+    rows = [
+        {
+            "matched_on": str(i),
+            "matches": [
+                {"company_data": {"crustdata_company_id": i, "basic_info": {"name": f"C{i}"}}}
+            ],
+        }
+        for i in ids
+    ]
+    return ok(rows, credits=str(2 * len(ids)), rid=f"batch-{len(ids)}")
+
+
+def test_batch_is_split_so_a_different_set_replays_offline(tmp_path: Path) -> None:
+    fake = Fake({"/company/enrich": _enrich_echo})
+    client, _ = make(tmp_path, fake)
+    first = client.enrich_companies(["1", "2", "3"])
+    assert {f.crustdata_company_id for f in first} == {"1", "2", "3"}
+    offline, _ = make(tmp_path, Fake({}), offline=True)
+    facts = offline.enrich_companies(["1", "3"])  # a different set than run 1
+    assert {f.crustdata_company_id for f in facts} == {"1", "3"}
+    assert all(f.cache_hit and f.source_request_id == "batch-3" for f in facts)
+    # live: only the ids not cached individually are fetched (and paid for)
+    client.enrich_companies(["2", "4"])
+    assert fake.bodies("/company/enrich")[-1]["crustdata_company_ids"] == [4]
+
+
+def test_person_enrich_never_attaches_a_row_by_position(tmp_path: Path) -> None:
+    row = {
+        "matched_on": "https://www.linkedin.com/in/someone-else",
+        "match_status": "matched",
+        "matches": [{"person_data": {"crustdata_person_id": 9, "basic_profile": {"name": "Z"}}}],
+    }
+    client, _ = make(tmp_path, Fake({"/person/enrich": ok([row])}))
+    url = "https://www.linkedin.com/in/ours"
+    assert client.enrich_persons_status([url]) == {url: None}

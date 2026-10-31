@@ -103,7 +103,7 @@ def _judge(
         return
     if verdict.log_record_id:
         d.log_record_id = verdict.log_record_id
-    if verdict.decision == MatchVerdict.yes and verdict.index is not None:
+    if verdict.decision == MatchVerdict.yes and verdict.index in range(len(shortlist)):
         d.status, d.method = ResolutionStatus.resolved, ResolutionMethod.llm_judge
         d.profile_url = shortlist[verdict.index].profile_url
         d.confidence = SEARCH_ACCEPT_CONFIDENCE
@@ -135,11 +135,14 @@ def resolve_staff(
             say(f"person enrich by URL failed: {e}")
             status = None
         for sid, url in by_url.items():
-            if status is None:
+            d = ds[sid]
+            done.add(sid)  # the row names its profile; never fall back to a name search
+            if status is None or url not in status:
+                d.status = ResolutionStatus.not_attempted
+                d.notes.append(f"{url}: enrich call failed")
                 continue
-            d, facts = ds[sid], status.get(url)
+            facts = status[url]
             d.considered, d.profile_url = 1, url
-            done.add(sid)
             if facts is None:
                 d.notes.append(f"{url}: not_found or redacted")
                 continue
@@ -166,7 +169,8 @@ def resolve_staff(
                     ResolutionStatus.resolved,
                     ResolutionMethod.person_identify_email,
                 )
-                d.confidence = hits[0].score if hits[0].score is not None else 1.0
+                score = hits[0].score if hits[0].score is not None else 1.0
+                d.confidence = max(0.0, min(1.0, float(score)))
                 d.profile_url, d.considered = hits[0].profile_url, 1
                 d.log_record_id = client.record_id_for(hits[0].request_id)
                 done.add(sid)
@@ -217,9 +221,10 @@ def resolve_staff(
     for d in ds.values():
         if d.facts is None and d.profile_url in enriched:
             d.facts = enriched[d.profile_url]
-            if d.facts is None:
-                d.status = ResolutionStatus.unresolved
-                d.notes.append("profile not_found or redacted on enrich")
+        if d.status == ResolutionStatus.resolved and d.facts is None:
+            # an identity without facts cannot carry a finding: the gate must see a gap
+            d.status = ResolutionStatus.unresolved
+            d.notes.append("profile not enriched (not_found, redacted or call failed)")
 
     out = []
     for s in staff:

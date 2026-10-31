@@ -119,6 +119,40 @@ def domain_stem_matches(query: str, domain: str | None) -> bool:
     )
 
 
+_COUNTRY = {
+    "india": "IND",
+    "in": "IND",
+    "ind": "IND",
+    "united kingdom": "GBR",
+    "uk": "GBR",
+    "gb": "GBR",
+    "gbr": "GBR",
+    "england": "GBR",
+    "great britain": "GBR",
+    "united states": "USA",
+    "united states of america": "USA",
+    "us": "USA",
+    "usa": "USA",
+    "canada": "CAN",
+    "ca": "CAN",
+    "can": "CAN",
+    "germany": "DEU",
+    "deu": "DEU",
+    "singapore": "SGP",
+    "sgp": "SGP",
+    "united arab emirates": "ARE",
+    "uae": "ARE",
+    "are": "ARE",
+}
+
+
+def same_country(a: str | None, b: str | None) -> bool:
+    """False only when both countries are known and differ ('India' vs 'IND' is the same)."""
+    ca = _COUNTRY.get((a or "").strip().lower())
+    cb = _COUNTRY.get((b or "").strip().lower())
+    return ca is None or cb is None or ca == cb
+
+
 def say(msg: str) -> None:
     print(f"[resolve] {msg}", file=sys.stderr)
 

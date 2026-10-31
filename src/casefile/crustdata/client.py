@@ -22,6 +22,7 @@ import os
 import random
 import threading
 import time
+import uuid
 from collections import deque
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -184,7 +185,7 @@ class RateLimiter:
 
     def acquire(self, path: str) -> float:
         """Block until `path` may be called; returns seconds waited."""
-        rpm = self.limits.get(path, DEFAULT_RPM)
+        rpm = self._rpm(path)
         waited = 0.0
         while True:
             with self._lock:
@@ -203,9 +204,14 @@ class RateLimiter:
         """After a 429, treat the window as full for `seconds` (server knows best)."""
         with self._lock:
             now = self.clock()
-            rpm = self.limits.get(path, DEFAULT_RPM)
             start = now + seconds - self.window
-            self._sent[path] = deque([start] * rpm)
+            self._sent[path] = deque([start] * self._rpm(path))
+
+    def _rpm(self, path: str) -> int:
+        try:
+            return max(1, int(self.limits.get(path) or DEFAULT_RPM))
+        except (TypeError, ValueError):
+            return DEFAULT_RPM
 
 
 # ---------------------------------------------------------------- response
@@ -343,19 +349,42 @@ class CrustdataClient:
         return self.cache_dir / f"{key}.json"
 
     def _read_cache(self, key: str) -> dict[str, Any] | None:
+        """A well-formed cache entry, or None (a corrupt file counts as a miss)."""
         p = self._cache_path(key)
         if not p.exists():
             return None
         try:
-            return json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
+            entry = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
             return None
+        ok = (
+            isinstance(entry, dict)
+            and isinstance(entry.get("status"), int)
+            and isinstance(entry.get("headers"), dict)
+            and "body" in entry
+            and isinstance(entry.get("fetched_at"), str)
+        )
+        return entry if ok else None
 
-    def _write_cache(self, key: str, entry: dict[str, Any]) -> None:
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        tmp = self._cache_path(key).with_suffix(".tmp")
-        tmp.write_text(json.dumps(entry, ensure_ascii=False), encoding="utf-8")
-        os.replace(tmp, self._cache_path(key))
+    def _write_cache(self, key: str, entry: dict[str, Any]) -> bool:
+        """Atomic write; never raises (OneDrive or antivirus can hold the file on Windows)."""
+        tmp = self._cache_path(key).with_suffix(f".{uuid.uuid4().hex[:8]}.tmp")
+        try:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            tmp.write_text(json.dumps(entry, ensure_ascii=False), encoding="utf-8")
+            for i in range(5):
+                try:
+                    os.replace(tmp, self._cache_path(key))
+                    return True
+                except PermissionError:
+                    time.sleep(0.1 * (i + 1))
+        except OSError:
+            pass
+        tmp.unlink(missing_ok=True)
+        self.notes.append(
+            f"cache write failed for {key[:12]}; this response will not replay offline"
+        )
+        return False
 
     def _send(self, method: str, path: str, body: Any) -> httpx.Response:
         self.limiter.acquire(path.split("?")[0])
@@ -366,6 +395,8 @@ class CrustdataClient:
                 r = self.http.request(method, path, json=body)
         except httpx.TransportError as e:
             raise TransientError(f"{method} {path}: {type(e).__name__}: {e}") from e
+        except httpx.HTTPError as e:
+            raise CrustdataError(f"{method} {path}: {type(e).__name__}: {e}") from e
         rid = r.headers.get("x-request-id")
         if r.status_code == 429:
             after = _retry_after(r.headers)
@@ -376,8 +407,8 @@ class CrustdataClient:
             raise TransientError(f"{method} {path}: {r.status_code}", r.status_code, rid)
         return r
 
-    def _fetch(self, method: str, path: str, body: Any) -> tuple[httpx.Response, int]:
-        attempts = 0
+    def _fetch(self, method: str, path: str, body: Any, attempts: list[int]) -> httpx.Response:
+        """Send with retries; `attempts[0]` counts tries even when the last one raises."""
         for attempt in Retrying(
             stop=stop_after_attempt(MAX_TRIES),
             wait=_wait,
@@ -386,8 +417,8 @@ class CrustdataClient:
             reraise=True,
         ):
             with attempt:
-                attempts += 1
-                return self._send(method, path, body), attempts
+                attempts[0] += 1
+                return self._send(method, path, body)
         raise AssertionError("unreachable")  # pragma: no cover
 
     @staticmethod
@@ -419,12 +450,12 @@ class CrustdataClient:
                 "offline": self.offline,
             },
         )
-        attempts = 0
+        attempts = [0]
         try:
             if entry is None:
                 if self.offline:
                     raise OfflineMiss(f"offline and not cached: {method} {path} ({key[:12]})")
-                r, attempts = self._fetch(method, path, body)
+                r = self._fetch(method, path, body, attempts)
                 try:
                     parsed: Any = r.json()
                 except ValueError:
@@ -442,25 +473,31 @@ class CrustdataClient:
                 }
                 if cache and (r.status_code < 300 or r.status_code in (400, 403, 404)):
                     self._write_cache(key, entry)
-            entry["headers"] = {k.lower(): v for k, v in entry["headers"].items()}
+            entry["headers"] = {str(k).lower(): v for k, v in entry["headers"].items()}
             self._raise_for(entry, method, path)
-        except CrustdataError as e:
+            try:
+                credits = float(entry["headers"].get("x-credits-used") or 0)
+            except (TypeError, ValueError):
+                credits = 0.0
+            request_id = entry["headers"].get("x-request-id")
+            result_sha = hash_json(entry["body"])
+        except Exception as e:  # noqa: BLE001 - every pre gets its post; callers see CrustdataError
+            err = e if isinstance(e, CrustdataError) else CrustdataError(f"{type(e).__name__}: {e}")
             self.audit.post(
                 rid,
                 {
                     "status": "error",
-                    "http_status": e.status,
-                    "request_id": e.request_id,
+                    "http_status": err.status,
+                    "request_id": err.request_id,
                     "error": f"{type(e).__name__}: {e}",
                     "credits_used": 0,
-                    "attempts": attempts,
+                    "attempts": attempts[0],
                 },
             )
-            raise
+            if err is e:
+                raise
+            raise err from e
 
-        credits = float(entry["headers"].get("x-credits-used") or 0)
-        request_id = entry["headers"].get("x-request-id")
-        result_sha = hash_json(entry["body"])
         self.calls += 1
         self.cache_hits += hit
         spent = 0.0 if hit else credits
@@ -475,7 +512,7 @@ class CrustdataClient:
                 "credits_billed_originally": credits,
                 "request_id": request_id,
                 "fetched_at": entry["fetched_at"],
-                "attempts": attempts,
+                "attempts": attempts[0],
             },
         )
         if request_id:
@@ -520,8 +557,9 @@ class CrustdataClient:
                 "disabled_fields": fields.get("disabled", []),
             }
             self.scope[path] = out[path]
-            if out[path]["rpm"]:
-                self.limiter.limits[path] = int(out[path]["rpm"])
+            rpm = out[path]["rpm"]
+            if isinstance(rpm, (int, float)) and rpm >= 1:
+                self.limiter.limits[path] = int(rpm)
         return out
 
     def enabled(self, path: str) -> bool:
@@ -556,18 +594,83 @@ class CrustdataClient:
     ) -> list[CompanyFacts]:
         """POST /company/enrich by crustdata_company_ids only (2 credits per match), 25 per call."""
         uniq = list(dict.fromkeys(str(i) for i in ids if i))
+        wire = [int(i) if i.isdigit() else i for i in uniq]
+
+        def same(item: Any, row: dict[str, Any]) -> bool:
+            if str(row.get("matched_on")) == str(item):
+                return True
+            return any(
+                str((m.get("company_data") or {}).get("crustdata_company_id")) == str(item)
+                for m in row.get("matches") or []
+            )
+
         out: list[CompanyFacts] = []
-        for chunk in _chunks(uniq):
-            body = {
-                "crustdata_company_ids": [int(i) if i.isdigit() else i for i in chunk],
-                "fields": fields or COMPANY_FIELDS,
-            }
-            r = self._call("POST", "/company/enrich", body)
-            for row in r.body if isinstance(r.body, list) else []:
-                for m in row.get("matches") or []:
-                    cd = m.get("company_data") or {}
-                    if cd.get("crustdata_company_id") is not None:
-                        out.append(self._noted(_company_facts(cd, r), r))
+        extra = {"fields": fields or COMPANY_FIELDS}
+        for _, row, r in self._batched(
+            "/company/enrich", "crustdata_company_ids", wire, extra, same
+        ):
+            for m in row.get("matches") or []:
+                cd = m.get("company_data") or {}
+                if cd.get("crustdata_company_id") is not None:
+                    out.append(self._noted(_company_facts(cd, r), r))
+                    break
+        return out
+
+    def _batched(
+        self,
+        path: str,
+        key: str,
+        items: list[Any],
+        extra: dict[str, Any],
+        same: Callable[[Any, dict[str, Any]], bool],
+    ) -> list[tuple[Any, dict[str, Any], Response]]:
+        """Batched POST with one cache entry per item: (item, its response row, response).
+
+        Items cached on their own are answered from the cache; the rest go out 25 at a time and
+        each batch response is split into single-item entries, so a later run that asks for a
+        different set (one judge verdict changed) still replays offline. Items whose batch
+        failed are left out; the first error is raised only if nothing succeeded.
+        """
+        out: list[tuple[Any, dict[str, Any], Response]] = []
+        missing: list[Any] = []
+        for item in items:
+            single = {key: [item], **extra}
+            if self._read_cache(cache_key("POST", path, single)) is not None:
+                r = self._call("POST", path, single)
+                rows = r.body if isinstance(r.body, list) else []
+                out.append((item, rows[0] if rows and isinstance(rows[0], dict) else {}, r))
+            else:
+                missing.append(item)
+        error: CrustdataError | None = None
+        for chunk in _chunks(missing):
+            body = {key: chunk, **extra}
+            try:
+                r = self._call("POST", path, body)
+            except CrustdataError as e:
+                error = error or e
+                continue
+            rows = [x for x in (r.body if isinstance(r.body, list) else []) if isinstance(x, dict)]
+            for item in chunk:
+                row = next((x for x in rows if same(item, x)), {})
+                out.append((item, row, r))
+                if len(chunk) > 1 and r.status < 300:
+                    single = {key: [item], **extra}
+                    self._write_cache(
+                        cache_key("POST", path, single),
+                        {
+                            "request": {"method": "POST", "path": path, "body": single},
+                            "status": r.status,
+                            "headers": {
+                                "x-request-id": r.request_id or "",
+                                "x-credits-used": "0",
+                                "x-split-from": cache_key("POST", path, body),
+                            },
+                            "body": [row] if row else [],
+                            "fetched_at": r.fetched_at,
+                        },
+                    )
+        if error is not None and not out:
+            raise error
         return out
 
     # ------------------------------------------------------------ people
@@ -609,20 +712,20 @@ class CrustdataClient:
     def enrich_persons_status(self, profile_urls: list[str]) -> dict[str, PersonFacts | None]:
         """Input URL -> PersonFacts, or None when not_found / redacted / no match."""
         uniq = list(dict.fromkeys(u for u in profile_urls if u))
+
+        def same(url: Any, row: dict[str, Any]) -> bool:  # no positional fallback, by design
+            return norm_profile_url(row.get("matched_on")) == norm_profile_url(url)
+
         out: dict[str, PersonFacts | None] = {}
-        for chunk in _chunks(uniq):
-            body = {"professional_network_profile_urls": chunk, "fields": PERSON_FIELDS}
-            r = self._call("POST", "/person/enrich", body)
-            rows = r.body if isinstance(r.body, list) else []
-            by_input = {norm_profile_url(row.get("matched_on")): row for row in rows}
-            for i, url in enumerate(chunk):
-                row = by_input.get(norm_profile_url(url)) or (rows[i] if i < len(rows) else {})
-                matches = row.get("matches") or []
-                if row.get("match_status", "matched") != "matched" or not matches:
-                    out[url] = None
-                    continue
-                facts = _person_facts(matches[0].get("person_data") or {}, url, r)
-                out[url] = self._noted(facts, r)
+        extra = {"fields": PERSON_FIELDS}
+        key = "professional_network_profile_urls"
+        for url, row, r in self._batched("/person/enrich", key, uniq, extra, same):
+            matches = row.get("matches") or []
+            if row.get("match_status", "matched") != "matched" or not matches:
+                out[url] = None
+                continue
+            facts = _person_facts(matches[0].get("person_data") or {}, url, r)
+            out[url] = self._noted(facts, r)
         return out
 
     def identify_persons(self, emails: list[str]) -> list[PersonCandidate]:

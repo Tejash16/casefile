@@ -34,6 +34,7 @@ from casefile.resolve._common import (
     norm,
     plausible,
     safe_judge,
+    same_country,
     say,
     strip_suffixes,
     threshold,
@@ -129,8 +130,10 @@ def decide(
         return d
 
     if top >= threshold("identify_accept"):
-        if len(leaders) == 1:
-            return accept(leaders[0], method, "single leader above accept threshold")
+        # a lone leader is accepted only under the vendor's exact (suffix-free) name; anything
+        # looser is a name-only guess and goes to the judge. Country is checked after enrich.
+        if len(leaders) == 1 and norm(leaders[0].get("name")) == norm(query):
+            return accept(leaders[0], method, "only company with this exact name")
         stems = [c for c in leaders if domain_stem_matches(query, c.get("primary_domain"))]
         if len(stems) == 1:
             return accept(stems[0], method, f"tie broken by domain {stems[0]['primary_domain']}")
@@ -147,7 +150,7 @@ def decide(
         return d
     if verdict.log_record_id:
         d.log_record_id = verdict.log_record_id
-    if verdict.decision == MatchVerdict.yes and verdict.index is not None:
+    if verdict.decision == MatchVerdict.yes and verdict.index in range(len(shortlist)):
         return accept(shortlist[verdict.index], ResolutionMethod.llm_judge, verdict.reason)
     d.status = (
         ResolutionStatus.unresolved
@@ -280,6 +283,17 @@ def resolve_vendors(
             out.append(v.model_copy(update={"resolution": res, "crustdata": None}))
             continue
         fact = facts.get(d.company_id) if d.company_id else None
+        if d.status == ResolutionStatus.resolved and fact is None:
+            # an identity without facts cannot carry a finding: the gate must see a gap
+            d.status, d.method, d.company_id = ResolutionStatus.unresolved, None, None
+            d.notes.append("enrich returned no record")
+        elif (
+            fact is not None
+            and d.method != ResolutionMethod.domain
+            and not same_country(v.country, fact.hq_country)
+        ):
+            d.status, d.method, d.company_id, fact = ResolutionStatus.ambiguous, None, None, None
+            d.notes.append(f"name matched but HQ country differs from {v.country!r}")
         out.append(v.model_copy(update={"resolution": d.resolution(), "crustdata": fact}))
 
     n_res = sum(v.resolution.status == ResolutionStatus.resolved for v in out)
