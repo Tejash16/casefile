@@ -1,0 +1,3 @@
+# Keep case bytes exact (BOM, CRLF in ledger.csv are deliberate messiness)
+*.csv -text
+*.txt -text
