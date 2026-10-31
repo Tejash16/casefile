@@ -600,9 +600,9 @@ class CrustdataClient:
             body = {"professional_network_profile_urls": chunk, "fields": PERSON_FIELDS}
             r = self._call("POST", "/person/enrich", body)
             rows = r.body if isinstance(r.body, list) else []
-            by_input = {row.get("matched_on"): row for row in rows}
+            by_input = {norm_profile_url(row.get("matched_on")): row for row in rows}
             for i, url in enumerate(chunk):
-                row = by_input.get(url) or (rows[i] if i < len(rows) else {})
+                row = by_input.get(norm_profile_url(url)) or (rows[i] if i < len(rows) else {})
                 matches = row.get("matches") or []
                 if row.get("match_status", "matched") != "matched" or not matches:
                     out[url] = None
@@ -652,6 +652,14 @@ def _decimal(v: Any) -> Decimal | None:
         return Decimal(str(v))
     except InvalidOperation:
         return None
+
+
+def norm_profile_url(url: str | None) -> str:
+    """'http://LinkedIn.com/in/kedar-sharma/' -> 'linkedin.com/in/kedar-sharma' (echoes vary)."""
+    u = (url or "").strip().lower().split("?")[0].rstrip("/")
+    for prefix in ("https://", "http://", "www."):
+        u = u.removeprefix(prefix)
+    return u
 
 
 def _profile_url(p: dict[str, Any]) -> str | None:
