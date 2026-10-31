@@ -358,7 +358,6 @@ STRENGTH: dict[str, float] = {
     "t02_coworking": 0.1,  # neutral note
     # T03 vendor age
     "t03_new": 0.6,
-    "t03_both": 0.7,
     "t03_paid_before_founded": 0.7,
     # T04 duplicates
     "t04_same_invoice_no": 0.9,

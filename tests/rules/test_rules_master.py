@@ -127,6 +127,38 @@ def test_t03_founded_after_first_payment():
     assert cd.citation in evs[0].source.refs
 
 
+def _docrack(first_invoice: date, created_on: date = date(2024, 1, 20)):
+    """V017 DocRack: Crustdata gives year_founded 2026 only (no month or day)."""
+    cd = company("71095782", "DocRack", year_founded=2026)
+    v = vendor("V017", created_on=created_on, resolution=resolved(), crustdata=cd)
+    b = Book()
+    b.add("V017", first_invoice, 214000, approver_id="S004")
+    return t03_vendor_age.run(ctx_for(b, [v])), cd
+
+
+def test_t03_year_only_founding_does_not_support_an_invoice_in_that_year():
+    """Founded 2026, first invoice 2026-03: a year cannot place the founding within days."""
+    evs, _ = _docrack(date(2026, 3, 9))
+    assert evs == []
+
+
+def test_t03_year_only_founding_supports_an_invoice_before_that_year():
+    """Founded 2026, first invoice 2025-06: paid before 1 January of the founding year."""
+    evs, cd = _docrack(date(2025, 6, 9))
+    assert [(e.direction, e.strength) for e in evs] == [
+        ("supports", STRENGTH["t03_paid_before_founded"])
+    ]
+    assert f"{cd.citation} year_founded 2026" in evs[0].quote
+    assert cd.citation in evs[0].source.refs
+
+
+def test_t03_created_on_keeps_its_day_level_rule_inside_the_founding_year():
+    evs, cd = _docrack(date(2026, 3, 9), created_on=date(2026, 2, 17))
+    assert [e.strength for e in evs] == [STRENGTH["t03_new"]]
+    assert "created 20 days before" in evs[0].summary
+    assert cd.citation not in evs[0].source.refs  # the year played no part
+
+
 def test_t03_old_vendor_has_no_evidence():
     v = vendor("V001", created_on=date(2019, 4, 1))
     assert t03_vendor_age.run(ctx_for(_book("V001"), [v])) == []

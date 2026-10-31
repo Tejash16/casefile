@@ -1,9 +1,11 @@
-"""T03 vendor_age_vs_first_payment: vendor master `created_on`, or Crustdata `year_founded`,
-within `new_vendor_days` of the first invoice; or founded after it was first paid."""
+"""T03 vendor_age_vs_first_payment:
+
+- vendor master `created_on` (a day) within `new_vendor_days` before the first invoice;
+- Crustdata `year_founded` (a year only) after the first invoice's year, i.e. the vendor was paid
+  before 1 January of the year it was founded. A year cannot place a founding within days of an
+  invoice, so a first invoice inside the founding year is not a signal."""
 
 from __future__ import annotations
-
-from datetime import date
 
 from casefile.rules import evidence as ev
 from casefile.rules.config import STRENGTH
@@ -34,20 +36,15 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
                 reasons.append(f"was created {age} days before its first invoice")
                 strength = STRENGTH["t03_new"]
         cd = v.crustdata
-        if cd is not None and cd.year_founded:
-            max_age = (first.date - date(cd.year_founded, 1, 1)).days
-            if cd.year_founded > first.date.year:
-                parts.append(f"{cd.citation} year_founded {cd.year_founded}")
-                reasons.append(f"was founded in {cd.year_founded}, after its first invoice")
-                strength = max(strength, STRENGTH["t03_paid_before_founded"])
-            elif max_age <= new_days:
-                parts.append(f"{cd.citation} year_founded {cd.year_founded}")
-                reasons.append(f"was founded at most {max_age} days before its first invoice")
-                strength = STRENGTH["t03_both"] if strength else STRENGTH["t03_new"]
+        founded_after = cd is not None and cd.year_founded and cd.year_founded > first.date.year
+        if founded_after:
+            parts.append(f"{cd.citation} year_founded {cd.year_founded}")
+            reasons.append(f"was founded in {cd.year_founded}, after its first invoice")
+            strength = max(strength, STRENGTH["t03_paid_before_founded"])
         if not parts:
             continue
         quote = "; ".join(parts) + f"; first invoice {row_line(first)}"
-        refs = [first.row_id, f"vendor:{vid}"] + ([cd.citation] if cd and cd.year_founded else [])
+        refs = [first.row_id, f"vendor:{vid}"] + ([cd.citation] if founded_after else [])
         out.append(
             ev.make(
                 test_id=TEST,
