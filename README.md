@@ -17,7 +17,7 @@ uv run casefile investigate --tip cases/career_overlap/tip.txt \
 python verify.py out/career_overlap/log.jsonl
 ```
 
-Any of the six cases in `cases/` runs the same way. Outputs in `out/<case>/`: `case_file.md` (the report, in ACFE order), `exhibits.md` (every cited evidence object, quoted verbatim), `evidence.json`, `findings.json`, `log.jsonl` (the hash-chained log), `root.txt` (Merkle root and record count).
+Any of the six cases in `cases/` runs the same way. Or open the local web page with `uv run casefile ui` (http://localhost:8501): pick a case, press Investigate, and watch the findings, the Crustdata records behind them, the evidence, the inputs and the verifiable log fill in. Outputs in `out/<case>/`: `case_file.md` (the report, in ACFE order), `exhibits.md` (every cited evidence object, quoted verbatim), `evidence.json`, `findings.json`, `log.jsonl` (the hash-chained log), `root.txt` (Merkle root and record count).
 
 | flag | effect |
 | --- | --- |
