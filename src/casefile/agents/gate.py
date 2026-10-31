@@ -65,8 +65,11 @@ def relevant_evidence(h: Hypothesis, evidence: Sequence[EvidenceObject]) -> list
 
 
 def _two_families(strong: Sequence[EvidenceObject], families: Mapping[str, list[str]]) -> bool:
-    """True if two distinct evidence objects can be assigned two different families."""
+    """True if two evidence objects from different tests can be assigned two different families.
+    Two objects from one test are one line of evidence, even if that test spans two families."""
     for a, b in combinations(strong, 2):
+        if a.test_id == b.test_id:
+            continue
         fa = set(families.get(a.test_id, [a.test_id]))
         fb = set(families.get(b.test_id, [b.test_id]))
         if any(x != y for x in fa for y in fb):

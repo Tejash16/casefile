@@ -204,4 +204,4 @@ def test_critique_all_parallel_and_failure_isolated(fake):
     fake.responses = [respond, respond]
     out = critique.critique_all([(H1, EVIDENCE), (h2, EVIDENCE)])
     assert out["H1"].model_verdict == Verdict.Substantiated
-    assert out["H2"].model_verdict == Verdict.Unsubstantiated and out["H2"].rationale == []
+    assert out["H2"] is None

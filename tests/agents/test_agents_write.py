@@ -48,7 +48,7 @@ def test_request_uses_search_results_with_hash_sources():
     sr = content[0]
     assert sr["type"] == "search_result" and sr["citations"] == {"enabled": True}
     assert sr["source"] == f"evidence:E1|{E1.sha256}"
-    assert sr["content"][0]["text"] == E1.quote
+    assert [c["text"] for c in sr["content"][:2]] == [E1.summary, E1.quote]
     assert "<findings>" in content[-1]["text"] and content[-1]["text"].rstrip().endswith(
         "</instructions>"
     )
@@ -92,6 +92,75 @@ def test_parse_keeps_cited_drops_uncited(fake, audit_log):
     assert rec["outcome"]["dropped_sentences"] == 2
     for s in case.executive_summary + [s for f in case.findings for s in f.rationale]:
         assert s.evidence_ids
+
+
+ORDER = [E1, E2, E3]
+
+
+def test_trailing_space_of_cited_block_does_not_cite_next_sentence():
+    msg = message(
+        [
+            text_block("## Executive summary\n"),
+            text_block("S004 worked at V017 until 2024-11-30. ", [cite(E1, 0)]),
+            text_block("S004 therefore steered contracts to V017.\n"),
+        ]
+    )
+    sections, dropped = write.parse_sections(msg, ORDER, {"H1"})
+    assert [s.text for s in sections["summary"]] == ["S004 worked at V017 until 2024-11-30."]
+    assert dropped == ["S004 therefore steered contracts to V017."]
+
+
+def test_partly_cited_sentence_is_dropped():
+    msg = message(
+        [
+            text_block("## Executive summary\n"),
+            text_block("S004 worked at V017 until 2024-11-30", [cite(E1, 0)]),
+            text_block(", and he then steered every contract to it as a personal reward.\n"),
+        ]
+    )
+    sections, dropped = write.parse_sections(msg, ORDER, {"H1"})
+    assert "summary" not in sections and len(dropped) == 1
+
+
+def test_mostly_cited_sentence_with_short_lead_in_is_kept():
+    msg = message(
+        [
+            text_block("## Finding H1\nThe ledger shows "),
+            text_block(
+                "L000002 2025-01-18 Orbital Fasteners 4,90,000 approver S004.", [cite(E2, 1)]
+            ),
+        ]
+    )
+    sections, _ = write.parse_sections(msg, ORDER, {"H1"})
+    assert sections["H1"][0].text.startswith("The ledger shows L000002")
+
+
+def test_unknown_finding_section_is_dropped():
+    msg = message(
+        [
+            text_block("## Finding H9\n"),
+            text_block("S004 worked at V017 until 2024-11-30.", [cite(E1, 0)]),
+        ]
+    )
+    sections, dropped = write.parse_sections(msg, ORDER, {"H1"})
+    assert sections == {} and len(dropped) == 1
+
+
+def test_empty_quote_does_not_send_empty_block():
+    blank = E1.model_copy(update={"quote": "  "})
+    assert all(c["text"].strip() for c in write.search_result(blank)["content"])
+
+
+def test_truncated_writer_output_drops_last_sentence(fake, audit_log):
+    blocks = [
+        text_block("## Executive summary\n"),
+        text_block("S004 worked at V017 until 2024-11-30. ", [cite(E1, 0)]),
+        text_block("Invoices clustered under the limit", [cite(E2, 1)]),
+    ]
+    fake.responses = [message(blocks, stop_reason="max_tokens")]
+    case = write.write_case_file([F1], EVIDENCE, META)
+    assert [s.text for s in case.executive_summary] == ["S004 worked at V017 until 2024-11-30."]
+    assert read_log(audit_log)[-1]["outcome"]["truncated"] is True
 
 
 def test_writer_failure_falls_back_to_cited_sentences(fake, audit_log):

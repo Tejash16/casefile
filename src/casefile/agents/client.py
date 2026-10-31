@@ -324,6 +324,7 @@ def call(
             if validate is not None:
                 validate(parsed)
         except (ValidationError, ValueError) as e:
+            # invalid output: log it, then retry with the error fed back
             last_error = str(e)
             outcome.update(status="invalid_output", error=last_error[:1000])
             audit.post(pre_id, outcome)
@@ -331,6 +332,10 @@ def call(
                 params["max_tokens"] = min(params["max_tokens"] * 2, 32000)
             attempt_messages = _with_feedback(messages, text, last_error)
             continue
+        except Exception as e:  # a buggy validate hook must still close its pre record
+            outcome.update(status="error", error=f"{type(e).__name__}: {e}"[:1000])
+            audit.post(pre_id, outcome)
+            raise ModelCallError(f"{name}: validation hook failed: {type(e).__name__}: {e}") from e
 
         post_id = audit.post(pre_id, outcome)
         return CallResult(parsed, text, message, served_by, post_id, attempt, usage)

@@ -125,18 +125,18 @@ def critique_all(
     *,
     audit: AuditSink | None = None,
     max_workers: int = MAX_WORKERS,
-) -> dict[str, CriticOutput]:
-    """Critique several hypotheses in parallel. A critique that fails after its retries becomes an
-    empty Unsubstantiated recommendation (the failure is already in the audit log)."""
+) -> dict[str, CriticOutput | None]:
+    """Critique several hypotheses in parallel. A critique that fails after its retries maps to
+    None (the failure is in the audit log); pass None to `gate.decide`, which then records no
+    model verdict rather than a fake one."""
+    items = list(items)
 
-    def one(item: tuple[Hypothesis, Sequence[EvidenceObject]]) -> CriticOutput:
+    def one(item: tuple[Hypothesis, Sequence[EvidenceObject]]) -> CriticOutput | None:
         h, ev = item
         try:
             return critique(h, ev, audit=audit)
         except client.ModelCallError:
-            return CriticOutput(
-                hypothesis_id=h.hypothesis_id, model_verdict=Verdict.Unsubstantiated
-            )
+            return None
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         results = list(pool.map(one, items))

@@ -22,6 +22,10 @@ from casefile.schemas import CaseFile, EvidenceObject, Finding, Hypothesis, Sent
 VERDICT_ORDER = {Verdict.Substantiated: 0, Verdict.Unfounded: 1, Verdict.Unsubstantiated: 2}
 SOURCE_PREFIX = "evidence:"
 PREDICATION_CHARS = 400
+# Share of a sentence's non-space characters that must lie inside cited text for it to be kept;
+# stops an uncited clause ("..., and he steered contracts to it") riding on a cited one.
+MIN_CITED_SHARE = 0.6
+_TRIM = set(" \t\r\n-*•")
 ABBREVIATIONS = {"pvt", "ltd", "inc", "co", "corp", "llp", "no", "rs", "mr", "ms", "dr", "st", "vs"}
 
 _HEADING = re.compile(r"^\s*#{1,4}\s*(.+?)\s*$")
@@ -46,7 +50,13 @@ def search_result(e: EvidenceObject) -> dict[str, Any]:
         "type": "search_result",
         "source": source_id(e),
         "title": f"{e.evidence_id}: {e.summary}",
-        "content": [{"type": "text", "text": e.quote}, {"type": "text", "text": ref}],
+        # the API rejects empty text blocks, so a blank quote must not disable the whole writer
+        # summary first so derived facts (e.g. "within 5% under the limit") are citable too
+        "content": [
+            {"type": "text", "text": e.summary.strip() or "(no summary)"},
+            {"type": "text", "text": e.quote.strip() or "(empty quote)"},
+            {"type": "text", "text": ref},
+        ],
         "citations": {"enabled": True},
     }
 
@@ -130,11 +140,15 @@ def split_sentences(line: str) -> list[tuple[int, int]]:
 
 
 def parse_sections(
-    message: Any, order: Sequence[EvidenceObject]
+    message: Any,
+    order: Sequence[EvidenceObject],
+    finding_ids: set[str] | None = None,
 ) -> tuple[dict[str, list[Sentence]], list[str]]:
-    """Split the cited response into {section: [Sentence]} and a list of dropped (uncited) texts.
+    """Split the cited response into {section: [Sentence]} and a list of dropped texts.
 
-    Sections are "summary" and the hypothesis ids from "## Finding H<n>" headings.
+    Sections are "summary" and the hypothesis ids from "## Finding H<n>" headings (only ids in
+    `finding_ids` when given). A sentence is kept only if at least MIN_CITED_SHARE of its
+    non-space characters lie inside cited text blocks; it then carries those blocks' evidence ids.
     """
     index = {e.evidence_id: e for e in order}
     full = ""
@@ -164,13 +178,24 @@ def parse_sections(
             )
             continue
         for s, e in split_sentences(line):
-            text = re.sub(r"\s+", " ", line[s:e]).strip().lstrip("-*• ").strip()
+            # trim whitespace and bullet characters so a cited block's trailing space cannot
+            # lend its citation to the next sentence
+            while s < e and line[s] in _TRIM:
+                s += 1
+            while e > s and line[e - 1].isspace():
+                e -= 1
+            text = re.sub(r"\s+", " ", line[s:e]).strip()
             if not text:
                 continue
             a, z = line_start + s, line_start + e
-            ids = [i for (bs, be, bids) in spans if bs < z and be > a for i in bids]
-            ids = sorted(dict.fromkeys(ids), key=_eid_key)
-            if ids and section != "other":
+            hit = [(max(a, bs), min(z, be), bids) for (bs, be, bids) in spans if bs < z and be > a]
+            cited = sum(1 for (x, y, _) in hit for c in full[x:y] if not c.isspace())
+            total = sum(1 for c in full[a:z] if not c.isspace())
+            ids = sorted(dict.fromkeys(i for (_, _, bids) in hit for i in bids), key=_eid_key)
+            known = section == "summary" or (
+                section != "other" and (finding_ids is None or section in finding_ids)
+            )
+            if ids and known and total and cited / total >= MIN_CITED_SHARE:
                 sections.setdefault(section, []).append(
                     Sentence(text=text, evidence_ids=ids, require_citation=True)
                 )
@@ -246,6 +271,7 @@ def write_case_file(
     sections: dict[str, list[Sentence]] = {}
     dropped: list[str] = []
     error = None
+    truncated = False
     if order:
         system_blocks, messages = build_request(findings, order, hypotheses)
         try:
@@ -258,7 +284,16 @@ def write_case_file(
                 effort="low",  # 7.5 s vs 17 s at medium, same cited content
                 audit=audit,
             )
-            sections, dropped = parse_sections(result.message, order)
+            sections, dropped = parse_sections(
+                result.message, order, {f.hypothesis_id for f in findings}
+            )
+            if getattr(result.message, "stop_reason", None) == "max_tokens" and sections:
+                # the last sentence may be cut mid-claim; later sections fall back
+                truncated = True
+                last = list(sections)[-1]
+                dropped.append(sections[last].pop().text)
+                if not sections[last]:
+                    del sections[last]
         except client.ModelCallError as e:
             error = str(e)
 
@@ -274,6 +309,7 @@ def write_case_file(
         {
             "status": "ok" if error is None else "fallback",
             "error": error,
+            "truncated": truncated,
             "kept_sentences": sum(len(v) for v in sections.values()),
             "dropped_sentences": len(dropped),
             "dropped": [d[:200] for d in dropped],

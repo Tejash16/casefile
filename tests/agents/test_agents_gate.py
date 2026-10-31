@@ -51,6 +51,20 @@ def test_same_family_is_not_enough():
     assert f.verdict_by == VerdictBy.gate_override_of_model
 
 
+def test_two_items_from_one_multi_family_test_are_one_line(monkeypatch):
+    monkeypatch.setattr(gate, "test_families", lambda: {"T13": ["footprint", "identity"]})
+    evidence = [ev("E1", "T13", S, 0.9), ev("E2", "T13", S, 0.9)]
+    assert gate.decide(H1, evidence, None, RESOLUTIONS).verdict == Verdict.Unsubstantiated
+
+
+def test_no_critic_means_no_override(audit_log):
+    evidence = [ev("E1", "T15", S, 0.9), ev("E2", "T05", S, 0.9)]
+    f = gate.decide(H1, evidence, None, RESOLUTIONS)
+    assert f.verdict == Verdict.Substantiated and f.model_verdict is None
+    assert f.verdict_by == VerdictBy.gate
+    assert read_log(audit_log)[-1]["outcome"]["override"] is False
+
+
 def test_weak_support_is_not_enough():
     evidence = [ev("E1", "T15", S, 0.9), ev("E2", "T05", S, SUP - 0.01)]
     assert gate.decide(H1, evidence, None, RESOLUTIONS).verdict == Verdict.Unsubstantiated

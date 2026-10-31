@@ -108,6 +108,40 @@ def test_semantic_validator_and_give_up(fake):
     assert len(fake.calls) == 3
 
 
+def test_crashing_validate_hook_still_closes_pre_record(fake, audit_log):
+    fake.responses = [message({"answer": "x", "score": 0.1})]
+
+    def validate(o: Out) -> None:
+        raise KeyError("bug in hook")
+
+    with pytest.raises(client.ModelCallError):
+        client.call(
+            "unit",
+            ["s"],
+            [{"role": "user", "content": "q"}],
+            model="claude-haiku-5-5",
+            output_schema=Out,
+            validate=validate,
+        )
+    recs = read_log(audit_log)
+    assert [r["record_phase"] for r in recs] == ["pre_execution", "post_execution"]
+    assert recs[-1]["outcome"]["status"] == "error"
+
+
+def test_effort_env_override(fake, monkeypatch):
+    monkeypatch.setenv("CASEFILE_EFFORT_UNIT", "medium")
+    fake.responses = [message({"answer": "ok", "score": 0.5})]
+    client.call(
+        "unit",
+        ["s"],
+        [{"role": "user", "content": "q"}],
+        model="claude-haiku-5-5",
+        output_schema=Out,
+        effort="low",
+    )
+    assert fake.calls[0]["output_config"]["effort"] == "medium"
+
+
 def test_refusal_raises(fake):
     fake.responses = [message("", stop_reason="refusal")]
     with pytest.raises(client.ModelRefusalError):
