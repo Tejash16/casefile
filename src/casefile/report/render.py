@@ -31,6 +31,7 @@ METRIC_LABELS = {
     "tokens_out": "Model tokens out",
     "log_records": "Audit log records",
     "rule_tests": "Rule tests run",
+    "cache_read": "Model tokens read from prompt cache",
 }
 
 
