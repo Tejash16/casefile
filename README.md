@@ -11,12 +11,13 @@ Built in five hours at ContextCon 03, IIT Bombay (31 Oct 2026), on Crustdata's i
 ```bash
 cp .env.example .env   # CRUSTDATA_API_KEY, ANTHROPIC_API_KEY
 uv sync
-uv run casefile investigate --tip cases/demo/tip.txt --ledger cases/demo/ledger.csv \
-  --vendors cases/demo/vendors.csv --staff cases/demo/staff.csv --out out/demo/
-python verify.py out/demo/log.jsonl
+uv run casefile investigate --tip cases/career_overlap/tip.txt \
+  --ledger cases/career_overlap/ledger.csv --vendors cases/career_overlap/vendors.csv \
+  --staff cases/career_overlap/staff.csv --out out/career_overlap/
+python verify.py out/career_overlap/log.jsonl
 ```
 
-Outputs in `out/demo/`: `case_file.md` (the report, in ACFE order), `exhibits.md` (every cited evidence object, quoted verbatim), `evidence.json`, `findings.json`, `log.jsonl` (the hash-chained log), `root.txt` (Merkle root and record count).
+Any of the six cases in `cases/` runs the same way. Outputs in `out/<case>/`: `case_file.md` (the report, in ACFE order), `exhibits.md` (every cited evidence object, quoted verbatim), `evidence.json`, `findings.json`, `log.jsonl` (the hash-chained log), `root.txt` (Merkle root and record count).
 
 | flag | effect |
 | --- | --- |
@@ -72,7 +73,7 @@ Six planted cases (`cases/README.md`), three runs each: run 1 live against Crust
 ## Verify the log
 
 ```bash
-python verify.py out/demo/log.jsonl            # standard library only, works from a fresh clone
+python verify.py out/demo/log.jsonl            # the committed demo run; standard library only
 uv run casefile verify out/demo/log.jsonl      # same check, exit 3 on failure
 ```
 
