@@ -21,6 +21,10 @@ THRESHOLDS: dict[str, Any] = {}
 TESTS: dict[str, Any] = {}  # unknown tests link by entity overlap only
 
 
+def tests_for(typology: str) -> list[str]:
+    return []  # the proposer's picks only
+
+
 @dataclass
 class StubContext:
     rows: list[LedgerRow]

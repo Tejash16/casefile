@@ -54,6 +54,7 @@ REGISTRY: dict[str, tuple[str, str]] = {
     "thresholds": ("casefile.rules.config", "casefile.stubs.rules"),
     "rank": ("casefile.rules.rank", "casefile.stubs.rules"),
     "registry": ("casefile.rules.registry", "casefile.stubs.rules"),
+    "tests_for": ("casefile.rules", "casefile.stubs.rules"),
     "check": ("casefile.report.check", "casefile.stubs.report"),
     "render": ("casefile.report.render", "casefile.stubs.report"),
 }
@@ -334,25 +335,31 @@ def run(
                 if "hypotheses" in inspect.signature(build_context).parameters
                 else build_context(rows, vendors, staff, graph=G, audit=audit)
             )
+            # every test that can count for or against each typology, not only the proposer's
+            # picks, so a verdict doesn't depend on which tests the model listed on this run
+            tests_for = impl("tests_for", "tests_for")
+            hypotheses = [
+                h.model_copy(
+                    update={"tests_to_run": sorted({*h.tests_to_run, *tests_for(str(h.typology))})}
+                )
+                for h in hypotheses
+            ]
             test_ids = sorted({t for h in hypotheses for t in h.tests_to_run})
             evidence: list[EvidenceObject] = list(impl("rules", "run_tests")(test_ids, ctx))
             path_evidence = impl("graph", "path_evidence")
-            for h in hypotheses:
-                for s in h.subjects:
-                    for v in h.objects:
-                        rid = audit.pre("rule_test", {"name": "T16", "args": [s, v]})
-                        e = path_evidence(G, s, v)
-                        ids: list[str] = []
-                        if e is not None:
-                            e = e.model_copy(
-                                update={
-                                    "evidence_id": f"E{_next_id(evidence)}",
-                                    "log_record_id": rid,
-                                }
-                            )
-                            evidence.append(e)
-                            ids = [e.evidence_id]
-                        audit.post(rid, {"status": "ok", "evidence_ids": ids})
+            # one T16 exhibit per staff-vendor pair, however many hypotheses share it
+            pairs = sorted({(s, v) for h in hypotheses for s in h.subjects for v in h.objects})
+            for s, v in pairs:
+                rid = audit.pre("rule_test", {"name": "T16", "args": [s, v]})
+                e = path_evidence(G, s, v)
+                ids: list[str] = []
+                if e is not None:
+                    e = e.model_copy(
+                        update={"evidence_id": f"E{_next_id(evidence)}", "log_record_id": rid}
+                    )
+                    evidence.append(e)
+                    ids = [e.evidence_id]
+                audit.post(rid, {"status": "ok", "evidence_ids": ids})
             centrality = impl("graph", "centrality")(G)
             hypotheses = impl("rank", "rerank")(hypotheses, evidence, centrality)
             # tag evidence with the hypotheses it bears on
