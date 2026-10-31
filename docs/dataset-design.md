@@ -23,8 +23,8 @@ Filled by b1 at 11:40 on 31 Oct. Every real vendor was checked with `POST /compa
 | S001 | Meera Kulkarni (fictional) | | Director - Finance, limit 25L | | clean |
 | S002 | Vikram Shah (fictional) | | Senior Manager, limit 10L | | clean |
 | S003 | Anil Deshpande (fictional; `Mr. Anil Deshpande` in the list, `A. Deshpande` in the ledger) | | Manager - Procurement, limit 5L, creates vendors | | shell vendor owner (address and phone shared with V023) |
-| S004 | team member A (**pending**; placeholder `Rohan Joshi` in fixtures) | **pending** | Manager - Procurement, limit 5L, approver | **pending** (becomes V017) | career-overlap conflict (true positive) |
-| S005 | team member B (**pending**; placeholder `Rahul Verma` in fixtures) | **pending** | Analyst, no approval limit | **pending** | false lead: the tip says S005 used to work at V031. A real namesake did; our S005 (resolved by LinkedIn URL) did not, so T15 refutes and the verdict is `Unfounded` |
+| S004 | Tejash Chauhan (team member A) | https://www.linkedin.com/in/tejash-chauhan-5424a9252 | Manager - Procurement, limit 5L, approver | Crustdata person 177265563 (enrich 1.0): DocRack, Co-Founder, 2026-03-01 → current (company 71095782); Just, 2023-01 → 2023-06 (no company id) | career-overlap conflict (true positive) with V017 = DocRack |
+| S005 | Kedar Sharma (team member B) | https://www.linkedin.com/in/kedar-sharma-67aa9b253 | Analyst, no approval limit | Crustdata person 420958731 (enrich 1.0): DocRack, Co-Founder, 2025-06 → current (71095782); Abhyuday IIT Bombay 2024-05 → 2025-04 (6121131); Just 2023-01 → 2023-06 (4562904) | false lead: the tip says S005 used to work at V031 (HCLTech). A namesake in Noida (person 6677240) did, 2023-02 → 2025-03; our S005 never did, so T15 refutes and the verdict is `Unfounded` |
 | S006 | Sunita Patil (fictional) | | AP clerk, posts entries | | clean |
 | S007 | Farhan Qureshi (fictional) | | Manager - Procurement, limit 5L | | clean |
 | S008 | Priya Nair (fictional) | | Manager - Finance, limit 5L | | clean |
@@ -45,21 +45,25 @@ Resolve real vendors by **website domain** or by the suffix-stripped name, not t
 | V006 | Pune Metrology | yes, small | 72073831 ("Pune Metrology", 0.8), punemetrology.in | 2-10 | clean |
 | V007 | Atomic Gauges | yes, small | 15339565 ("Atomic Gauges", 1.0), atomicgauges.co.in | 2-10 | clean (kickback velocity optional) |
 | V008 | Zentravik Industrial Supplies Pvt Ltd | fictional | none (top hit unrelated, 0.6) | none | expected `unresolved` → any allegation Unsubstantiated |
-| V009 | Castool Precision Tooling | yes, small | 2310938 ("Castool Precision Tooling", 1.0), castool.com | 2-10 | clean |
-| V017 | **pending** S004's past employer (placeholder `Persistent Systems Limited`, id 3647, in fixtures; variants `PERSISTENT SYSTEMS`, `Persistant Systems Ltd`) | yes | pending | | conflict of interest, true positive |
+| V009 | Fox Precision Tooling | yes, small | 8697742 (domain foxprecisiontooling.co.uk, 1.0) | 2-10 | clean (replaced Castool: castool.com resolves to 6938202, 118 staff) |
+| V017 | DocRack (`DOCRACK`, `Docrak`) | yes, small | 71095782 ("DocRack", 1.0). **No website in vendors.csv on purpose**: docrack.ai resolves to a different record, "Orvyn Labs" (6337171) | 2-10 | conflict of interest, true positive: S004 co-founder from 2026-03-01; payments 2025-06-12 → 2026-03-19, all approved by S004 |
 | V023 | Brindora Engineering Traders Pvt Ltd (`BRINDORA ENGINEERING TRADERS PRIVATE LIMITED`, `Brindora Enginering Traders`) | fictional | none (no Brindora match; top hit unrelated, 0.6) | none | shell: address and phone = S003's; created 2025-01-10, first invoice 2025-01-18; round amounts 4,90,000–4,99,000 under S003's 5L limit |
-| V031 | **pending** a company a namesake of team member B worked at (placeholder `Cummins India Ltd`, id 1085, in fixtures) | yes | pending | | false lead, expected Unfounded for S005 |
+| V031 | HCL Technologies Ltd (`HCLTech`) | yes, large | 1910 (domain hcltech.com, 1.0; the name "HCLTech" alone gives three 1.0 matches) | 10001+ | false lead, expected Unfounded for S005 |
+
+Known noise: S005 is also DocRack's co-founder (from 2025-06), so a Crustdata path S005–V017 exists in any case that contains both. S005 approves nothing; in single-plant cases only one of them is on the staff list.
+
+**Open conflict (needs A / a2):** the gate forces `Unsubstantiated` when any subject or object is not `resolved` (CLAUDE.md says the same). V023 is fictional, so it is always `unresolved`, and every fictional staff member comes back `ambiguous` or `unresolved` (b2, 11:55). As written, the planted shell case (S003 + V023) can never be `Substantiated`, which contradicts `cases/README.md`. b2's proposal: apply the rule only when the hypothesis rests on Crustdata evidence about that entity (T13/T15/T17), and let T13 treat `unresolved` as support for shell_company. Until decided, `cases/shell_vendor/case.json` expects whatever A decides.
 
 Rejected: "Orbital Fasteners" (the brief's example shell name) collides with a real UK company, Orbital Fasteners Ltd (id 9469227); "Quorvane" exists (id 69779436); "Larsen & Toubro" returns two 1.0 matches (2744 and 28126659).
 
 For `shared_office_honest` (gen.py): two small real vendors registered at one coworking address, to be picked at 13:00 and listed here.
 
-## 4. The tip (fixture version; S005 and V017/V031 names swap when the pending rows are filled)
+## 4. The tip (fixture version)
 
 ```
 Subject: procurement payments - please look
 
-I work in finance at Halvexa. For the last year a manager in procurement has been pushing payments to Brindora Engineering Traders and Persistent Systems. Brindora didn't exist before January and nobody on the shop floor has seen anything delivered from them. Their invoices are always just under five lakh and some get approved late at night. I also heard Rahul Verma used to work for Cummins India and still gets them contracts. Something is off with how fast these get approved. Please look at the invoices from last year. I'd rather not say who I am.
+I work in finance at Halvexa. For the last year a manager in procurement has been pushing payments to Brindora Engineering Traders and DocRack. Brindora didn't exist before January and nobody on the shop floor has seen anything delivered from them. Their invoices are always just under five lakh and some get approved late at night. I also heard Kedar Sharma used to work for HCLTech and still gets them contracts. Something is off with how fast these get approved. Please look at the invoices from last year. I'd rather not say who I am.
 ```
 
 ## 5. Thresholds we will state as assumptions

@@ -1,0 +1,339 @@
+[
+ {
+  "matched_on": "https://www.linkedin.com/in/tejash-chauhan-5424a9252",
+  "match_type": "professional_network_profile_url",
+  "match_status": "matched",
+  "matches": [
+   {
+    "confidence_score": 1.0,
+    "person_data": {
+     "basic_profile": {
+      "current_title": "Co-Founder",
+      "first_name": "Tejash",
+      "headline": "Building the Future of Audit || Co-Founder @DocRack || IIT Bombay",
+      "languages": [],
+      "last_name": "Chauhan",
+      "location": {
+       "city": "Mumbai",
+       "continent": "Asia",
+       "country": "India",
+       "full_location": null,
+       "raw": "Mumbai, Maharashtra, India",
+       "state": "Maharashtra"
+      },
+      "name": "Tejash Chauhan",
+      "normalized_title": {
+       "confident": true,
+       "department": "Executive Leadership",
+       "matched_title": "Co-Founder",
+       "similarity": 0.9998999834060669,
+       "sub_department": "Founder & Entrepreneurship Leadership"
+      },
+      "professional_network_name": "Tejash Chauhan",
+      "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/3a6eecab4134d0c5c2b39ce839b9950a01989716bfaa744cd8eb47af4e194176.jpg",
+      "summary": "Hey, I'm Tejash Chauhan, a final-year student at IIT Bombay and the co-founder of DocRack.I'm driven by curiosity and enjoy working at the intersection of AI, software systems, and business. I like understanding how complex systems work, questioning assumptions, and building technology that solves real operational problem not just interesting technical ones.Currently, I'm focused on reducing enterprise audit cycles from weeks to days by building AI systems that understand documents, verify information, and automate repetitive knowledge work. I enjoy creating products that transform scattered data into structured, trustworthy, and actionable insights, enabling teams to make faster and better decisions.Beyond my current work, I'm fascinated by how AI, intelligent software, and emerging technologies are reshaping the way organizations operate. I enjoy thinking about product strategy, system design, and the intersection of technology, workflows, and execution.I believe the best products come from deeply understanding both people and systems, and that meaningful innovation happens when strong technical thinking meets relentless execution.Always happy to connect with founders, engineers, operators, and anyone building ambitious technology."
+     },
+     "education": {
+      "schools": [
+       {
+        "activities_and_societies": "",
+        "degree": "Bachelor of Technology - BTech",
+        "description": "",
+        "end_year": 2026,
+        "field_of_study": "",
+        "institute_logo_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/c4119891cf19c674316aaff24c3f2cfd90fbbe6d21964820fdac1e6553095e50.jpg",
+        "institute_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQGmDoDCx_FYpA/company-logo_400_400/company-logo_400_400/0/1660636307357/indian_institute_of_technology_bombay_logo?e=1787184000&v=beta&t=8Hs-nCZafzzPqnoLcAKOEjv4Zf260X99ux7oCc6pyHg",
+        "location": {
+         "city": null,
+         "continent": "Asia",
+         "country": "India",
+         "raw": "Powai, Mumbai",
+         "state": "Mahārāshtra"
+        },
+        "professional_network_id": "157266",
+        "school": "Indian Institute of Technology, Bombay",
+        "start_year": 2022
+       },
+       {
+        "activities_and_societies": "",
+        "degree": "Intermediate ",
+        "description": "",
+        "end_year": 2021,
+        "field_of_study": "Science & Math",
+        "institute_logo_permalink": null,
+        "institute_logo_url": "",
+        "location": {
+         "city": null,
+         "continent": null,
+         "country": null,
+         "raw": null,
+         "state": null
+        },
+        "professional_network_id": "",
+        "school": "Modern Era Public School",
+        "start_year": 2020
+       }
+      ]
+     },
+     "experience": {
+      "employment_details": {
+       "current": [
+        {
+         "company_description": "DocRack is a privacy-first AI audit engine built for Indian CA firms and statutory auditors. DocRack is a privacy-first AI audit engine built for Indian CA firms and statutory auditors. It automates the most time-intensive parts of a statutory audit — cross-document verification, ledger classification, GST and TDS reconciliation, sampling, working paper generation, and audit trail management — all aligned to ICAI standards and the Standards on Auditing.Every number DocRack produces ties back to its source document, and every action in the system is cryptographically signed and timestamped. The result is an audit file that is tamper-evident and NFRA inspection-ready from day one.Unlike generic document AI tools, DocRack is built ground-up for the Indian audit context — Schedule III, Form 3CD, CARO 2020, GSTR-9C, and the complete statutory workflow from engagement setup to UDIN sign-off. Client data stays in India and never leaves the firm's control.CA firms use DocRack to compress audits from months to a few days, eliminate manual reconciliation work, and produce defensible, traceable audit documentation — without changing how their teams already work.",
+         "company_headcount_latest": 2,
+         "company_headcount_range": "2-10",
+         "company_industries": [
+          "Financial Services"
+         ],
+         "company_professional_network_industry": "Financial Services",
+         "company_professional_network_profile_url": "https://linkedin.com/company/126363995",
+         "company_profile_picture_permalink": "",
+         "company_status": "active",
+         "company_website": "https://docrack.ai/",
+         "company_website_domain": null,
+         "crustdata_company_id": 71095782,
+         "description": "DocRack is an AI-powered platform for internal and external audit, built for the audit and accounting teams who do the actual fieldwork.\n \nAudit still runs on samples, scattered evidence and working papers rebuilt by hand. DocRack changes that. It reads the evidence, tests the full population instead of a sample, and produces the working paper at the end of the run.\n \nAI handles extraction, a deterministic engine handles the testing, so results are repeatable and every number traces straight back to the document it came from. Maker-checker review and typed verdicts on every exception are part of the workflow, not an afterthought.\n \nAll data stays in India by design.\n \nWorking with top enterprises. Backed by NVIDIA Inception.",
+         "employment_type": "Self-employed",
+         "end_date": null,
+         "function_category": "",
+         "is_default": true,
+         "location": {
+          "raw": "Mumbai"
+         },
+         "name": "DocRack",
+         "position_id": 2638653911,
+         "professional_network_id": "126363995",
+         "seniority_level": "Owner / Partner",
+         "start_date": "2026-03-01T00:00:00+00:00",
+         "title": "Co-Founder",
+         "years_at_company": "Less than 1 year",
+         "years_at_company_raw": 0.0
+        }
+       ],
+       "past": [
+        {
+         "company_description": null,
+         "company_headcount_latest": null,
+         "company_headcount_range": null,
+         "company_industries": null,
+         "company_professional_network_industry": null,
+         "company_professional_network_profile_url": null,
+         "company_profile_picture_permalink": null,
+         "company_status": null,
+         "company_website": null,
+         "company_website_domain": null,
+         "crustdata_company_id": null,
+         "description": "Tried building a niche social app in my first year to connect people looking for club partners.",
+         "employment_type": "Self-employed",
+         "end_date": "2023-06-01T00:00:00+00:00",
+         "function_category": "",
+         "is_default": false,
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         },
+         "name": "Just",
+         "position_id": 2638652483,
+         "professional_network_id": null,
+         "seniority_level": "CXO",
+         "start_date": "2023-01-01T00:00:00+00:00",
+         "title": "Co-Founder & CTO",
+         "years_at_company": "Less than 1 year",
+         "years_at_company_raw": 0.0
+        }
+       ]
+      }
+     },
+     "social_handles": {
+      "dev_platform_identifier": {
+       "profile_url": null
+      },
+      "professional_network_identifier": {
+       "profile_url": "https://www.linkedin.com/in/tejash-chauhan-5424a9252"
+      },
+      "twitter_identifier": {
+       "slug": ""
+      }
+     },
+     "crustdata_person_id": 177265563
+    }
+   }
+  ]
+ },
+ {
+  "matched_on": "https://www.linkedin.com/in/kedar-sharma-67aa9b253",
+  "match_type": "professional_network_profile_url",
+  "match_status": "matched",
+  "matches": [
+   {
+    "confidence_score": 1.0,
+    "person_data": {
+     "basic_profile": {
+      "current_title": "Co-Founder",
+      "first_name": "Kedar",
+      "headline": "Building the Future of Audit || IIT Bombay",
+      "languages": [],
+      "last_name": "Sharma",
+      "location": {
+       "city": "Mumbai",
+       "continent": "Asia",
+       "country": "India",
+       "full_location": null,
+       "raw": "Mumbai, Maharashtra, India",
+       "state": "Maharashtra"
+      },
+      "name": "Kedar Sharma",
+      "normalized_title": {
+       "confident": true,
+       "department": "Executive Leadership",
+       "matched_title": "Co-Founder",
+       "similarity": 0.9998999834060669,
+       "sub_department": "Founder & Entrepreneurship Leadership"
+      },
+      "professional_network_name": "Kedar Sharma",
+      "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/96580078f832156348fef020c54149678613d3053924440a7360e66b1d7edd6a.jpg",
+      "summary": "Hi, I’m Kedar.I’m working on building systems that help teams make sense of their data, turning scattered documents and information into clear, actionable answers.Beyond this, I’m interested in how technology is shaping modern businesses across AI, software systems, and emerging areas like Web3 and how these shifts influence decision-making, operations, and leadership.I enjoy thinking about business systems, technology strategy, and building products that sit at the intersection of data, workflows, and execution.Always keen to connect with people building or operating in fast-moving, technology-driven environments."
+     },
+     "education": {
+      "schools": [
+       {
+        "activities_and_societies": "",
+        "degree": "Bachelor of Technology - BTech",
+        "description": "",
+        "end_year": 2026,
+        "field_of_study": "",
+        "institute_logo_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/c4119891cf19c674316aaff24c3f2cfd90fbbe6d21964820fdac1e6553095e50.jpg",
+        "institute_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQGmDoDCx_FYpA/company-logo_400_400/company-logo_400_400/0/1660636307357/indian_institute_of_technology_bombay_logo?e=1771459200&v=beta&t=95uJla7ZTxV_cGqCojlENwIGV8TrQs2FUqgcDD3Y0Po",
+        "location": {
+         "city": null,
+         "continent": "Asia",
+         "country": "India",
+         "raw": "Powai, Mumbai",
+         "state": "Mahārāshtra"
+        },
+        "professional_network_id": "157266",
+        "school": "Indian Institute of Technology, Bombay",
+        "start_year": 2022
+       }
+      ]
+     },
+     "experience": {
+      "employment_details": {
+       "current": [
+        {
+         "company_description": "DocRack is a privacy-first AI audit engine built for Indian CA firms and statutory auditors. DocRack is a privacy-first AI audit engine built for Indian CA firms and statutory auditors. It automates the most time-intensive parts of a statutory audit — cross-document verification, ledger classification, GST and TDS reconciliation, sampling, working paper generation, and audit trail management — all aligned to ICAI standards and the Standards on Auditing.Every number DocRack produces ties back to its source document, and every action in the system is cryptographically signed and timestamped. The result is an audit file that is tamper-evident and NFRA inspection-ready from day one.Unlike generic document AI tools, DocRack is built ground-up for the Indian audit context — Schedule III, Form 3CD, CARO 2020, GSTR-9C, and the complete statutory workflow from engagement setup to UDIN sign-off. Client data stays in India and never leaves the firm's control.CA firms use DocRack to compress audits from months to a few days, eliminate manual reconciliation work, and produce defensible, traceable audit documentation — without changing how their teams already work.",
+         "company_headcount_latest": 2,
+         "company_headcount_range": "2-10",
+         "company_industries": [
+          "Financial Services"
+         ],
+         "company_professional_network_industry": "Financial Services",
+         "company_professional_network_profile_url": "https://linkedin.com/company/126363995",
+         "company_profile_picture_permalink": "",
+         "company_status": "active",
+         "company_website": "https://docrack.ai/",
+         "company_website_domain": null,
+         "crustdata_company_id": 71095782,
+         "description": "DocRack is rebuilding internal and external audit with an AI-powered platform built for audit and accounting teams.\n \nFrom evidence to working paper, DocRack runs audit tests across the full population rather than a sample, with every value traced back to its source document.\n \nAI reads and structures the evidence, and a deterministic engine does the testing, so every result is repeatable and explainable. Maker-checker review, typed verdicts on every exception, and tamper-evident working papers are built into the workflow rather than bolted on.\n \nBuilt India-resident by engineering, so your data never leaves the country.\n \nWorking with top enterprises. Backed by NVIDIA Inception.",
+         "employment_type": "",
+         "end_date": null,
+         "function_category": "",
+         "is_default": true,
+         "location": {
+          "raw": ""
+         },
+         "name": "DocRack",
+         "position_id": 2904330870,
+         "professional_network_id": "126363995",
+         "seniority_level": "Owner / Partner",
+         "start_date": "2025-06-01T00:00:00+00:00",
+         "title": "Co-Founder",
+         "years_at_company": "1 to 2 years",
+         "years_at_company_raw": 1.0
+        }
+       ],
+       "past": [
+        {
+         "company_description": "Abhyuday, IIT Bombay is a student run organization working towards creating a sense of Social Responsibility and Leadership among the youth of India. Abhyuday was conceptualized as a movement by socially conscious students and professors of IIT Bombay in the years 2011 and 2012 in support of the ‘Anti-Corruption’ and ‘Women’s Right’ protests then going on in the country. Deriving its name from the Sanskrit word meaning ‘The Rising’, Abhyuday has established itself as India’s Largest Students Body for Social Development in the mere span of time. Taking forward IIT Bombay’s Senate mandated requirement of participating in Student Gymkhana activities of Sports, Culture and Social Service, Abhyuday serves as an avenue for students to start their journey of self-development while contributing towards the Society. Abhyuday encompasses a large spectrum of activities that aims at modelling the youth to work towards solving World’s Social Problems & our ‘Initiatives’ focus on creating a positive impact on the local communities. The ‘Social Fest’ is a two day extravaganza that celebrates the spirit of Social Good.We invite you to be a part of India’s Largest Student Run Movement for Social Good.",
+         "company_headcount_latest": 51,
+         "company_headcount_range": "51-200",
+         "company_industries": [
+          "Non-profit Organizations",
+          "Consumer Services"
+         ],
+         "company_professional_network_industry": "Non-profit Organizations",
+         "company_professional_network_profile_url": "https://linkedin.com/company/3993329",
+         "company_profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/f778a64f25ffdd4f81648b49f64d101281a57b2f05a43626e7c5248e95d71fc6.jpg",
+         "company_status": "active",
+         "company_website": "http://abhyudayiitb.org",
+         "company_website_domain": "abhyudayiitb.org",
+         "crustdata_company_id": 6121131,
+         "description": "Worked as part of the campaign team at Abhyuday, IIT Bombay, contributing to large-scale community initiatives focused on sustainability and social impact.\n\nPlayed a key role in organizing and executing projects such as the Powai Lake Cleanup, DIY Central Park, and food donation drives. Collaborated with local communities, managed on-ground logistics, and helped mobilize student participation to drive meaningful civic engagement.",
+         "employment_type": "",
+         "end_date": "2025-04-01T00:00:00+00:00",
+         "function_category": "",
+         "is_default": false,
+         "location": {
+          "raw": ""
+         },
+         "name": "Abhyuday | The Social Body of IIT Bombay",
+         "position_id": 2389992916,
+         "professional_network_id": "3993329",
+         "seniority_level": "Entry Level Manager",
+         "start_date": "2024-05-01T00:00:00+00:00",
+         "title": "Campaign Manager",
+         "years_at_company": "Less than 1 year",
+         "years_at_company_raw": 0.0
+        },
+        {
+         "company_description": "Building a platform where one can find their kind to enjoy moments together.",
+         "company_headcount_latest": 37,
+         "company_headcount_range": "2-10",
+         "company_industries": [
+          "Social Networking Platforms",
+          "Technology, Information and Internet",
+          "Technology, Information and Media"
+         ],
+         "company_professional_network_industry": "Social Networking Platforms",
+         "company_professional_network_profile_url": "https://linkedin.com/company/86411508",
+         "company_profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/acd7119fd20a0e4302364a708f006196857ccbd2cbdf64fde19bb0ffee86de11.jpg",
+         "company_status": "active",
+         "company_website": "http://justnapp.com",
+         "company_website_domain": "justnapp.com",
+         "crustdata_company_id": 4562904,
+         "description": "Co-founded and built a platform that connected people through shared interests and real-world activities, offering an alternative to traditional dating apps. \n \n Led product strategy and end-to-end development alongside a team of 5 developers and 3 co-founders. \n \n Raised ₹1 lakh in seed funding and secured investment commitments totaling ₹10 lakh from early-stage investors. \n \n Defined the product vision around fostering authentic, activity-based social connections. \n \n Conducted user interviews and iterative feedback sessions to improve product features and user experience. \n \n Explored product-market fit and go-to-market strategies, gaining firsthand experience in scaling an early-stage startup. \n \n Managed cross-functional collaboration, team coordination, hiring, and operational planning throughout the venture. \n \n Built practical experience in entrepreneurship, leadership, financial planning, and startup execution. \n \n Learned to navigate uncertainty, resolve team challenges, and adapt product direction based on user and market feedback.",
+         "employment_type": "",
+         "end_date": "2023-06-01T00:00:00+00:00",
+         "function_category": "",
+         "is_default": false,
+         "location": {
+          "raw": ""
+         },
+         "name": "Just",
+         "position_id": 2637195124,
+         "professional_network_id": "86411508",
+         "seniority_level": "Owner / Partner",
+         "start_date": "2023-01-01T00:00:00+00:00",
+         "title": "Co-Founder",
+         "years_at_company": "Less than 1 year",
+         "years_at_company_raw": 0.0
+        }
+       ]
+      }
+     },
+     "social_handles": {
+      "dev_platform_identifier": {
+       "profile_url": null
+      },
+      "professional_network_identifier": {
+       "profile_url": "https://www.linkedin.com/in/kedar-sharma-67aa9b253"
+      },
+      "twitter_identifier": {
+       "slug": ""
+      }
+     },
+     "crustdata_person_id": 420958731
+    }
+   }
+  ]
+ }
+]
