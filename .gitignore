@@ -14,3 +14,4 @@ out/eval/*/
 dist/
 *.egg-info/
 .DS_Store
+video/build/
