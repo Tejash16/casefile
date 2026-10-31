@@ -1,0 +1,83 @@
+{
+ "profiles": [
+  {
+   "crustdata_person_id": 2029845,
+   "basic_profile": {
+    "current_title": "Industry Agentic System - Founder & Global Business Head",
+    "location": {
+     "city": "Reading",
+     "continent": "Europe",
+     "country": "United Kingdom",
+     "full_location": "Greater Reading Area",
+     "raw": "Greater Reading Area",
+     "state": "England"
+    },
+    "name": "Bhupesh Naik",
+    "normalized_title": {
+     "confident": true,
+     "department": "Executive Leadership",
+     "matched_title": "Industry Executive",
+     "similarity": 0.949,
+     "sub_department": "General & Regional Management"
+    },
+    "professional_network_name": "Bhupesh Naik"
+   },
+   "experience": {
+    "employment_details": {
+     "current": [
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "World of Quantum & AI"
+      }
+     ],
+     "past": [
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "Infosys"
+      },
+      {
+       "name": "Mastek"
+      },
+      {
+       "name": "Searchlight Pvt. Ltd."
+      },
+      {
+       "name": "Edutech Start-up, Compassbox.com Pvt Ltd. - Venture of Career Launcher"
+      }
+     ]
+    }
+   },
+   "metadata": {
+    "updated_at": "2026-10-26T19:22:07+00:00"
+   },
+   "social_handles": {
+    "dev_platform_identifier": {
+     "profile_url": null
+    },
+    "professional_network_identifier": {
+     "profile_url": "https://www.linkedin.com/in/bhupeshnaik"
+    },
+    "twitter_identifier": {
+     "slug": "Bhupeshnaik"
+    }
+   }
+  }
+ ],
+ "next_cursor": null,
+ "total_count": 1,
+ "total_count_relation": null,
+ "remarks": []
+}

@@ -1,0 +1,164 @@
+[
+ {
+  "matched_on": "https://www.linkedin.com/in/bhupeshnaik",
+  "match_type": "professional_network_profile_url",
+  "match_status": "matched",
+  "matches": [
+   {
+    "confidence_score": 1.0,
+    "person_data": {
+     "basic_profile": {
+      "current_title": "Industry Agentic System - Founder & Global Business Head",
+      "first_name": "Bhupesh",
+      "languages": [],
+      "last_name": "Naik",
+      "location": {
+       "city": "Reading",
+       "continent": "Europe",
+       "country": "United Kingdom",
+       "full_location": null,
+       "raw": "Greater Reading Area",
+       "state": "England"
+      },
+      "name": "Bhupesh Naik",
+      "normalized_title": {
+       "confident": true,
+       "department": "Executive Leadership",
+       "matched_title": "Industry Executive",
+       "similarity": 0.9490000009536743,
+       "sub_department": "General & Regional Management"
+      },
+      "professional_network_name": "Bhupesh Naik"
+     },
+     "crustdata_person_id": 2029845,
+     "experience": {
+      "employment_details": {
+       "current": [
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": null,
+         "name": "Infosys",
+         "start_date": "2025-10-01T00:00:00+00:00",
+         "title": "Industry Agentic System - Founder & Global Business Head"
+        },
+        {
+         "company_headcount_range": "2-10",
+         "company_status": "active",
+         "company_website_domain": "worldofquantumai.com",
+         "crustdata_company_id": 29696770,
+         "end_date": null,
+         "name": "World of Quantum & AI",
+         "start_date": "2026-03-01T00:00:00+00:00",
+         "title": "Founder of Open Forum"
+        }
+       ],
+       "past": [
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": "2025-11-01T00:00:00+00:00",
+         "name": "Infosys",
+         "start_date": "2020-10-01T00:00:00+00:00",
+         "title": "AVP,  AI & Automation Strategy Business Head  | Executive Technology Office"
+        },
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": "2020-09-01T00:00:00+00:00",
+         "name": "Infosys",
+         "start_date": "2015-01-01T00:00:00+00:00",
+         "title": "Chief Digital Strategist - Europe Practice Head"
+        },
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": "2015-06-01T00:00:00+00:00",
+         "name": "Infosys",
+         "start_date": "2012-06-01T00:00:00+00:00",
+         "title": "Director - Digital Strategy"
+        },
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": "2012-06-01T00:00:00+00:00",
+         "name": "Infosys",
+         "start_date": "2010-04-01T00:00:00+00:00",
+         "title": "Chief Enterprise Architect & Digital Strategist"
+        },
+        {
+         "company_headcount_range": "10001+",
+         "company_status": "active",
+         "company_website_domain": "infosys.com",
+         "crustdata_company_id": 2199,
+         "end_date": "2010-06-01T00:00:00+00:00",
+         "name": "Infosys",
+         "start_date": "2008-05-01T00:00:00+00:00",
+         "title": "Chief Architect  - Large Enterprise Solutions"
+        },
+        {
+         "company_headcount_range": "5001-10000",
+         "company_status": "active",
+         "company_website_domain": "mastek.com",
+         "crustdata_company_id": 2962,
+         "end_date": "2008-04-01T00:00:00+00:00",
+         "name": "Mastek",
+         "start_date": "2002-01-01T00:00:00+00:00",
+         "title": "Chief Product Architect"
+        },
+        {
+         "company_headcount_range": null,
+         "company_status": null,
+         "company_website_domain": null,
+         "crustdata_company_id": null,
+         "end_date": "2002-01-01T00:00:00+00:00",
+         "name": "Searchlight Pvt. Ltd.",
+         "start_date": "2001-02-01T00:00:00+00:00",
+         "title": "Portolio Architect & Manager"
+        },
+        {
+         "company_headcount_range": null,
+         "company_status": null,
+         "company_website_domain": null,
+         "crustdata_company_id": null,
+         "end_date": "2001-01-01T00:00:00+00:00",
+         "name": "Edutech Start-up, Compassbox.com Pvt Ltd. - Venture of Career Launcher",
+         "start_date": "1999-05-01T00:00:00+00:00",
+         "title": "Product Technology Lead & Programme Manager"
+        }
+       ]
+      }
+     },
+     "social_handles": {
+      "dev_platform_identifier": {
+       "profile_url": null
+      },
+      "professional_network_identifier": {
+       "profile_url": "https://www.linkedin.com/in/bhupeshnaik"
+      },
+      "twitter_identifier": {
+       "slug": "Bhupeshnaik"
+      }
+     },
+     "updated_at": "2026-10-28T16:13:35Z"
+    }
+   }
+  ]
+ },
+ {
+  "matched_on": "https://www.linkedin.com/in/zz-nobody-xq-9981",
+  "match_type": "professional_network_profile_url",
+  "match_status": "not_found",
+  "matches": []
+ }
+]
