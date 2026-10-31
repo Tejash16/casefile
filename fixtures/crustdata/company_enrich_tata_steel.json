@@ -1,0 +1,2266 @@
+[
+ {
+  "matched_on": "5042",
+  "match_type": "crustdata_company_id",
+  "matches": [
+   {
+    "confidence_score": 1.0,
+    "company_data": {
+     "crustdata_company_id": 5042,
+     "funding": {
+      "acquired_by": [],
+      "acquisitions": [
+       {
+        "acquiree_company_id": 20240754,
+        "acquiree_company_name": "Creative Port Development",
+        "acquiree_crunchbase_url": "https://crunchbase.com/organization/creative-port-development",
+        "acquirer_company_id": 5042,
+        "acquirer_company_name": "Tata Steel",
+        "acquirer_crunchbase_url": "https://crunchbase.com/organization/tata-steel",
+        "announced_on_date": "2017-01-25",
+        "transaction_text": "Creative Port Development acquired by Tata Steel"
+       },
+       {
+        "acquiree_company_id": 1689496,
+        "acquiree_company_name": "Medica TS Hospital",
+        "acquiree_crunchbase_url": "https://crunchbase.com/organization/medica-ts-hospital",
+        "acquirer_company_id": 5042,
+        "acquirer_company_name": "Tata Steel",
+        "acquirer_crunchbase_url": "https://crunchbase.com/organization/tata-steel",
+        "announced_on_date": "2026-03-17",
+        "transaction_text": "Medica TS Hospital acquired by Tata Steel"
+       },
+       {
+        "acquiree_company_id": 28221,
+        "acquiree_company_name": "Bhubaneshwar Power Private Ltd.",
+        "acquiree_crunchbase_url": "https://crunchbase.com/organization/bhubaneshwar-power-private-ltd",
+        "acquirer_company_id": 5042,
+        "acquirer_company_name": "Tata Steel",
+        "acquirer_crunchbase_url": "https://crunchbase.com/organization/tata-steel",
+        "announced_on_date": "2018-02-02",
+        "transaction_text": "Bhubaneshwar Power Private Ltd. acquired by Tata Steel"
+       }
+      ],
+      "investors_detailed": [
+       {
+        "crunchbase_profile_url": "https://www.crunchbase.com/organization/leadership-group-for-industry-transition",
+        "permalink": "leadership-group-for-industry-transition",
+        "name": "Leadership Group for Industry Transition",
+        "uuid": "277ec44c-e78f-434b-afe5-3805a002acf9",
+        "type": "organization",
+        "categories": [
+         ""
+        ]
+       },
+       {
+        "crunchbase_profile_url": "https://www.crunchbase.com/organization/uk-government",
+        "permalink": "uk-government",
+        "name": "UK Government",
+        "uuid": "539eddc1-f7e5-4669-b2f4-d98c9e34b7a5",
+        "type": "organization",
+        "categories": [
+         "government_office"
+        ]
+       }
+      ],
+      "milestones": [
+       {
+        "round_type": "grant",
+        "is_fund": false,
+        "investors_detailed": [
+         {
+          "categories": [
+           ""
+          ],
+          "crunchbase_profile_url": "https://www.crunchbase.com/organization/leadership-group-for-industry-transition",
+          "name": "Leadership Group for Industry Transition",
+          "permalink": "leadership-group-for-industry-transition",
+          "type": "organization",
+          "uuid": "277ec44c-e78f-434b-afe5-3805a002acf9"
+         }
+        ],
+        "permalink": "tata-steel-grant--1b827a93",
+        "date": "2025-12-09",
+        "funding_date": "2025-12-09",
+        "amount_usd": null,
+        "investors": "Leadership Group for Industry Transition",
+        "lead_investors": "Leadership Group for Industry Transition"
+       },
+       {
+        "round_type": "grant",
+        "is_fund": false,
+        "investors_detailed": [
+         {
+          "categories": [
+           "government_office"
+          ],
+          "crunchbase_profile_url": "https://www.crunchbase.com/organization/uk-government",
+          "name": "UK Government",
+          "permalink": "uk-government",
+          "type": "organization",
+          "uuid": "539eddc1-f7e5-4669-b2f4-d98c9e34b7a5"
+         }
+        ],
+        "permalink": "tata-steel-grant--51224239",
+        "date": "2024-09-11",
+        "funding_date": "2024-09-11",
+        "amount_usd": 651907481.0,
+        "investors": "UK Government",
+        "lead_investors": "UK Government"
+       }
+      ],
+      "contact_email": "feedback@tatasteel.com",
+      "is_investor": false,
+      "phone_number": "+44 (0)20 7717 4444",
+      "funds_total_usd": null,
+      "last_fund_date": null,
+      "num_funding_rounds": 2,
+      "num_funds": 0,
+      "total_investment_usd": 651907481.0,
+      "last_round_amount_usd": 651907481.0,
+      "last_round_type": "grant",
+      "investors": [
+       "Leadership Group for Industry Transition",
+       "UK Government"
+      ],
+      "last_fundraise_date": "2025-12-09"
+     },
+     "headcount": {
+      "by_function_timeseries": {
+       "CURRENT_FUNCTION": {
+        "Real Estate": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 43
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 44
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 48
+         }
+        ],
+        "Marketing": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 448
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 445
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 449
+         }
+        ],
+        "Legal": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 223
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 219
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 230
+         }
+        ],
+        "Human Resources": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 897
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 885
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 919
+         }
+        ],
+        "Information Technology": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 1910
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 1922
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 2168
+         }
+        ],
+        "Sales": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 2574
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 2587
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 2673
+         }
+        ],
+        "Product Management": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 117
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 118
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 135
+         }
+        ],
+        "Program and Project Management": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 816
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 825
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 870
+         }
+        ],
+        "Accounting": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 687
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 689
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 709
+         }
+        ],
+        "Quality Assurance": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 555
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 563
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 584
+         }
+        ],
+        "Customer Success and Support": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 673
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 678
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 731
+         }
+        ],
+        "Consulting": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 235
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 237
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 246
+         }
+        ],
+        "Community and Social Services": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 258
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 256
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 272
+         }
+        ],
+        "Administrative": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 2018
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 2040
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 2114
+         }
+        ],
+        "Research": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 841
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 838
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 883
+         }
+        ],
+        "Business Development": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 961
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 963
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 991
+         }
+        ],
+        "Entrepreneurship": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 187
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 192
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 197
+         }
+        ],
+        "Purchasing": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 439
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 434
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 449
+         }
+        ],
+        "Operations": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 10106
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 10142
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 10840
+         }
+        ],
+        "Healthcare Services": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 496
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 499
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 505
+         }
+        ],
+        "Arts and Design": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 260
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 259
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 276
+         }
+        ],
+        "Education": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 1158
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 1170
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 1177
+         }
+        ],
+        "Finance": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 493
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 494
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 511
+         }
+        ],
+        "Media and Communication": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 258
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 257
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 279
+         }
+        ],
+        "Military and Protective Services": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 665
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 666
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 700
+         }
+        ],
+        "Engineering": [
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 9387
+         },
+         {
+          "date": "2025-01-01 00:00:00",
+          "employee_count": 9488
+         },
+         {
+          "date": "2025-02-01 00:00:00",
+          "employee_count": 9731
+         }
+        ]
+       },
+       "GEO_REGION": {
+        "Angul Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 156
+         }
+        ],
+        "Cleveland, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 228
+         }
+        ],
+        "The Hague Area, Netherlands": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 72
+         }
+        ],
+        "Jharkhand, India": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 14092
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 12840
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 13663
+         }
+        ],
+        "Hazaribag Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 179
+         }
+        ],
+        "Sheffield, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 280
+         }
+        ],
+        "Kolkata Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 1255
+         }
+        ],
+        "Mumbai Metropolitan Region": [
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 1442
+         },
+         {
+          "date": "2024-10-01 00:00:00",
+          "employee_count": 1442
+         },
+         {
+          "date": "2024-11-01 00:00:00",
+          "employee_count": 1442
+         }
+        ],
+        "Jajpur Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 214
+         }
+        ],
+        "Jamshedpur Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 6076
+         }
+        ],
+        "New Delhi Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 497
+         }
+        ],
+        "Wales, United Kingdom": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 1817
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 1779
+         }
+        ],
+        "The Randstad, Netherlands": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 1767
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 1757
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 1811
+         }
+        ],
+        "Bokaro Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 208
+         }
+        ],
+        "Greater Kolkata Area": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 2177
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 2107
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 2248
+         }
+        ],
+        "Doncaster, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 514
+         }
+        ],
+        "Hyderabad Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 121
+         }
+        ],
+        "United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 3252
+         },
+         {
+          "date": "2022-02-01 00:00:00",
+          "employee_count": 3252
+         },
+         {
+          "date": "2022-03-01 00:00:00",
+          "employee_count": 3252
+         }
+        ],
+        "Jajpur": [
+         {
+          "date": "2024-10-01 00:00:00",
+          "employee_count": 1056
+         },
+         {
+          "date": "2024-11-01 00:00:00",
+          "employee_count": 1077
+         },
+         {
+          "date": "2024-12-01 00:00:00",
+          "employee_count": 1098
+         }
+        ],
+        "Ranchi Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 319
+         }
+        ],
+        "Bhadrakh Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 175
+         }
+        ],
+        "Amsterdam Area, Netherlands": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 2377
+         }
+        ],
+        "Amsterdam Area": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 1685
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 1682
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 1731
+         }
+        ],
+        "Bada Barabil Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 559
+         }
+        ],
+        "Noida Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 393
+         }
+        ],
+        "Patna Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 394
+         }
+        ],
+        "Dhanbad-Ranchi Area": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 1757
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 1717
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 1808
+         }
+        ],
+        "Bhubaneshwar Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 444
+         }
+        ],
+        "Mumbai Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 692
+         }
+        ],
+        "Breda Area, Netherlands": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 62
+         }
+        ],
+        "Swansea, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 884
+         }
+        ],
+        "India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 20625
+         },
+         {
+          "date": "2022-02-01 00:00:00",
+          "employee_count": 20625
+         },
+         {
+          "date": "2022-03-01 00:00:00",
+          "employee_count": 20625
+         }
+        ],
+        "Newport, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 350
+         }
+        ],
+        "Jamshedpur": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 10786
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 9873
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 10317
+         }
+        ],
+        "Canada": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 170
+         }
+        ],
+        "North Holland, Netherlands": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 2327
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 2311
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 2693
+         }
+        ],
+        "Maharashtra, India": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 2998
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 2794
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 2977
+         }
+        ],
+        "France": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 168
+         }
+        ],
+        "Netherlands": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 2921
+         },
+         {
+          "date": "2022-02-01 00:00:00",
+          "employee_count": 2921
+         },
+         {
+          "date": "2022-03-01 00:00:00",
+          "employee_count": 2921
+         }
+        ],
+        "Odisha, India": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 7362
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 6610
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 7019
+         }
+        ],
+        "Chennai Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 146
+         }
+        ],
+        "Rotterdam Area, Netherlands": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 70
+         }
+        ],
+        "West Bengal, India": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 3132
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 2858
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 3176
+         }
+        ],
+        "Cuttack Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 568
+         }
+        ],
+        "Cardiff, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 306
+         }
+        ],
+        "Chester, United Kingdom": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 151
+         }
+        ],
+        "Greater Delhi Area": [
+         {
+          "date": "2024-07-01 00:00:00",
+          "employee_count": 1611
+         },
+         {
+          "date": "2024-08-01 00:00:00",
+          "employee_count": 1602
+         },
+         {
+          "date": "2024-09-01 00:00:00",
+          "employee_count": 1658
+         }
+        ],
+        "Bengaluru Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 192
+         }
+        ],
+        "Dhanbad Area, India": [
+         {
+          "date": "2022-01-01 00:00:00",
+          "employee_count": 216
+         }
+        ]
+       }
+      },
+      "largest_headcount_country": "IND",
+      "total": 59525,
+      "growth_percent": {
+       "mom": 0.9240420481519159,
+       "qoq": 1.298458187263878,
+       "six_months": 3.732812853981144,
+       "yoy": 6.306032789227417,
+       "two_years": 12.636478891895472
+      },
+      "growth_absolute": {
+       "mom": 545,
+       "qoq": 763,
+       "six_months": 2142,
+       "yoy": 3531,
+       "two_years": 6678
+      },
+      "by_role_absolute": {
+       "Human Resources": 1183,
+       "Education": 1489,
+       "Operations": 14014,
+       "Sales": 3338,
+       "Information Technology": 2868,
+       "Business Development": 1222,
+       "Support": 935,
+       "Research": 1134,
+       "Administrative": 2575,
+       "Engineering": 11542,
+       "Program and Project Management": 1144
+      },
+      "by_role_percent": {
+       "Human Resources": 1.9874002519949603,
+       "Education": 2.501469970600588,
+       "Operations": 23.54304913901722,
+       "Sales": 5.607727845443091,
+       "Information Technology": 4.818143637127258,
+       "Business Development": 2.0529189416211677,
+       "Support": 1.5707685846283075,
+       "Research": 1.9050818983620328,
+       "Administrative": 4.325913481730366,
+       "Engineering": 19.39017219655607,
+       "Program and Project Management": 1.9218815623687526
+      },
+      "by_role_growth_6m_pct": {
+       "Healthcare Services": 2.8142589118198873,
+       "Media and Communication": -0.6802721088435374,
+       "Research": 25.442477876106196,
+       "Consulting": 0.0,
+       "Community and Social Services": 2.8268551236749118,
+       "Support": 5.530474040632054,
+       "Business Development": 18.9873417721519,
+       "Legal": 2.8455284552845526,
+       "Purchasing": 3.0973451327433628,
+       "Administrative": 9.527860484900042,
+       "Finance": 5.4945054945054945,
+       "Sales": 14.275932899691886,
+       "Program and Project Management": 31.343283582089555,
+       "Quality Assurance": 5.246422893481717,
+       "Entrepreneurship": 5.172413793103448,
+       "Real Estate": 5.357142857142857,
+       "Product Management": -1.4705882352941175,
+       "Operations": 17.675707448148458,
+       "Education": 13.750954927425516,
+       "Arts and Design": 3.7854889589905363,
+       "Accounting": 3.48993288590604,
+       "Information Technology": 29.950158586316267,
+       "Human Resources": 22.972972972972975,
+       "Marketing": 3.1914893617021276,
+       "Customer Success and Support": 2.802547770700637,
+       "Military and Protective Services": 6.530089628681178,
+       "Engineering": 11.830249006879178
+      },
+      "by_role_growth_yoy_pct": {
+       "Healthcare Services": 4.980842911877394,
+       "Media and Communication": 2.8169014084507045,
+       "Research": -1.647875108412836,
+       "Consulting": 1.9920318725099602,
+       "Community and Social Services": 3.9285714285714284,
+       "Support": 7.71889400921659,
+       "Business Development": 3.3840947546531304,
+       "Legal": 6.751054852320674,
+       "Purchasing": 5.191873589164786,
+       "Administrative": 10.136869118905047,
+       "Finance": 6.077348066298343,
+       "Sales": 9.802631578947368,
+       "Program and Project Management": 3.342366757000903,
+       "Quality Assurance": 7.99347471451876,
+       "Entrepreneurship": 12.442396313364055,
+       "Real Estate": 5.357142857142857,
+       "Product Management": 2.2900763358778624,
+       "Operations": 11.17810392701309,
+       "Education": 7.586705202312139,
+       "Arts and Design": 8.58085808580858,
+       "Accounting": 5.616438356164384,
+       "Information Technology": 3.9883973894126177,
+       "Human Resources": 5.249110320284697,
+       "Marketing": 3.411513859275053,
+       "Customer Success and Support": 4.533678756476684,
+       "Military and Protective Services": 10.344827586206897,
+       "Engineering": 7.587621178225206
+      },
+      "by_region_absolute": {
+       "The Randstad, Netherlands": 1680,
+       "Jajpur": 1415,
+       "Greater Kolkata Area": 2613,
+       "Jharkhand, India": 15822,
+       "Netherlands": 2806,
+       "Jamshedpur": 11987,
+       "West Bengal, India": 3634,
+       "United Kingdom": 3317,
+       "Odisha, India": 9780,
+       "Amsterdam Area": 1606,
+       "Mumbai Metropolitan Region": 1745,
+       "Maharashtra, India": 3192,
+       "India": 45216,
+       "North Holland, Netherlands": 2409,
+       "Dhanbad-Ranchi Area": 2010
+      },
+      "by_region_percent": {
+       "The Randstad, Netherlands": 2.8223435531289374,
+       "Jajpur": 2.377152456950861,
+       "Greater Kolkata Area": 4.389752204955901,
+       "Jharkhand, India": 26.58042839143217,
+       "Netherlands": 4.713985720285594,
+       "Jamshedpur": 20.137757244855102,
+       "West Bengal, India": 6.104997900041999,
+       "United Kingdom": 5.572448551028979,
+       "Odisha, India": 16.43007139857203,
+       "Amsterdam Area": 2.6980260394792106,
+       "Mumbai Metropolitan Region": 2.9315413691726167,
+       "Maharashtra, India": 5.362452750944981,
+       "India": 75.96136077278454,
+       "North Holland, Netherlands": 4.0470390592188155,
+       "Dhanbad-Ranchi Area": 3.376732465350693
+      },
+      "by_skill_absolute": {
+       "Microsoft Office": 4679,
+       "Communication": 2980,
+       "Engineering": 5227,
+       "Analytical Skills": 2083,
+       "Microsoft Word": 2488,
+       "Project Planning": 2082,
+       "AutoCAD": 2155,
+       "Microsoft Excel": 4423,
+       "Project Management": 3830,
+       "Management": 2882,
+       "Team Management": 2172,
+       "Microsoft PowerPoint": 2455,
+       "Manufacturing": 2140,
+       "Problem Solving": 2001,
+       "Leadership": 2933,
+       "Operations Management": 1833,
+       "Steel": 2097
+      },
+      "by_skill_percent": {
+       "Microsoft Office": 7.860562788744225,
+       "Communication": 5.0062998740025195,
+       "Engineering": 8.781184376312472,
+       "Analytical Skills": 3.499370012599748,
+       "Microsoft Word": 4.1797564048719025,
+       "Project Planning": 3.4976900461990765,
+       "AutoCAD": 3.620327593448131,
+       "Microsoft Excel": 7.430491390172196,
+       "Project Management": 6.434271314573708,
+       "Management": 4.841663166736665,
+       "Team Management": 3.6488870222595544,
+       "Microsoft PowerPoint": 4.124317513649727,
+       "Manufacturing": 3.595128097438051,
+       "Problem Solving": 3.361612767744645,
+       "Leadership": 4.9273414531709365,
+       "Operations Management": 3.079378412431751,
+       "Steel": 3.522889542209156
+      },
+      "timeseries": [
+       {
+        "date": "2019-10-28",
+        "employee_count": 24294
+       },
+       {
+        "date": "2019-11-04",
+        "employee_count": 24294
+       },
+       {
+        "date": "2019-11-11",
+        "employee_count": 24294
+       }
+      ]
+     },
+     "locations": {
+      "city": "Mumbai",
+      "country": "IND",
+      "state": "Maharashtra",
+      "street_address": "Bombay House, 24, Homi Mody Street, Mumbai G.P.O., Town Hall (Mumbai), Tajmahal, Stock Exchange, Bazargate, M.P.T., Maharashtra",
+      "headquarters": "Mumbai G.P.O., Town Hall (Mumbai), Tajmahal, Stock Exchange, Bazargate, M.P.T., Maharashtra, India",
+      "all_office_addresses": []
+     },
+     "people": {
+      "cxos": [
+       {
+        "crustdata_person_id": 12063818,
+        "basic_profile": {
+         "name": "Jayanta Banerjee",
+         "headline": "Group CIO Tata Steel Ltd | On Boards of mjunction & TSGCCL ",
+         "current_title": "Group CIO",
+         "summary": "Jayanta Banerjee is a member of the senior management team, an IT industry veteran, and a recognized thought leader in Digital, Data, and Artificial Intelligence, driving industrial transformation to create sustainable business value. Known for being “patiently impatient” in leading change, he has been at the forefront of leveraging technology to transform businesses and operations.Prior to joining Tata Steel as Chief Information Officer over a decade ago, Jayanta was a Business Leader at Tata Consultancy Services (TCS), where he headed the Life Sciences and Energy &amp; Resources verticals.With over 33 years of experience within the Tata Group, he has led businesses globally across strategy, sales, delivery, operations, and digital transformation.A widely travelled industry speaker and technology evangelist, Jayanta has championed several pioneering initiatives in Industry 4.0, Industry 5.0, AI, and digital transformation. He serves on the boards of Tata Steel Global Capability Centre Limited and Mjunction Services Limited and actively contributes to leading industry forums and institutions globally.Jayanta is a member of the Advisory Board of the World Economic Forum’s Global Lighthouse Network and actively collaborates with global leaders on the future of advanced manufacturing, digital transformation, and artificial intelligence. He also serves as Chair of the IFQM Digital Chapter and participates in the MIT Generative AI Consortium.He is an alumnus of CEDEP (France), AIMA–Berkeley, and the Ross School of Business (Tata Management Training Centre).Beyond his professional commitments, Jayanta is passionate about fitness, wellness, and mentoring aspiring leaders, helping shape the next generation of technology and business professionals.",
+         "languages": [
+          "English"
+         ],
+         "last_updated": "2026-10-09T19:52:06.773Z",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/eece4d6caeb93492026d136fd7dc0b30274cf3a2f81bfd7b86810bbf2f9dd785.jpg",
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D4D03AQFdsclQSBXwRg/profile-displayphoto-crop_800_800/B4DZ6wY.aXKQAM-/0/1781075797911?e=1793232000&v=beta&t=qRBywsZOCrpLBeCPBbx1GxhRVLDgMUhZ-qaK92Wgpxk",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/eece4d6caeb93492026d136fd7dc0b30274cf3a2f81bfd7b86810bbf2f9dd785.jpg",
+         "name": "Jayanta Banerjee",
+         "headline": "Group CIO Tata Steel Ltd | On Boards of mjunction & TSGCCL ",
+         "current_title": "Group CIO",
+         "summary": "Jayanta Banerjee is a member of the senior management team, an IT industry veteran, and a recognized thought leader in Digital, Data, and Artificial Intelligence, driving industrial transformation to create sustainable business value. Known for being “patiently impatient” in leading change, he has been at the forefront of leveraging technology to transform businesses and operations.Prior to joining Tata Steel as Chief Information Officer over a decade ago, Jayanta was a Business Leader at Tata Consultancy Services (TCS), where he headed the Life Sciences and Energy &amp; Resources verticals.With over 33 years of experience within the Tata Group, he has led businesses globally across strategy, sales, delivery, operations, and digital transformation.A widely travelled industry speaker and technology evangelist, Jayanta has championed several pioneering initiatives in Industry 4.0, Industry 5.0, AI, and digital transformation. He serves on the boards of Tata Steel Global Capability Centre Limited and Mjunction Services Limited and actively contributes to leading industry forums and institutions globally.Jayanta is a member of the Advisory Board of the World Economic Forum’s Global Lighthouse Network and actively collaborates with global leaders on the future of advanced manufacturing, digital transformation, and artificial intelligence. He also serves as Chair of the IFQM Digital Chapter and participates in the MIT Generative AI Consortium.He is an alumnus of CEDEP (France), AIMA–Berkeley, and the Ross School of Business (Tata Management Training Centre).Beyond his professional commitments, Jayanta is passionate about fitness, wellness, and mentoring aspiring leaders, helping shape the next generation of technology and business professionals.",
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         },
+         "connections": 9406
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Artificial Intelligence (AI)",
+          "Industry 4.0",
+          "Industry 5.O"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/jayantabanerjee1"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "1202666623",
+            "employee_title": "Group CIO",
+            "employee_description": "Chief Information Officer. Responsible for IT, Digital, Industrial Automation and AI led business transformation.",
+            "employee_location": "Mumbai, Maharashtra, India",
+            "employee_start_date": "2018-02-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "Tata Group",
+            "employer_linkedin_id": "237053",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQE5Yf8PnWgE7Q/company-logo_400_400/company-logo_400_400/0/1660714926525/tata_group_logo?e=1794441600&v=beta&t=VyWFnPMCIWQUGhFJ4QgFvVdeQwEqUimF-R_QGC6q3LA",
+            "employer_linkedin_description": "Founded by Jamsetji Tata in 1868, the Tata group is a global enterprise headquartered in India. The group operates in more than 100 countries across six continents with a mission 'To improve the quality of life of the communities we serve globally, through long-term stakeholder value creation based on Leadership with Trust'.Sixty-six per cent of the equity of Tata Sons, the promoter holding company, is held by philanthropic trusts, thereby returning wealth to society. The Tata name has been respected in India for 150 years for its adherence to strong values and business ethics.The companies of the Tata group employ the best and finest, strengthened by a culture of ethics and integrity. Today we stand strong at 702,454 employees.",
+            "employer_company_id": [
+             "7417"
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "1449265660",
+            "employee_title": "Senior Executive",
+            "employee_description": "Technology & thought leader. Have held various roles in business & corporate function leadership, sales, delivery, & operations.",
+            "employee_location": "Global",
+            "employee_start_date": "1993-07-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Tata Consultancy Services",
+            "employer_linkedin_id": "1353",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQGsGR9p4ikS5w/company-logo_200_200/company-logo_200_200/0/1708946550425/tata_consultancy_services_logo?e=1750291200&v=beta&t=kJlzVRgWERZNm18FSkWA2LXTAxkXEFQ4ySwUjgMfgm0",
+            "employer_linkedin_description": "Tata Consultancy Services (TCS) is the technology partner of choice for industry-leading organizations worldwide. Since its inception in 1968, TCS has upheld the highest standards of innovation, engineering excellence, and customer service.It has set an aspiration to become the world's largest AI-led technology services company and is enabling its clients to transform themselves across the full AI stack, from infrastructure to intelligence.Rooted in the heritage of the Tata Group, TCS is focused on creating long term value for its clients, its investors, its employees, and the community at large. With a highly skilled workforce spread across 56 countries and 194 service delivery centers across the world, the company has been recognized as a top employer in six continents. With the ability to rapidly apply and scale new technologies, the company has built long-term partnerships with its clients. Many of these relationships have endured into decades and navigated every technology cycle, from mainframes in the 1970s to artificial intelligence today.TCS sponsors 14 of the world’s most prestigious marathons and endurance events, including the TCS New York City Marathon, TCS London Marathon, Tata Mumbai Marathon, and TCS Sydney Marathon with a focus on promoting health, sustainability, and community empowerment.Caution against fraudulent job offers: TCS doesn’t charge any fee throughout the recruitment process. Refer here: https://www.tcs.com/careers/india/recruitment-fraud-alert",
+            "employer_company_id": [
+             "5057"
+            ],
+            "employer_website": [
+             "tcs.com"
+            ],
+            "employee_position_id": "291078369",
+            "employee_title": "Global Head - Energy & Resources Business Unit",
+            "employee_description": "Business Leadership",
+            "employee_location": "Mumbai",
+            "employee_start_date": "2011-07-01T00:00:00.000Z",
+            "employee_end_date": "2015-10-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Consultancy Services",
+            "employer_linkedin_id": "1353",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQGsGR9p4ikS5w/company-logo_200_200/company-logo_200_200/0/1708946550425/tata_consultancy_services_logo?e=1750291200&v=beta&t=kJlzVRgWERZNm18FSkWA2LXTAxkXEFQ4ySwUjgMfgm0",
+            "employer_linkedin_description": "Tata Consultancy Services (TCS) is the technology partner of choice for industry-leading organizations worldwide. Since its inception in 1968, TCS has upheld the highest standards of innovation, engineering excellence, and customer service.It has set an aspiration to become the world's largest AI-led technology services company and is enabling its clients to transform themselves across the full AI stack, from infrastructure to intelligence.Rooted in the heritage of the Tata Group, TCS is focused on creating long term value for its clients, its investors, its employees, and the community at large. With a highly skilled workforce spread across 56 countries and 194 service delivery centers across the world, the company has been recognized as a top employer in six continents. With the ability to rapidly apply and scale new technologies, the company has built long-term partnerships with its clients. Many of these relationships have endured into decades and navigated every technology cycle, from mainframes in the 1970s to artificial intelligence today.TCS sponsors 14 of the world’s most prestigious marathons and endurance events, including the TCS New York City Marathon, TCS London Marathon, Tata Mumbai Marathon, and TCS Sydney Marathon with a focus on promoting health, sustainability, and community empowerment.Caution against fraudulent job offers: TCS doesn’t charge any fee throughout the recruitment process. Refer here: https://www.tcs.com/careers/india/recruitment-fraud-alert",
+            "employer_company_id": [
+             "5057"
+            ],
+            "employer_website": [
+             "tcs.com"
+            ],
+            "employee_position_id": "291079387",
+            "employee_title": "Global Head Energy",
+            "employee_description": "Business Management",
+            "employee_location": null,
+            "employee_start_date": "2008-09-01T00:00:00.000Z",
+            "employee_end_date": "2011-06-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Consultancy Services",
+            "employer_linkedin_id": "1353",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQGsGR9p4ikS5w/company-logo_200_200/company-logo_200_200/0/1708946550425/tata_consultancy_services_logo?e=1750291200&v=beta&t=kJlzVRgWERZNm18FSkWA2LXTAxkXEFQ4ySwUjgMfgm0",
+            "employer_linkedin_description": "Tata Consultancy Services (TCS) is the technology partner of choice for industry-leading organizations worldwide. Since its inception in 1968, TCS has upheld the highest standards of innovation, engineering excellence, and customer service.It has set an aspiration to become the world's largest AI-led technology services company and is enabling its clients to transform themselves across the full AI stack, from infrastructure to intelligence.Rooted in the heritage of the Tata Group, TCS is focused on creating long term value for its clients, its investors, its employees, and the community at large. With a highly skilled workforce spread across 56 countries and 194 service delivery centers across the world, the company has been recognized as a top employer in six continents. With the ability to rapidly apply and scale new technologies, the company has built long-term partnerships with its clients. Many of these relationships have endured into decades and navigated every technology cycle, from mainframes in the 1970s to artificial intelligence today.TCS sponsors 14 of the world’s most prestigious marathons and endurance events, including the TCS New York City Marathon, TCS London Marathon, Tata Mumbai Marathon, and TCS Sydney Marathon with a focus on promoting health, sustainability, and community empowerment.Caution against fraudulent job offers: TCS doesn’t charge any fee throughout the recruitment process. Refer here: https://www.tcs.com/careers/india/recruitment-fraud-alert",
+            "employer_company_id": [
+             "5057"
+            ],
+            "employer_website": [
+             "tcs.com"
+            ],
+            "employee_position_id": "433302957",
+            "employee_title": "Global Head - Energy & Resources",
+            "employee_description": null,
+            "employee_location": null,
+            "employee_start_date": "2008-01-01T00:00:00.000Z",
+            "employee_end_date": "2013-01-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "Alumni of CEDEP (INSEAD) France, AIMA (Berkeley), TMTC (Ross School of business)",
+           "degree": null,
+           "field_of_study": "Business Administration and Management, General",
+           "activities": null
+          },
+          {
+           "school": "CEDEP - Executive Development – Fontainebleau",
+           "degree": "Senior Executive Development",
+           "field_of_study": null,
+           "activities": null
+          },
+          {
+           "school": "University of Michigan - Stephen M. Ross School of Business",
+           "degree": "Tata Group Executive Leadership (TGELS)",
+           "field_of_study": null,
+           "activities": null
+          }
+         ]
+        },
+        "updated_at": "2026-10-09T19:52:06.773Z"
+       },
+       {
+        "crustdata_person_id": 2252285,
+        "basic_profile": {
+         "name": "Karan Lakhani",
+         "headline": "CHRO at Tata Steel Downstream Products Ltd. || HR/IR Committee Member of CII - Eastern Region || TBEM Assessor || University of Cambridge ||",
+         "current_title": "Chief Human Resources Officer, TSDPL",
+         "summary": "An HR Professional with Post Graduation Diploma in Personnel Management &amp; Industrial Relations from Xavier Institute of Social Service (XISS) and a Tata Business Excellence Model Assessor \"Gold Category\" from TataBEX Group.I come with over 14 years of work experience in HR &amp; IR function of Tata Steel Ltd, India Operations. I have worked in multiple geographies having diverse workforce &amp; varied culture. Specialties : Industrial Relations, Business HR Partnering, Business Acumen, Strategic HR, HR Policies , Cost Analysis, Organizational Restructuring, Organizational Design, Diversity &amp; Inclusion, Talent Management.",
+         "languages": [],
+         "last_updated": "2026-09-27T19:54:20.818Z",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/068b8180b1b3b901526b3dbfc213459cab693f77080a6acb28887a441557901a.jpg",
+         "location": {
+          "raw": "Kolkata, West Bengal, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D5603AQHmxi29PDBv-w/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1727560488250?e=1792022400&v=beta&t=B4bQf-zl8mBdq7U-XgV1IGPNU4GLUv5beJ8rx3iGkvU",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/068b8180b1b3b901526b3dbfc213459cab693f77080a6acb28887a441557901a.jpg",
+         "name": "Karan Lakhani",
+         "headline": "CHRO at Tata Steel Downstream Products Ltd. || HR/IR Committee Member of CII - Eastern Region || TBEM Assessor || University of Cambridge ||",
+         "current_title": "Chief Human Resources Officer, TSDPL",
+         "summary": "An HR Professional with Post Graduation Diploma in Personnel Management &amp; Industrial Relations from Xavier Institute of Social Service (XISS) and a Tata Business Excellence Model Assessor \"Gold Category\" from TataBEX Group.I come with over 14 years of work experience in HR &amp; IR function of Tata Steel Ltd, India Operations. I have worked in multiple geographies having diverse workforce &amp; varied culture. Specialties : Industrial Relations, Business HR Partnering, Business Acumen, Strategic HR, HR Policies , Cost Analysis, Organizational Restructuring, Organizational Design, Diversity &amp; Inclusion, Talent Management.",
+         "location": {
+          "raw": "Kolkata, West Bengal, India"
+         },
+         "connections": 5399
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Management",
+          "Leadership",
+          "Strategic Planning"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/karan-lakhani-a5049416b"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2239929988",
+            "employee_title": "On Deputation to TSDPL",
+            "employee_description": null,
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2022-07-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2239932786",
+            "employee_title": "Chief Human Resources Officer, TSDPL",
+            "employee_description": null,
+            "employee_location": "Kolkata",
+            "employee_start_date": "2022-07-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "1352150429",
+            "employee_title": "Sr. Manager HRM Supply Chain",
+            "employee_description": null,
+            "employee_location": "Jamshedpur Area, India",
+            "employee_start_date": "2015-10-01T00:00:00.000Z",
+            "employee_end_date": "2019-07-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "1494498964",
+            "employee_title": "Manager HRM",
+            "employee_description": null,
+            "employee_location": "Jamshedpur Area, India",
+            "employee_start_date": "2012-04-01T00:00:00.000Z",
+            "employee_end_date": "2015-09-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "1495000627",
+            "employee_title": "Head HRBP",
+            "employee_description": null,
+            "employee_location": "Haldia",
+            "employee_start_date": "2019-08-01T00:00:00.000Z",
+            "employee_end_date": "2022-07-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "University of Cambridge",
+           "degree": null,
+           "field_of_study": "Human Resources Management/Personnel Administration, General",
+           "activities": null
+          },
+          {
+           "school": "Xavier Institute of Social Service",
+           "degree": "PGDPM&IR",
+           "field_of_study": "Human Resources Management/Personnel Administration, General",
+           "activities": null
+          },
+          {
+           "school": "Xavier Institute of Social Service",
+           "degree": "Master of Business Administration - MBA",
+           "field_of_study": "Human Resources Management/Personnel Administration, General",
+           "activities": null
+          }
+         ]
+        },
+        "updated_at": "2026-09-27T19:54:20.818Z"
+       },
+       {
+        "crustdata_person_id": 1423547,
+        "basic_profile": {
+         "name": "Dinesh Kumar Shrimali",
+         "headline": "Chief Information Security Officer and Data Protection Officer",
+         "current_title": "Chief Information Security Officer and Data Protection Officer",
+         "summary": "I have a distinguished career in the field of Information Technology and am an accomplished professional. With more than two decades of experience, I have amassed a wealth of knowledge in advancing strategic security initiatives and mitigating complex cyber risks. A track record of successfully aligning cybersecurity strategies with business objectives, allowing organizations to confidently navigate an ever-changing threat landscape. I have witnessed the evolution of my profession, most notably the rapid rise of digitization and the central role that cybersecurity plays in shaping the future of economies across the globe. I contribute a strategic perspective and the ability to generate results through effective planning and execution.\n\nThroughout my tenure, I have led the design and implementation of enterprise-wide security programmes while holding key positions. My experience includes information security, risk management, compliance, and data privacy, among others. The best method, in my opinion, to assist individuals and businesses in enhancing their security posture is to provide them with the knowledge and tools necessary to make informed decisions and implement effective solutions.\n\nI look forward to the expanding cybersecurity market and my continued dedication to ensuring everyone and every organization has a safe and secure online future.",
+         "languages": [],
+         "last_updated": "2026-09-14T04:26:58.195Z",
+         "profile_picture_permalink": null,
+         "location": {
+          "raw": "Jamshedpur, Jharkhand, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": null,
+         "profile_picture_permalink": null,
+         "name": "Dinesh Kumar Shrimali",
+         "headline": "Chief Information Security Officer and Data Protection Officer",
+         "current_title": "Chief Information Security Officer and Data Protection Officer",
+         "summary": "I have a distinguished career in the field of Information Technology and am an accomplished professional. With more than two decades of experience, I have amassed a wealth of knowledge in advancing strategic security initiatives and mitigating complex cyber risks. A track record of successfully aligning cybersecurity strategies with business objectives, allowing organizations to confidently navigate an ever-changing threat landscape. I have witnessed the evolution of my profession, most notably the rapid rise of digitization and the central role that cybersecurity plays in shaping the future of economies across the globe. I contribute a strategic perspective and the ability to generate results through effective planning and execution.\n\nThroughout my tenure, I have led the design and implementation of enterprise-wide security programmes while holding key positions. My experience includes information security, risk management, compliance, and data privacy, among others. The best method, in my opinion, to assist individuals and businesses in enhancing their security posture is to provide them with the knowledge and tools necessary to make informed decisions and implement effective solutions.\n\nI look forward to the expanding cybersecurity market and my continued dedication to ensuring everyone and every organization has a safe and secure online future.",
+         "location": {
+          "raw": "Jamshedpur, Jharkhand, India"
+         },
+         "connections": 5383
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Engineering",
+          "Project Planning",
+          "Information Security Management"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/dinesh-kumar-shrimali"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2375497292",
+            "employee_title": "Chief Information Security Officer and Data Protection Officer",
+            "employee_description": null,
+            "employee_location": "Jamshedpur, Jharkhand, India",
+            "employee_start_date": "2024-03-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Ambuja Cements Limited",
+            "employer_linkedin_id": "269587",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/C4D0BAQF38qfy3UifZg/company-logo_200_200/company-logo_200_200/0/1631328086400?e=1747872000&v=beta&t=9QKIGeTNaxtc1UCKTaSqqFZ3CGf7RzyfCOOqO6b3eqE",
+            "employer_linkedin_description": "Ambuja Cements Ltd. is among the leading cement companies in India. It is a member of the Adani Group - the largest and fastest-growing portfolio of diversified sustainable businesses. Ambuja Cement is known for its hassle-free, home-building solutions. Its unique products tailor-made for Indian climatic conditions, sustainable operations and initiatives that advance the company's philosophy of contributing to the larger good of the society have made it the most trusted brand in the Indian cement industry.",
+            "employer_company_id": [
+             "232"
+            ],
+            "employer_website": [
+             "ambujacement.com"
+            ],
+            "employee_position_id": "101272853",
+            "employee_title": "Database Administrator",
+            "employee_description": null,
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2005-08-01T00:00:00.000Z",
+            "employee_end_date": "2007-02-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "System Solution Technology",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "101275236",
+            "employee_title": "Software Engineer",
+            "employee_description": null,
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2003-05-01T00:00:00.000Z",
+            "employee_end_date": "2005-07-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Seven Hills Opticommunication Pvt. Ltd.,",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "101275308",
+            "employee_title": "Trainee Engineer",
+            "employee_description": null,
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2000-06-01T00:00:00.000Z",
+            "employee_end_date": "2001-07-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "Jadavpur University",
+           "degree": "Master of Engineering - MEng",
+           "field_of_study": "Electronics & Telecommunications",
+           "activities": null
+          },
+          {
+           "school": "Don Bosco High School - India",
+           "degree": "Higher Secondary",
+           "field_of_study": "Science",
+           "activities": null
+          },
+          {
+           "school": "Don Bosco School",
+           "degree": null,
+           "field_of_study": null,
+           "activities": null
+          }
+         ]
+        },
+        "updated_at": "2026-09-14T04:26:58.195Z"
+       }
+      ],
+      "decision_makers": [
+       {
+        "crustdata_person_id": 211869402,
+        "basic_profile": {
+         "name": "Pawan Kumar",
+         "headline": "Head of Sales @ Tata Steel | P&L Leader | E-Commerce Specialist | Strategist | Team Leader | Fitness Enthusiast",
+         "current_title": "Head of Sales",
+         "summary": "I am an Innovator with impact toward global change.I enjoy developing innovative business models in my industry that establish new revenue streams. I am inclined towards creating difference in lives of individuals by identifying and garner latent talent. In my current professional career, I am a key contributor to the product and business development of my organization’s B2B &amp; B2C businesses for the entire country. In this tenure, I have held leadership roles in Sales &amp; Marketing and Digital functions across the company’s Consumer, Business and distribution network units. I solve and leverage opportunities.My negotiation and sales skills, along with my tenacity and strategic vision have been recognized and seen as valuable assets throughout my career. Building relationships and motivating teams are a natural passion. I utilize my skills to help organizations quickly grow their presence in emerging markets.Beyond work, I enjoy motivating, inspiring, and mentoring folks who want to make a mark for themselves. I am passionate about fitness, music, traveling and participating in outdoor activities.",
+         "languages": [
+          "English (Native or bilingual proficiency)",
+          "German (Full professional proficiency)"
+         ],
+         "last_updated": "2026-10-27T07:14:57.212Z",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/84ea40e4b85f7f5d792caa7d383f69dcfd3643ad17f2d168ee81385ddd0dd15d.jpg",
+         "location": {
+          "raw": "Kolkata, West Bengal, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D4D03AQFi9roNJuVjfw/profile-displayphoto-crop_800_800/B4DZ96lfqFJcAI-/0/1784468079255?e=1794441600&v=beta&t=cEPgJImFnhjPUJFMNcfn65vacm8OlDCarad6ZqT0IFw",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/84ea40e4b85f7f5d792caa7d383f69dcfd3643ad17f2d168ee81385ddd0dd15d.jpg",
+         "name": "Pawan Kumar",
+         "headline": "Head of Sales @ Tata Steel | P&L Leader | E-Commerce Specialist | Strategist | Team Leader | Fitness Enthusiast",
+         "current_title": "Head of Sales",
+         "summary": "I am an Innovator with impact toward global change.I enjoy developing innovative business models in my industry that establish new revenue streams. I am inclined towards creating difference in lives of individuals by identifying and garner latent talent. In my current professional career, I am a key contributor to the product and business development of my organization’s B2B &amp; B2C businesses for the entire country. In this tenure, I have held leadership roles in Sales &amp; Marketing and Digital functions across the company’s Consumer, Business and distribution network units. I solve and leverage opportunities.My negotiation and sales skills, along with my tenacity and strategic vision have been recognized and seen as valuable assets throughout my career. Building relationships and motivating teams are a natural passion. I utilize my skills to help organizations quickly grow their presence in emerging markets.Beyond work, I enjoy motivating, inspiring, and mentoring folks who want to make a mark for themselves. I am passionate about fitness, music, traveling and participating in outdoor activities.",
+         "location": {
+          "raw": "Kolkata, West Bengal, India"
+         },
+         "connections": 29433
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Leadership Development",
+          "Entrepreneurship Development",
+          "Business Analysis"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/pawan2iiml"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2969456967",
+            "employee_title": "Head of Sales",
+            "employee_description": "In my role at Tata Steel, I have successfully built and scaled large B2B and B2C steel businesses in Eastern and Southern India. My focus has been on leveraging digital strategies and market development to drive growth. I am now poised to take on a larger business with comprehensive commercial responsibilities, utilizing my expertise in team leadership and strategic planning.",
+            "employee_location": "Jamshedpur",
+            "employee_start_date": "2026-04-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2977423463",
+            "employee_title": "Senior Manager Aashiyana",
+            "employee_description": "Doubled overall Aashiyana sales from INR 726 Cr. in 2021 to INR 1400Cr in 2022; acquired 31% customers in pin codes which had no physical presence via targeted digital campaigns. Doubled traffic and sales from 23.8 KT to 47 KT in one year using paid digital marketing through Google search and display campaigns.",
+            "employee_location": null,
+            "employee_start_date": "2021-10-01T00:00:00.000Z",
+            "employee_end_date": "2023-04-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2989141822",
+            "employee_title": "Senior Online Marketing Manager",
+            "employee_description": "Doubled GMV of Tata Steel Aashiyana platform. Platform won numerous accolades for online marketing initiatives.",
+            "employee_location": "Kolkata",
+            "employee_start_date": "2021-04-01T00:00:00.000Z",
+            "employee_end_date": "2023-04-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2989145589",
+            "employee_title": "Product Manager",
+            "employee_description": "End to end product management of Tata Shaktee galvanised corrugated roofing sheet brand.",
+            "employee_location": "Kolkata",
+            "employee_start_date": "2012-04-01T00:00:00.000Z",
+            "employee_end_date": "2015-03-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "St.Xavier's",
+           "degree": "High School",
+           "field_of_study": "Science",
+           "activities": null
+          },
+          {
+           "school": "Indian Institute of Management, Lucknow",
+           "degree": "PGDM",
+           "field_of_study": "Marketing and Finance",
+           "activities": "1.Winner, Pan-IIM (A, B, C, L) business strategy competition, amongst 59 national level teams\n2.Offered PPI, represented IIM-Lucknow to present before Mr. Shantanu Khosla, CEO P&G"
+          },
+          {
+           "school": "Jadavpur University",
+           "degree": "Bachelor of Engineering (BE)",
+           "field_of_study": "Information Technology",
+           "activities": "1. Core Committee member, SanskritiNational level cultural festival, Jadavpur University, \n2. Captain, department cricket team, crowned college champions in Arena; intra-college event\n3. Winner, Intra College Carrom Championship among 27 departments in the college\n4. Awarded Best Male Actor in Sanskriti, the national level cultural festival of Jadavpur University"
+          }
+         ]
+        },
+        "updated_at": "2026-10-27T07:14:57.212Z"
+       },
+       {
+        "crustdata_person_id": 30085943,
+        "basic_profile": {
+         "name": "Sanjeev Bhatia, PCC",
+         "headline": "ICF-PCC Coach | Leadership, Culture & Transformation",
+         "current_title": "Head of Human Resources",
+         "summary": "Sanjeev Bhatia is the CEO of Knowbility Ventures Pvt. Ltd., a Consulting and Coaching firm specializing in leadership and change for purpose-driven organizations that seek to have an impact beyond the bottom line. He also works extensively as an Executive Coach in supporting leaders to find their unique calling in life, and to speak their truth from a place of purpose and power. He focuses on enabling them to discover and live their purpose, so they can lead a more fulfilled and meaningful life. \nHe makes himself available and coaches the HR leaders who are in transition from a local to a global role. He also loves to devote his time to helping visionary leaders discover their ‘LIVING MESSAGE’, so they can give their greatest gifts to society and build a successful practice to solve big, important problems that help change the world. So,  \n•\tWhere do you want to make a difference in your company and in your life? \n•\tWhat do you value most? Are you living those values?  \n•\tHow do you deal with disappointment or failure? \n•\tWhat motivates you? \n•\tWhat is your true purpose? \nSanjeev can help you explore a compelling vision that can take any goal, action, or outcome with new power and energy within you.  \n\nSanjeev is an experienced CEO with a demonstrated history of working in an MNC, business conglomerates, and management consultancy. He takes a holistic approach to HR & Org Strategy. This covers facilitating in development of Vision, Mission, Values, Organization Structure, Roles, Competencies, all steps of the Employees' Journey, Compensation, Incentives & Benefits, Organization Policies, and Culture.  \n\nHe is an internationally certified practitioner on Lumina Spark for Leadership Assessment, certified by Coach for Life, USA, and an accredited ACC by ICF (International Coaching Federation). He is a strong business professional and an alumnus of IIM-Ahmedabad and BHU.",
+         "languages": [],
+         "last_updated": "2026-09-13T03:52:22.827Z",
+         "profile_picture_permalink": null,
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D4D03AQGYGw9RYiffhA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1722312682308?e=1790812800&v=beta&t=4kM-MR5F0N7wIjcYpBPVnbRJR__bP8XNUmXj0PKGlF0",
+         "profile_picture_permalink": null,
+         "name": "Sanjeev Bhatia, PCC",
+         "headline": "ICF-PCC Coach | Leadership, Culture & Transformation",
+         "current_title": "Head of Human Resources",
+         "summary": "Sanjeev Bhatia is the CEO of Knowbility Ventures Pvt. Ltd., a Consulting and Coaching firm specializing in leadership and change for purpose-driven organizations that seek to have an impact beyond the bottom line. He also works extensively as an Executive Coach in supporting leaders to find their unique calling in life, and to speak their truth from a place of purpose and power. He focuses on enabling them to discover and live their purpose, so they can lead a more fulfilled and meaningful life. \nHe makes himself available and coaches the HR leaders who are in transition from a local to a global role. He also loves to devote his time to helping visionary leaders discover their ‘LIVING MESSAGE’, so they can give their greatest gifts to society and build a successful practice to solve big, important problems that help change the world. So,  \n•\tWhere do you want to make a difference in your company and in your life? \n•\tWhat do you value most? Are you living those values?  \n•\tHow do you deal with disappointment or failure? \n•\tWhat motivates you? \n•\tWhat is your true purpose? \nSanjeev can help you explore a compelling vision that can take any goal, action, or outcome with new power and energy within you.  \n\nSanjeev is an experienced CEO with a demonstrated history of working in an MNC, business conglomerates, and management consultancy. He takes a holistic approach to HR & Org Strategy. This covers facilitating in development of Vision, Mission, Values, Organization Structure, Roles, Competencies, all steps of the Employees' Journey, Compensation, Incentives & Benefits, Organization Policies, and Culture.  \n\nHe is an internationally certified practitioner on Lumina Spark for Leadership Assessment, certified by Coach for Life, USA, and an accredited ACC by ICF (International Coaching Federation). He is a strong business professional and an alumnus of IIM-Ahmedabad and BHU.",
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         },
+         "connections": 24725
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Networking Skilks",
+          "Workshops",
+          "Writing"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/sanjeev-bhatia-pcc-8345432"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Knowbility Ventures",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "1648405051",
+            "employee_title": "Life Coach and Global Executive Coach for Purpose Driven Leaders and OrganizationsO",
+            "employee_description": "Knowbility Ventures is a leadership assessment, development and coaching organization, offering a full range of personal and  organizational effectiveness, and training, services. We focus on supporting leaders, teams, and organizations to realize meaningful change and sustainable business performance, consistent with their mission, vision, and values.\n\nKnowbility Ventures is a network of trusted advisors with broad expertise in leadership and change. We work at the juncture of business strategy and people, understanding that individuals and teams determine the underlying values and processes that drive business outcomes. Because outcomes are never neutral, we also espouse principles that support business integrity, inclusion, sustainability, and courage.\n\nFocusing on being all human, all of the time through the following key offerings:\n\n|| EXECUTIVE AND LEADERSHIP COACHING ||\nFor leaders and entrepreneurs seeking to develop their leadership capabilities\n\n|| WOMEN IN LEADERSHIP ||\nOne to one accountability and coaching to help female executives and entrepreneurs create a thriving career or business they love.\n\nII COACHING FOR HR LEADERS - MOVING FROM LOCAL TO GLOBAL ROLE II\nOne to one coaching of HR leaders, who are moving to higher role in a new territory to face major challenges and the opportunities.\n \n|| TEAM COACHING ||\nHelping team members to work together to produce breakthrough results\n\n|| LEADERSHIP DEVELOPMENT ||\nCustomized approaches that enable leaders to envision and achieve innovative outcomes that serve the organization's key stakeholders\n\n|| ORGANIZATION EFFECTIVENESS AND CHANG ||\nEngaging employees and developing a culture and climate that fosters outstanding business results\n\n|| CONFERENCE DESIGN AND FACILITATION ||\nInteractive and dynamic large group forums designed to achieve a specific goal\n\n|| FOR COMPLIMENTARY COACHING SESSION ||\nAsk at 📧 sanjeev.bhatia@knwobiliy.in;+917400073791",
+            "employee_location": "Mumbai, India",
+            "employee_start_date": "2020-05-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "Knowbility Ventures",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "1806482626",
+            "employee_title": "CEO / Organization/Individual Transformation Coach and Consultant",
+            "employee_description": "Sanjeev is facilitating & transforming organizations and implementing result-driven initiatives across various disciplines for his client organizations. His focus is on leadership assessment, development, \n coaching, and holistic org. transformation with advanced processes like Role Profiler, OKR, Digital Coach, etc.\n\nHe gained hands-on experience from blue-chip multinational companies and industry leaders in their segments including steel, power generation, transmission, & distribution, infrastructure, chemicals, polymers & wool fibers. He has a strong record of creating an out-of-box approach to talent management by keeping the processes pragmatic and straightforward for easy adoption by business leaders. He can move quickly from a strategic leader to a hands-on team member. C Level Executives seek him for new, creative, and breakthrough thinking to help, identify and make pipeline talent ready to meet current and future business demands.",
+            "employee_location": "Mumbai",
+            "employee_start_date": "2019-04-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "The Mumbai Charter Chapter of ICF",
+            "employer_linkedin_id": "7864019",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/C4E0BAQFvjIDXm5DPZA/company-logo_200_200/company-logo_200_200/0/1630618358117/icf_mumbai_chapter_logo?e=1743638400&v=beta&t=COx5aVv7JTLpNObfhj8q24pHT2u0mqj0HrpTMJ_-sfc",
+            "employer_linkedin_description": "We are a not-for-profit individual membership organization, and a local representation of the International Coaching Federation (ICF). We are formed by ICF certified and credentialed coaching professionals in India who practice and/or teach business, personal and several other forms of coaching. Managing Committee | Oct 2024 - Dec 2026:Sanjeev Bhatia| PresidentVinod K Sharma | SecretaryTapas Kapadia | TreasurerDexter Valles | Director-Communities of PracticeSanjay Shesh | Director – Corporate PartnershipsPriti Gupta | Director-Diversity, Equity, Inclusion, & BelongingAniket Anjali Pohekar | Director - Marketing & CommunicationsSaurav Dutta | Director – Memberships & Member ExperienceAnitha Nallasekharan | Director – Social PartnershipsAnne Williams Dias | Director – TechnologySandeep Kalra | Director-Learning & EventsNavin Tauro | Director – PublicationAnjan Bhowmick | Director – Research",
+            "employer_company_id": [
+             "1971264"
+            ],
+            "employer_website": [
+             "icfmumbai.com"
+            ],
+            "employee_position_id": "2487314627",
+            "employee_title": "President",
+            "employee_description": null,
+            "employee_location": "Mumbai, Maharashtra, India",
+            "employee_start_date": "2024-10-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Reliance Power Transmission Ltd.",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "10383733",
+            "employee_title": "Vice President-Human Resources",
+            "employee_description": "Sanjeev was Responsible for HR & Adm. Functions of pan India business of Reliance Transmission & Power Trading (RPTL) which is the largest private Transmission Business player in India. It had 4 Special Purpose Vehicles (SPV) in its business. These SPVs were spread in 10 states in India at present.",
+            "employee_location": "Mumbai",
+            "employee_start_date": "2010-10-01T00:00:00.000Z",
+            "employee_end_date": "2011-10-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "10383948",
+            "employee_title": "Head HR New Initiatives",
+            "employee_description": "1. Re-structured Special Steels, Mumbai which has three units in Mumbai, Tarapur (Maharashtra) & Navsari (Gujrat). \n2. Was a key member in organization re-structuring of officer layers of Tata Steel. \n3. Did Assessment Center, Strengthening Performance Management System, Introducing Campus Relation Building Concept, Compensation benchmarking, Personal Development Plan, Leadership Building System, Succession Planning.",
+            "employee_location": "Jamshedpur Area, India",
+            "employee_start_date": "2001-09-01T00:00:00.000Z",
+            "employee_end_date": "2005-03-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Freelance",
+            "employer_linkedin_id": null,
+            "employer_logo_url": null,
+            "employer_linkedin_description": null,
+            "employer_company_id": [
+             null
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "1795111557",
+            "employee_title": "Lead Coach, Yellow Spark",
+            "employee_description": null,
+            "employee_location": "Mumbai",
+            "employee_start_date": "2021-05-01T00:00:00.000Z",
+            "employee_end_date": "2021-12-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "Banaras Hindu University",
+           "degree": "Post Graduation",
+           "field_of_study": "Statistics",
+           "activities": null
+          },
+          {
+           "school": "Queen's Collage",
+           "degree": "Intermediate",
+           "field_of_study": "Science",
+           "activities": null
+          },
+          {
+           "school": "Coach For Life Institute, USA - ICF (International Coach Federation) Approved",
+           "degree": "Certification",
+           "field_of_study": "Coaching",
+           "activities": null
+          }
+         ]
+        },
+        "updated_at": "2026-09-13T03:52:22.827Z"
+       },
+       {
+        "crustdata_person_id": 165506866,
+        "basic_profile": {
+         "name": "Kritika Singh",
+         "headline": "HR Manager at Tata Steel with expertise in HR strategy and stakeholder engagement.",
+         "current_title": "Human Resources Business Partner",
+         "summary": "As an experienced Human Resources Business Partner with a passion for people, culture, and performance, I bring nearly a decade of expertise in driving strategic HR initiatives across diverse industries. My journey has spanned talent management, employee engagement, industrial relations, and organizational development — helping businesses align people strategy with business goals.\n\nAt Tata Steel, I currently lead HR and IR for the Ferro Alloy Plant, partnering with business leaders to enhance employee experience, ensure compliance, and strengthen workforce capability. Previously with YES Bank and Aditya Birla Finance, I spearheaded talent programs, employee engagement surveys, and HR process improvements that drove measurable impact — from reducing onboarding time to improving engagement scores.\n\nI believe HR is not just about managing people but about empowering them to grow, perform, and thrive. My approach blends data-driven decision-making with empathy, creating workplaces that balance efficiency with culture.\n\nOutside work, I’m an avid traveller, scuba diver, and active volunteer with the NGO Being Social, reflecting my belief in continuous learning and giving back to the community.",
+         "languages": [
+          "Hindi",
+          "English"
+         ],
+         "last_updated": "2026-09-23T17:39:39.060Z",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/3e9a9796e4fd64ee02bfe371d98935921762d98f3f0d56b8bd54319562bd3fbf.jpg",
+         "location": {
+          "raw": "India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D5603AQEcbFcH5z9eRg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1698159986490?e=1792022400&v=beta&t=hcge4jDuEKeQn2UcGkaCXt1BPrG9eljHJzz2Kb0xHoc",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/3e9a9796e4fd64ee02bfe371d98935921762d98f3f0d56b8bd54319562bd3fbf.jpg",
+         "name": "Kritika Singh",
+         "headline": "HR Manager at Tata Steel with expertise in HR strategy and stakeholder engagement.",
+         "current_title": "Human Resources Business Partner",
+         "summary": "As an experienced Human Resources Business Partner with a passion for people, culture, and performance, I bring nearly a decade of expertise in driving strategic HR initiatives across diverse industries. My journey has spanned talent management, employee engagement, industrial relations, and organizational development — helping businesses align people strategy with business goals.\n\nAt Tata Steel, I currently lead HR and IR for the Ferro Alloy Plant, partnering with business leaders to enhance employee experience, ensure compliance, and strengthen workforce capability. Previously with YES Bank and Aditya Birla Finance, I spearheaded talent programs, employee engagement surveys, and HR process improvements that drove measurable impact — from reducing onboarding time to improving engagement scores.\n\nI believe HR is not just about managing people but about empowering them to grow, perform, and thrive. My approach blends data-driven decision-making with empathy, creating workplaces that balance efficiency with culture.\n\nOutside work, I’m an avid traveller, scuba diver, and active volunteer with the NGO Being Social, reflecting my belief in continuous learning and giving back to the community.",
+         "location": {
+          "raw": "India"
+         },
+         "connections": 10634
+        },
+        "skills": {
+         "professional_network_skills": [
+          "Stakeholder Management",
+          "Human Resources (HR)",
+          "Business Partner Relations"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/kritika-singh-10a50855"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2946561958",
+            "employee_title": "Human Resources Business Partner",
+            "employee_description": "Partner with business leaders to design and execute HR strategies for a 1400+ workforce (employees + contract workers). Lead Industrial Relations (IR) for the entire plant, effectively coordinating with unions, vendors, and employees. Drive recruitment, talent management, onboarding, and employee engagement initiatives. Oversee canteen operations serving 1500+ meals/day across 3 shifts. Ensure 100% legal and labour law compliance through monthly audits and process improvement. Lead and execute university hiring for campus recruits and manage end-to-end onboarding. Drive manpower planning and dynamic staffing models for operational agility. Spearheaded manpower cost reduction program encouraging voluntary retirement. Led annual organizational themes including Wellness, Talent Acquisition, Diversity & Inclusion.",
+            "employee_location": "Jamshedpur",
+            "employee_start_date": "2023-09-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Aditya Birla Capital",
+            "employer_linkedin_id": "40439053",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQFRJbym_ZuGMA/company-logo_200_200/company-logo_200_200/0/1706788062189/aditya_birla_capital_logo?e=1747872000&v=beta&t=qh13_RQPbtNvR6BCH9E4_YO_I0vrUngTTkeqeeopxdw",
+            "employer_linkedin_description": "Aditya Birla Capital Ltd is a financial services company based out of One World Center, Tower 1, 18th Floor, Jupiter Mills Compound, 841, Senapati Bapat Marg, Elphinstone Road, MUMBAI, India.-Aditya Birla Capital is committed to provide equal opportunity to all in employment and prohibits discrimination or harassment in any form on the basis of race, colour, religion, ethnicity, age, gender, disability or any other characteristic protected by law. Diversity, Equity and Inclusion (DEI) is embedded in our recruitment policies based on our business needs and candidates meeting the eligibility criteria such as qualification, skills and experience.",
+            "employer_company_id": [
+             "25"
+            ],
+            "employer_website": [
+             "adityabirlacapital.com"
+            ],
+            "employee_position_id": "1572981389",
+            "employee_title": "Human Resources Business Partner- Kolkata",
+            "employee_description": "Promotion",
+            "employee_location": "Kolkata Area, India",
+            "employee_start_date": "2020-02-01T00:00:00.000Z",
+            "employee_end_date": "2022-02-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Aditya Birla Capital",
+            "employer_linkedin_id": "40439053",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQFRJbym_ZuGMA/company-logo_200_200/company-logo_200_200/0/1706788062189/aditya_birla_capital_logo?e=1747872000&v=beta&t=qh13_RQPbtNvR6BCH9E4_YO_I0vrUngTTkeqeeopxdw",
+            "employer_linkedin_description": "Aditya Birla Capital Ltd is a financial services company based out of One World Center, Tower 1, 18th Floor, Jupiter Mills Compound, 841, Senapati Bapat Marg, Elphinstone Road, MUMBAI, India.-Aditya Birla Capital is committed to provide equal opportunity to all in employment and prohibits discrimination or harassment in any form on the basis of race, colour, religion, ethnicity, age, gender, disability or any other characteristic protected by law. Diversity, Equity and Inclusion (DEI) is embedded in our recruitment policies based on our business needs and candidates meeting the eligibility criteria such as qualification, skills and experience.",
+            "employer_company_id": [
+             "25"
+            ],
+            "employer_website": [
+             "adityabirlacapital.com"
+            ],
+            "employee_position_id": "1843102692",
+            "employee_title": "Human Resources Business Partner Karnataka",
+            "employee_description": "Managed 250+ employees in the “Unsecured Loans” team\n● Developed and implemented processes and procedures to streamline HR operations\n● Managed the recruitment process, trained & mentored new hires in the HR team, and provided guidance to\nexisting team members\n● Established and maintained relationships with universities, job boards, and external recruitment agencies to\nincrease the reach of recruitment efforts\n● Conducted initial phone screens and interviews with potential hires to assess their qualifications\n● Crisis management with agility during the Covid pandemic, ensuring facilities of WFH being extended to all\nemployees, coordinating with Aditya Birla Red code team to manage critical medical and hospitalization\n● Executed manpower downsizing efforts during Covid in alignment with business priorities",
+            "employee_location": "Bangalore Urban, Karnataka, India",
+            "employee_start_date": "2021-09-01T00:00:00.000Z",
+            "employee_end_date": "2022-02-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "YES BANK",
+            "employer_linkedin_id": "269604",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQFmWgd25_vKjA/company-logo_200_200/company-logo_200_200/0/1685430307118/yes_bank_logo?e=1754524800&v=beta&t=X7VWmRK8Q7rZHNYEKSGQAEHJ3UPVLoM1AiI_AvoO1dI",
+            "employer_linkedin_description": "YES BANK is a leading Indian private sector bank committed to transforming the financial landscape of India. With over 1200 branches nationwide and a dedicated team of YES BANKers, we strive to deliver exceptional banking solutions and empower individuals, businesses and communities to thrive. At YES BANK, we believe in the power of innovation and transparency. Operating in Retail, MSME and Corporate banking sectors, we are a full service bank and offer an extensive range of financial services. We leverage cutting-edge technology & industry insights to meet the evolving needs of our diverse clientele. One in three UPI transactions in the country are processed by YES BANK.Driven by our core values, we aim to build long lasting relationships with our customers and stakeholders. Our robust risk management framework ensures the safety and security of your finances, while our unwavering commitment to sustainability drives us to create a positive impact on society and the environment. We recognize the potential within each person and strive to unlock it through opportunities for growth, learning and innovation. Joining our ranks means joining a vibrant ecosystem of individuals who are passionate about making an impact and shaping the future of banking. Together, let’s create a future where your dreams can flourish and make a lasting impact.Note: YES BANK will NEVER ask you to reveal your User ID or Password. Therefore, never disclose your credentials (User ID, Password, OTP, PIN etc.) to anyone either through mail or over phone. If you receive any mail asking you to update or authenticate your User ID or Password, please DO NOT fall into the trap of putting in your Password or OTP or PIN.",
+            "employer_company_id": [
+             "5648"
+            ],
+            "employer_website": [
+             "yes.bank.in"
+            ],
+            "employee_position_id": "1917734995",
+            "employee_title": "Human Capital Manager",
+            "employee_description": null,
+            "employee_location": "Bengaluru, Karnataka, India",
+            "employee_start_date": "2022-02-01T00:00:00.000Z",
+            "employee_end_date": "2023-09-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": [
+          {
+           "school": "Jindal school",
+           "degree": "High School",
+           "field_of_study": "Business/Commerce, General",
+           "activities": null
+          },
+          {
+           "school": "HOLY CROSS SCHOOL, JINDAL SCHOOL",
+           "degree": null,
+           "field_of_study": null,
+           "activities": null
+          },
+          {
+           "school": "Vellore Institute of Technology",
+           "degree": "Master of Business Administration (MBA)",
+           "field_of_study": "Human Resources Development",
+           "activities": null
+          }
+         ]
+        },
+        "updated_at": "2026-09-23T17:39:39.060Z"
+       }
+      ],
+      "founders": [
+       {
+        "crustdata_person_id": 613596,
+        "basic_profile": {
+         "name": "Anubhuti Banerjee",
+         "headline": "Sr. Area Manager(EA to CIO) at Tata Steel and Freelance Screenwriter",
+         "current_title": "Founder & Lead - LGBTQ Employee Resource Group",
+         "summary": "Anubhuti is a Senior Area Manager functioning as the Executive Assistant to CIO (Chief Information Officer, part of the AI/Digital Leadership team at Tata Steel, with over 13 years experience in Digital and AI Strategy and Analytics.\n\nAt Tata Steel she founded and leads an industry pioneering Employee Resource Group at Tata Steel called “Wings”, one of the first in the country, especially in the Manufacturing sector. It was a pivotal first step of LGBTQ Inclusion on Tata Steel’s journey towards becoming a World Economic Forum (WEF), Global DEI Lighthouse, one of the only 8 in the world, and the only one in India. She has also been part of the movement for LGBTQ+ Inclusion on India Inc. as a whole.\n\nAnubhuti is also an US State Dept’s IVLP Fellow in Screenwriting, a DAAD (German Academic Exchange) Research Fellow, a Mingle Young LGBT+ leader reflecting the diversity in her areas of interests and proficiency. She also regularly shares her experience – her Anubhuti – of what it is like being a self-made woman of steel in Corporate India.",
+         "languages": [],
+         "last_updated": "2026-09-26T08:04:27.377Z",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/4cde9f83ee20ea6dbbeda143ae5ec77de86a753fb5156a00189efa5a8f404ebe.jpg",
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         }
+        },
+        "professional_network": {
+         "profile_picture_url": "https://media.licdn.com/dms/image/v2/D4D03AQEIXVyE4vvoNA/profile-displayphoto-shrink_800_800/B4DZdtgQc.HkAc-/0/1749888862779?e=1792022400&v=beta&t=IczHlq0PXaiHyYJcP3P6htCkQ09DsJp_IsB2HfSG3sQ",
+         "profile_picture_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/person/4cde9f83ee20ea6dbbeda143ae5ec77de86a753fb5156a00189efa5a8f404ebe.jpg",
+         "name": "Anubhuti Banerjee",
+         "headline": "Sr. Area Manager(EA to CIO) at Tata Steel and Freelance Screenwriter",
+         "current_title": "Founder & Lead - LGBTQ Employee Resource Group",
+         "summary": "Anubhuti is a Senior Area Manager functioning as the Executive Assistant to CIO (Chief Information Officer, part of the AI/Digital Leadership team at Tata Steel, with over 13 years experience in Digital and AI Strategy and Analytics.\n\nAt Tata Steel she founded and leads an industry pioneering Employee Resource Group at Tata Steel called “Wings”, one of the first in the country, especially in the Manufacturing sector. It was a pivotal first step of LGBTQ Inclusion on Tata Steel’s journey towards becoming a World Economic Forum (WEF), Global DEI Lighthouse, one of the only 8 in the world, and the only one in India. She has also been part of the movement for LGBTQ+ Inclusion on India Inc. as a whole.\n\nAnubhuti is also an US State Dept’s IVLP Fellow in Screenwriting, a DAAD (German Academic Exchange) Research Fellow, a Mingle Young LGBT+ leader reflecting the diversity in her areas of interests and proficiency. She also regularly shares her experience – her Anubhuti – of what it is like being a self-made woman of steel in Corporate India.",
+         "location": {
+          "raw": "Mumbai, Maharashtra, India"
+         },
+         "connections": 646
+        },
+        "skills": {
+         "professional_network_skills": [
+          "System Architecture",
+          "Supplier Evaluation",
+          "Process Improvement"
+         ]
+        },
+        "social_handles": {
+         "professional_network_identifier": {
+          "profile_url": "https://www.linkedin.com/in/anubhuti-banerjee-4b353a262"
+         },
+         "twitter_identifier": {
+          "slug": null
+         }
+        },
+        "experience": {
+         "employment_details": {
+          "current": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2104712918",
+            "employee_title": "Founder & Lead - LGBTQ Employee Resource Group",
+            "employee_description": "Founded and led \"Wings\", the LGBTQ Employee Resource Group at Tata Steel. Led one of the first LGBTQ Inclusion Programs in Corporate India and in the Tata Group. Drove the creation of Industry Leading Policy changes for LGBTQ Inclusion especially in Transgender Inclusion. Contributed to",
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2018-05-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2158295604",
+            "employee_title": "Senior Manager IT (Executive Assistant to Chief Information Officer)",
+            "employee_description": "As Executive Assistant to the Chief Information Officer (CIO) at Tata Steel, I effectively manage a wide range of executive functions, including Digital Strategy & Planning, Internal and External Communications, Organization & Administration, Event Planning & Production, and Driving Initiatives and Execution.\n\nI am adept at liaising with C-suite leaders within Tata Steel and Tata Group, as well as external partners, ensuring seamless communication and collaboration. A key responsibility includes creating and implementing the Annual Digital Strategy and Plan in close coordination with the entire IT Department.\n\nIn addition to crafting compelling business write-ups and presentations for talks, panel discussions, and journalistic publications featuring the CIO, I maintain the smooth day-to-day functioning of the IT Department by overseeing administrative and human resource tasks. My dedication to efficiency and productivity contributes to the overall success of the CIO and the IT Department.",
+            "employee_location": "Mumbai, Maharashtra, India",
+            "employee_start_date": "2023-04-01T00:00:00.000Z",
+            "employee_end_date": null
+           },
+           {
+            "employer_name": "Indian Film Industry",
+            "employer_linkedin_id": "85230557",
+            "employer_logo_url": null,
+            "employer_linkedin_description": "Indian Film Industry is a company based out of 7A, Dwarika Homes, Gujarat, India.",
+            "employer_company_id": [
+             "3404178"
+            ],
+            "employer_website": [
+             null
+            ],
+            "employee_position_id": "2555459120",
+            "employee_title": "Screenwriter",
+            "employee_description": "Anubhuti Banerjee is a freelance screenwriter who begin her storytelling journey with a series produced for Amazon Prime Video (Release awaited). Also working as a senior manager and executive assistant to the CIO at Tata Steel in Mumbai, Anubhuti leads efforts for inclusion of underrepresented groups at her workplace, an effort which won recognition by the World Economic Forum's Global Parity Alliance. She has taken part in various workshops, trainings, and filmmaking labs, and her screenwriting mixes fantasy, myth, horror and humor. \n\nHer Hindi feature film script T102 Yari Road was selected by the Writer’s INK Feature Film Writing Lab (India’s top screenwriting lab) to be made into a film. \n\nAnubhuti looks forward to harnessing the power of film and visual media to craft imaginative stories with nuanced perspectives from her own unique and diverse experiences – from growing up at the edge of a mystical forest to living as a queer/trans woman in a megacity today. She hopes to continue advocating for inclusive practices in India's entertainment industry.",
+            "employee_location": "Mumbai Metropolitan Region",
+            "employee_start_date": "2022-01-01T00:00:00.000Z",
+            "employee_end_date": null
+           }
+          ],
+          "past": [
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2104712373",
+            "employee_title": "Senior Manager Digital Transformation for Human Resources",
+            "employee_description": null,
+            "employee_location": "Mumbai, Maharashtra, India",
+            "employee_start_date": "2022-06-01T00:00:00.000Z",
+            "employee_end_date": "2023-04-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2104712685",
+            "employee_title": "Marketing Data Analyst",
+            "employee_description": null,
+            "employee_location": "Kolkata, West Bengal, India",
+            "employee_start_date": "2018-10-01T00:00:00.000Z",
+            "employee_end_date": "2021-06-01T00:00:00.000Z"
+           },
+           {
+            "employer_name": "Tata Steel",
+            "employer_linkedin_id": "166262",
+            "employer_logo_url": "https://media.licdn.com/dms/image/v2/D4D0BAQH2BeRSuDAJpw/company-logo_200_200/company-logo_200_200/0/1723787236718?e=1749686400&v=beta&t=FwE5AhRFSotgQTQShY38zeq3_I02nexaQxYZQx57pCQ",
+            "employer_linkedin_description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+            "employer_company_id": [
+             "5042"
+            ],
+            "employer_website": [
+             "tatasteel.com"
+            ],
+            "employee_position_id": "2104715421",
+            "employee_title": "Executive Assistant to Chief Information Officer",
+            "employee_description": "Responsible for executive functions of the Chief Information Officer (CIO) at Tata Steel heading the Digital Strategy & Planning, Internal and External Communications, Organization & Administration, Event Planning & Production, Driving Initiatives and Execution. \n- Responsible for communicating with C-suite leaders in Tata Steel and Tata Group, as well as partners. \n- Also responsible with creating and executing the Annual Digital Strategy and Plan with involvement of the entire IT Department. \n- Regularly creating business write-ups and presentations for Talks, Panel Discussions and journalistic publications where the Chief Information Officer (CIO) participated in. \n- Responsible for the smooth day-to-day functioning of the IT Department with Administration and Human Resource functions",
+            "employee_location": "Mumbai, Maharashtra, India",
+            "employee_start_date": "2021-06-01T00:00:00.000Z",
+            "employee_end_date": "2022-06-01T00:00:00.000Z"
+           }
+          ]
+         }
+        },
+        "education": {
+         "schools": []
+        },
+        "updated_at": "2026-09-26T08:04:27.377Z"
+       }
+      ]
+     },
+     "basic_info": {
+      "status": "active",
+      "name": "Tata Steel",
+      "primary_domain": "tatasteel.com",
+      "all_domains": [
+       "tatasteel.com"
+      ],
+      "website": "https://www.tatasteel.com",
+      "logo_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/1e52a4bb58737d56f533cdf6d4863048d46ce7adfb9ccb0d3ceaa3cbda483091.jpg",
+      "description": "One of the most diversified integrated steel producers with a capacity of 36 million tonnes per annum (MTPA) across India, the Netherlands, the UK, and Thailand, Tata Steel is shaping a better tomorrow through innovation, sustainability, and an enduring commitment to excellence. The Company’s Jamshedpur, Kalinganagar and IJmuiden plants have been recognised among the World Economic Forum Advanced 4th Industrial Revolution (4IR) Global Lighthouses. With over 77,000 employees across the globe, Tata Steel is a Great Place to Work®-certified organisation. The Company recorded a consolidated turnover of approximately US$26 billion in the financial year ending March 31, 2026.Tata Steel has set an ambitious target of achieving Net Zero emissions by 2045. The newly inaugurated 0.75 MTPA electric arc furnace-based steelmaking facility in Ludhiana is the Company’s first low-emission plant in India. In the UK, Tata Steel is transitioning to a 3.2 MTPA EAF-based steelmaking route while in the Netherlands, the Company has signed a non-binding Joint Letter of Intent with the Government of the Netherlands and the Province of North-Holland on integrated decarbonisation and health measures project.Focused on sustainability, innovation, agility, and fostering deep relationships with customers and communities, Tata Steel aspires to become the most respected and valuable metals and mining company globally.",
+      "company_type": "Public Company",
+      "year_founded": 1907,
+      "employee_count_range": "10001+",
+      "markets": [
+       "NSE",
+       "BSE"
+      ],
+      "crustdata_company_id": 5042,
+      "professional_network_id": "166262",
+      "professional_network_url": "https://www.linkedin.com/company/tatasteelltd",
+      "profile_name": "Tata Steel"
+     }
+    }
+   }
+  ]
+ }
+]
