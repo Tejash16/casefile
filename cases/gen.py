@@ -576,15 +576,20 @@ def plant_career_overlap(case: Case, vid: str = "V017") -> None:
         date(2026, 2, 5),
         date(2026, 3, 19),
     ]
+    # DocRack bills other clients too: invoice numbers jump like other real vendors' (no T07).
+    # A separate generator keeps every other draw in the case unchanged.
+    inv_rng = random.Random(case.seed + 17)
+    inv = inv_rng.randint(100, 300)
     for k, t in enumerate(targets):
         d = weekday_near(rng, t, spread=4)
         amount = non_round(rng, 205_000 + 48_000 * k, 215_000 + 48_000 * k)
+        inv += inv_rng.randint(37, 400)
         case.rows.append(
             Row(
                 d,
                 v,
                 [v.name, *v.variants][k % 3],
-                f"DR/{d.year}/{101 + k}",
+                f"DR/{d.year}/{inv}",
                 amount,
                 s,
                 approver_raw(rng, s),
