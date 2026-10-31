@@ -1,6 +1,6 @@
 # Casefile
 
-**Demo video:** _link here by 15:15_
+**Demo video:** [video/casefile-demo.mp4](video/casefile-demo.mp4) (84 s, in this repo)
 
 **Every fake caught, no honest business turned away, every fact traceable.** Casefile is an autonomous forensic-audit agent. Give it an insider tip, a company's ledger, its vendor master and its staff list, and it returns an audit-committee case file: every allegation **Substantiated**, **Unfounded** or **Unsubstantiated**, every sentence cited to a ledger row or a Crustdata record, and every tool call in a hash-chained, verifiable log. No human steps between the command and the file.
 
