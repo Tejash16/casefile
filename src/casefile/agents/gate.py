@@ -154,7 +154,7 @@ def decide(
     tested = {e.test_id for e in ev}
     if critic:
         gaps += [
-            f"test {t} not run for {hypothesis.hypothesis_id}"
+            f"test {t} produced no evidence for {hypothesis.hypothesis_id}"
             for t in critic.missing_tests
             if t not in tested
         ]

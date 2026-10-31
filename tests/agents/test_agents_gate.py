@@ -134,4 +134,4 @@ def test_missing_tests_become_data_gaps():
     crit = critic(Verdict.Unsubstantiated)
     crit = crit.model_copy(update={"missing_tests": ["T15", "T13"]})
     f = gate.decide(H1, [ev("E1", "T15", S, 0.5)], crit, RESOLUTIONS)
-    assert f.data_gaps == ["test T13 not run for H1"]
+    assert f.data_gaps == ["test T13 produced no evidence for H1"]
