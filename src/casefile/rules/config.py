@@ -349,6 +349,7 @@ STRENGTH: dict[str, float] = {
     "t01_extra_match": 0.05,  # added per further matched attribute
     "t01_cap": 0.95,
     "t01_coworking": 0.2,  # neutral
+    "t01_not_arms_length": 0.7,  # staff-linked vendor refutes kickback / non_accomplice_vendor
     # T02 thin footprint
     "t02_address": 0.6,
     "t02_no_contact": 0.6,

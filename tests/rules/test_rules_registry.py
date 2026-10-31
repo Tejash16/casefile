@@ -22,7 +22,7 @@ def test_all_seventeen_tests_registered_with_families_and_typologies():
     for t in TESTS.values():
         assert t.families and callable(t.fn)
         assert t.typologies or t.id == "T08"  # Benford is screen-only
-        assert set(t.refutes) <= set(t.typologies) or t.id == "T13"
+        assert set(t.refutes) <= set(t.typologies) or t.id == "T01"  # T01: see registry
 
 
 #  Menu pairings deliberately not registered: a career link is the interest itself (conflict of

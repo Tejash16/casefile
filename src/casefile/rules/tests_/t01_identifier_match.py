@@ -84,13 +84,44 @@ def _matches(a: Party, b: Party, fuzzy_min: int, min_tokens: int) -> dict[str, i
     return found
 
 
-def _evidence(a: Party, b: Party, found: dict[str, int]) -> EvidenceObject:
-    coworking = "address" in found and (a.coworking or b.coworking)
+def _quote(a: Party, b: Party, found: dict[str, int]) -> str:
     parts = []
     for attr, score in found.items():
         part = f'{a.kind} {a.id} {attr} "{a.raw[attr]}" = {b.kind} {b.id} {attr} "{b.raw[attr]}"'
         parts.append(part + (f" (score {score})" if score < 100 else ""))
-    quote = "; ".join(parts)
+    return "; ".join(parts)
+
+
+def _common(a: Party, b: Party, quote: str) -> dict:
+    return dict(
+        test_id=TEST,
+        quote=quote,
+        kind=SourceKind.vendor_master,
+        refs=[f"{p.kind}:{p.id}" for p in (a, b)],
+        records={f"{p.kind}:{p.id}": p.record for p in (a, b)},
+        subject_ids=[p.id for p in (a, b) if p.kind == "staff"],
+        object_ids=[p.id for p in (a, b) if p.kind == "vendor"],
+    )
+
+
+def _not_arms_length(a: Party, b: Party, found: dict[str, int]) -> EvidenceObject:
+    """A vendor that shares identifiers with a staff member is that person's own vehicle, not an
+    independent third party: a kickback (a vendor paying the employee) or an unknowing vendor
+    does not fit. ACFE separates these billing schemes from corruption schemes."""
+    vendor, person = (a, b) if a.kind == "vendor" else (b, a)
+    names = ", ".join(k.replace("_", " ") for k in found)
+    return ev.make(
+        direction=Direction.refutes,
+        strength=STRENGTH["t01_not_arms_length"],
+        summary=f"Vendor {vendor.id} shares {names} with staff member {person.id}, so it is not "
+        f"an independent third party that could pay {person.id} or bill unknowingly.",
+        **_common(a, b, _quote(a, b, found)),
+    )
+
+
+def _evidence(a: Party, b: Party, found: dict[str, int]) -> EvidenceObject:
+    coworking = "address" in found and (a.coworking or b.coworking)
+    quote = _quote(a, b, found)
     names = ", ".join(k.replace("_", " ") for k in found)
     if coworking and set(found) == {"address"}:
         direction, strength = Direction.neutral, STRENGTH["t01_coworking"]
@@ -107,20 +138,7 @@ def _evidence(a: Party, b: Party, found: dict[str, int]) -> EvidenceObject:
             + STRENGTH["t01_extra_match"] * (len(scored) - 1),
         )
         summary = f"{a.kind.capitalize()} {a.id} and {b.kind} {b.id} share {names}."
-    staff = [p.id for p in (a, b) if p.kind == "staff"]
-    vendors = [p.id for p in (a, b) if p.kind == "vendor"]
-    return ev.make(
-        test_id=TEST,
-        direction=direction,
-        strength=strength,
-        summary=summary,
-        quote=quote,
-        kind=SourceKind.vendor_master,
-        refs=[f"{p.kind}:{p.id}" for p in (a, b)],
-        records={f"{p.kind}:{p.id}": p.record for p in (a, b)},
-        subject_ids=staff,
-        object_ids=vendors,
-    )
+    return ev.make(direction=direction, strength=strength, summary=summary, **_common(a, b, quote))
 
 
 def run(ctx: RuleContext) -> list[EvidenceObject]:
@@ -132,5 +150,8 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
         for other in [*staff, *vendors[i + 1 :]]:
             found = _matches(v, other, fuzzy_min, min_tokens)
             if found:
-                out.append(_evidence(v, other, found))
+                e = _evidence(v, other, found)
+                out.append(e)
+                if other.kind == "staff" and e.direction == Direction.supports:
+                    out.append(_not_arms_length(v, other, found))
     return out

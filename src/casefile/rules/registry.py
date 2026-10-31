@@ -58,6 +58,8 @@ _TESTS = [
         ("identity",),
         (SHELL, PASS, GHOST),
         t01_identifier_match.run,
+        # a staff-owned vendor is no third party: refutes bribery and the unknowing-vendor scheme
+        refutes=(KICK, NAV),
     ),
     Test("T02", "thin_vendor_footprint", ("footprint",), (SHELL, GHOST), t02_thin_footprint.run),
     Test("T03", "vendor_age_vs_first_payment", ("timing",), (SHELL,), t03_vendor_age.run),

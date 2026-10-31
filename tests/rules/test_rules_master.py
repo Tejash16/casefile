@@ -51,11 +51,34 @@ def test_t01_vendor_shares_staff_address_and_phone():
     v = vendor("V023", address=V023_ADDR, phone="+91 98220 41736")
     s = staff("S003", "Anil Deshpande", address=S003_ADDR, phone="9822041736")
     evs = t01_identifier_match.run(ctx_for(_book("V023"), [v], [s]))
-    assert len(evs) == 1
-    e = evs[0]
-    assert e.direction == "supports" and e.subject_ids == ["S003"] and e.object_ids == ["V023"]
+    assert [x.direction for x in evs] == ["supports", "refutes"]
+    e, r = evs
+    assert e.subject_ids == ["S003"] and e.object_ids == ["V023"]
     assert e.strength == pytest.approx(STRENGTH["t01_phone"] + STRENGTH["t01_extra_match"])
     assert '"+91 98220 41736"' in e.quote and "address" in e.quote
+    # the same link says V023 is S003's own vehicle: no third party to pay a kickback
+    assert r.strength == STRENGTH["t01_not_arms_length"] and r.quote == e.quote
+    assert r.subject_ids == ["S003"] and r.object_ids == ["V023"]
+    assert "not an independent third party" in r.summary
+
+
+def test_t01_refutation_bears_on_kickback_not_shell():
+    from casefile.rules import bears_on
+
+    v = vendor("V023", phone="+91 98220 41736")
+    s = staff("S003", phone="9822041736")
+    sup, ref = t01_identifier_match.run(ctx_for(_book("V023"), [v], [s]))
+    assert bears_on(sup, "shell_company") and not bears_on(sup, "kickback")
+    assert bears_on(ref, "kickback") and bears_on(ref, "non_accomplice_vendor")
+    assert not bears_on(ref, "shell_company")
+
+
+def test_t01_vendor_pairs_and_coworking_get_no_refutation():
+    a = vendor("V1", address=WEWORK, phone="02240001111")
+    b = vendor("V2", address=WEWORK, phone="02240001111")
+    s = staff("S9", address=WEWORK)  # coworking-only link to a staff member: neutral
+    evs = t01_identifier_match.run(ctx_for(_book("V1"), [a, b], [s]))
+    assert not [e for e in evs if e.direction == "refutes"]
 
 
 def test_t01_shared_coworking_address_is_neutral():
