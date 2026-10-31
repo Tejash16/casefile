@@ -341,3 +341,14 @@ def test_metrics_panel(store: PayloadStore) -> None:
     print_metrics(make_case(store), console)
     text = console.export_text()
     assert "Substantiated" in text and "Crustdata credits used" in text and "INR 9,93,500" in text
+
+
+def test_index_of_evidence_objects_falls_back_to_default_store() -> None:
+    """pipeline passes {evidence_id: EvidenceObject}; payloads then come from default_store."""
+    from casefile.audit.payloads import default_store
+
+    default_store.clear()
+    case = make_case(default_store)
+    assert check_citations(case, {e.evidence_id: e for e in case.exhibits}) == []
+    default_store.clear()
+    assert any("no stored payload" in e for e in check_citations(case, {}))

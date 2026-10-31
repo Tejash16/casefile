@@ -2,7 +2,8 @@
 
 `check_citations(case, evidence_index) -> list[str]`: empty means the case may be rendered.
 `evidence_index` maps an evidence's `sha256` (or its `evidence_id`) to the payload bytes its
-quote was taken from; `casefile.audit.payloads.default_store` is the usual one.
+quote was taken from; payloads not found there are looked up in
+`casefile.audit.payloads.default_store`.
 """
 
 from __future__ import annotations
@@ -33,11 +34,18 @@ def cited_sentences(case: CaseFile) -> list[tuple[str, Sentence]]:
     return out
 
 
-def _payload(ev: EvidenceObject, index: Mapping[str, bytes]) -> bytes | None:
-    for key in (ev.sha256, ev.evidence_id):
-        if key in index:
-            data = index[key]
-            return data.encode("utf-8") if isinstance(data, str) else data
+def _payload(ev: EvidenceObject, index: Mapping[str, object]) -> bytes | None:
+    """Payload bytes from `index`, else from the process-wide payload store. Index values
+    that are not bytes or str (e.g. an id -> EvidenceObject map) are ignored."""
+    from casefile.audit.payloads import default_store
+
+    for source in (index, default_store):
+        for key in (ev.sha256, ev.evidence_id):
+            data = source.get(key)
+            if isinstance(data, str):
+                return data.encode("utf-8")
+            if isinstance(data, bytes):
+                return data
     return None
 
 
