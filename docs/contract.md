@@ -269,7 +269,7 @@ Refuting evidence: T13 refutes shell_company when headcount ≥ 50 and website p
 
 ## 7. Gate rules (agents/gate.py, deterministic)
 
-- `Substantiated`: ≥ 2 supporting evidence objects from ≥ 2 different families, each strength ≥ 0.6, and no refuting evidence with strength ≥ 0.7.
+- `Substantiated`: ≥ 2 supporting evidence objects from ≥ 2 different families, each strength ≥ 0.6, and no refuting evidence with strength ≥ 0.7. T16 (`graph`) is corroborative: it is listed as support but counts toward neither the two objects nor the two families, because its path edges are facts other tests already found. (Changed 31 Oct, a1: graph paths were double-counting T15's employment link.)
 - `Unfounded`: ≥ 1 refuting evidence with strength ≥ 0.7 and no supporting evidence with strength ≥ 0.6.
 - Otherwise `Unsubstantiated`.
 - Any subject or object with `resolution.status != resolved` adds a `data_gaps` entry, and evidence that depends on that entity's Crustdata record does not count: `source.kind` in `crustdata_company` / `crustdata_person`, or tests T13, T15, T17 naming that entity. The three rules above then run on the remaining evidence; if none fires, the verdict is `Unsubstantiated`. So a fictional shell with ≥ 2 independent ledger and master-file families can be `Substantiated`, while a career-overlap or existence allegation about an unresolved entity cannot. (Changed 31 Oct, a1: the earlier "forces Unsubstantiated" made planted shells unreachable; CLAUDE.md says "any allegation *depending on* one".)

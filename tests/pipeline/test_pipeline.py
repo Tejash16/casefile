@@ -96,6 +96,10 @@ def test_redact_hides_staff_names(inputs, tmp_path, all_stubs):
     )
     text = (out / "case_file.md").read_text(encoding="utf-8")
     assert "Asha Rao" not in text  # stub staff name
+    # unredacted evidence and payloads stay out of the published directory
+    assert not (out / "evidence_all.json").exists()
+    assert not (out / "payloads").exists()
+    assert (tmp_path / ".private" / "out" / "evidence_all.json").exists()
 
 
 def test_uncited_sentence_exits_2(inputs, tmp_path, all_stubs, monkeypatch):

@@ -12,6 +12,7 @@ import importlib
 import inspect
 import json
 import os
+import shutil
 import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
@@ -120,6 +121,12 @@ def _people(staff: list[StaffRecord], vendors: list[VendorRecord]) -> list[str]:
         if v.crustdata:
             names += [p.name for p in [*v.crustdata.founders, *v.crustdata.decision_makers]]
     return names
+
+
+def _vendor_names(vendors: list[VendorRecord]) -> list[str]:
+    """Company names --redact must leave alone, even where they contain a person's name."""
+    names = [v.name_raw for v in vendors] + [v.crustdata.name for v in vendors if v.crustdata]
+    return sorted(set(names))
 
 
 def _sha256_file(path: Path) -> tuple[str, int]:
@@ -441,12 +448,18 @@ def run(
             case = case.model_copy(update={"hypotheses": hypotheses})
 
         with _timed("render"):
-            # every evidence object, cited or not; render writes the cited ones to evidence.json
-            (out / "evidence_all.json").write_text(
+            # every evidence object (cited or not) and the raw quote payloads hold unredacted
+            # names, so under --redact they go next to the redaction map, not into `out`
+            private = out.resolve().parent / ".private" / out.resolve().name if redact else out
+            private.mkdir(parents=True, exist_ok=True)
+            if redact:  # leftovers from an earlier unredacted run into the same dir
+                (out / "evidence_all.json").unlink(missing_ok=True)
+                shutil.rmtree(out / "payloads", ignore_errors=True)
+            (private / "evidence_all.json").write_text(
                 json.dumps([e.model_dump(mode="json") for e in evidence], indent=2),
                 encoding="utf-8",
             )
-            payload_store.dump(out / "payloads")
+            payload_store.dump(private / "payloads")
             render = impl("render", "render")
             errors = impl("check", "check_citations")(case, payload_store)
             if errors:
@@ -461,18 +474,28 @@ def run(
             }
             case = case.model_copy(update={"merkle_root": audit.merkle_root()})
             rid = audit.pre("render", {"name": "case_file", "redact": redact})
+            kwargs: dict[str, Any] = {
+                "evidence_index": payload_store,
+                "people": _people(staff, vendors),
+            }
+            if "keep" in inspect.signature(render).parameters:
+                kwargs["keep"] = _vendor_names(vendors)  # vendors are never redacted
             try:
-                path = render(
-                    case,
-                    out,
-                    redact=redact,
-                    evidence_index=payload_store,
-                    people=_people(staff, vendors),
-                )
+                path = render(case, out, redact=redact, **kwargs)
             except BaseException as e:  # a3's CitationError is a SystemExit
                 audit.post(rid, {"status": "error", "error": f"{type(e).__name__}: {e}"})
                 raise
-            audit.post(rid, {"status": "ok", "result_sha256": _sha256_file(Path(path))[0]})
+            outcome: dict[str, Any] = {
+                "status": "ok",
+                "result_sha256": _sha256_file(Path(path))[0],
+            }
+            try:  # hash every rendered file, so verify catches edits to any of them
+                from casefile.report.render import rendered_hashes
+
+                outcome["files"] = rendered_hashes(out)
+            except ImportError:
+                pass
+            audit.post(rid, outcome)
 
         case.metrics["wall_seconds"] = round(time.perf_counter() - t0, 2)
         return case
