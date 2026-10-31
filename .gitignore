@@ -1,0 +1,16 @@
+.env
+.mcp.json
+.venv/
+.cache/
+.claude/worktrees/
+.claude/settings.local.json
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+out/*
+!out/demo/
+!out/eval/
+dist/
+*.egg-info/
+.DS_Store
