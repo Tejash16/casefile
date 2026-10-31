@@ -1,0 +1,24 @@
+{% macro exhibit(e) %}
+### {{ e.id }}
+
+| field | value |
+| --- | --- |
+| Test | {{ e.test_id }}{% if e.test_name %} {{ e.test_name }}{% endif %} |
+| Direction | {{ e.direction }} |
+| Strength | {{ e.strength }} |
+| Hypotheses | {{ e.hypotheses | join(", ") or "screening" }} |
+| Subjects / objects | {{ (e.subjects + e.objects) | join(", ") or "none" }} |
+| Source | {{ e.source_kind }}: {{ e.refs | join(", ") }} |
+{% if e.as_of %}
+| Record updated_at | {{ e.as_of }} |
+{% endif %}
+| Payload sha256 | `{{ e.sha256 }}` |
+| Log record | `{{ e.log_record_id }}` |
+
+{{ e.summary }}
+
+{{ e.fence }}text
+{{ e.quote }}
+{{ e.fence }}
+
+{% endmacro %}

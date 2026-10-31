@@ -1,0 +1,126 @@
+{% from "_exhibit.md.j2" import exhibit %}
+# Case file: {{ company }}
+
+| | |
+| --- | --- |
+| Case id | {{ case_id }} |
+| Generated at | {{ generated_at }} |
+| Findings | {{ counts.Substantiated }} Substantiated, {{ counts.Unfounded }} Unfounded, {{ counts.Unsubstantiated }} Unsubstantiated |
+| Audit log | `log.jsonl`{% if log_records is not none %}, {{ log_records }} records at render time{% endif %} |
+| Verify | `{{ verify_command or "python verify.py log.jsonl" }}` |
+
+{% if merkle_root %}
+**Merkle root:** `{{ merkle_root }}`{% if log_records is not none %} over {{ log_records }} records{% endif %} (RFC 6962 over the audit log's record hashes)
+{% else %}
+**Merkle root:** not sealed
+{% endif %}
+{% if redacted %}
+
+*Person names are redacted to initials; staff ids and Crustdata record ids are unchanged.*
+{% endif %}
+
+## 1. Background and predication
+
+{{ predication }}
+
+## 2. Executive summary
+
+{% for s in executive_summary %}
+- {{ s }}
+{% else %}
+- No allegation reached a verdict.
+{% endfor %}
+
+## 3. Scope
+
+{% for s in scope %}
+- {{ s }}
+{% endfor %}
+
+## 4. Approach
+
+{% for s in approach %}
+- {{ s }}
+{% endfor %}
+
+## 5. Findings
+
+{% for f in findings %}
+### 5.{{ loop.index }} {{ f.id }}{% if f.typology %}: {{ f.typology }}{% endif %} — **{{ f.verdict | upper }}**
+
+| | |
+| --- | --- |
+| Verdict | **{{ f.verdict }}** (decided by {{ "the coded gate" if f.verdict_by == "gate" else "the coded gate, overriding the model" }}{% if f.model_verdict %}; model proposed {{ f.model_verdict }}{% endif %}) |
+| Confidence | {{ f.confidence }} |
+| Subjects | {{ f.subjects | join(", ") or "none" }} |
+| Objects | {{ f.objects | join(", ") or "none" }} |
+| Amount at issue | {{ f.amount }} |
+{% if f.origin %}
+| Origin | {{ "insider tip" if f.origin == "tip" else "screening rules, not in the tip" }} |
+{% endif %}
+
+{% if f.statement %}
+**Allegation tested:** {{ f.statement }}
+
+{% endif %}
+**Rationale**
+
+{% for s in f.rationale %}
+- {{ s }}
+{% endfor %}
+
+{% if f.supporting %}
+**Supporting evidence:** {% for e in f.supporting %}[{{ e.id }}](#{{ e.anchor }}){{ ", " if not loop.last }}{% endfor %}
+
+{% endif %}
+**Counter-evidence**
+
+{% for e in f.counter %}
+- [{{ e.id }}](#{{ e.anchor }}) {{ e.summary }}
+{% else %}
+- None found.
+{% endfor %}
+
+{% if f.data_gaps %}
+**Data gaps**
+
+{% for g in f.data_gaps %}
+- {{ g }}
+{% endfor %}
+
+{% endif %}
+{% else %}
+No findings.
+
+{% endfor %}
+## 6. Data quality notes
+
+{% for s in data_quality %}
+- {{ s }}
+{% else %}
+- None recorded.
+{% endfor %}
+
+## 7. Assumptions and thresholds
+
+| Threshold | Value | Rationale | Source |
+| --- | --- | --- | --- |
+{% for a in assumptions %}
+| `{{ a.name }}` | {{ a.value }} | {{ a.rationale }} | {{ a.source }} |
+{% endfor %}
+
+## 8. Metrics
+
+| Metric | Value |
+| --- | --- |
+{% for m in metrics %}
+| {{ m.label }} | {{ m.value }} |
+{% endfor %}
+
+## 9. Exhibits
+
+Also in `exhibits.md`; `evidence.json` holds the same objects as data.
+
+{% for e in exhibits %}
+{{ exhibit(e) }}
+{% endfor %}

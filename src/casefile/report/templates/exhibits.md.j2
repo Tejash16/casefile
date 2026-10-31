@@ -1,0 +1,9 @@
+{% from "_exhibit.md.j2" import exhibit %}
+# Exhibits: {{ company }} ({{ case_id }})
+
+One block per evidence object cited in `case_file.md`. Each quote is verbatim from the source payload whose SHA-256 is shown; the log record is the audit entry of the test or call that produced it.{% if redacted %} Person names are replaced by initials.{% endif %}
+
+
+{% for e in exhibits %}
+{{ exhibit(e) }}
+{% endfor %}
