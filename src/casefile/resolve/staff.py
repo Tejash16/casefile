@@ -7,9 +7,10 @@ Order (first that applies wins):
 2. `email` -> Person Identify (`person_identify_email`), only when describe_scope says the
    endpoint is enabled (it is 403 on our plan, so this is skipped without spending a call).
 3. Person Search, exact mode, name + audited company (current or past roles): one hit ->
-   `person_search`; several -> judge. No hit -> name-only search; any hits go to the judge and are
-   never auto-accepted, because a namesake's career attached to our staff member is precisely the
-   false lead the case file must not make. No judge decision -> ambiguous; no hits -> unresolved.
+   `person_search`; several -> judge (no decision -> ambiguous). No hit -> name-only search: any
+   hits end `ambiguous` and are never accepted, not even by the judge, because none of them lists
+   the audited company and a namesake's career attached to our staff member is precisely the
+   false lead the case file must not make. No hits at all -> unresolved.
 
 `candidates_considered` counts every profile looked at, so the case file can say how many
 namesakes were ruled out.
@@ -202,7 +203,10 @@ def resolve_staff(
             d.notes.append(f"no profile named {name}")
             continue
         d.log_record_id = client.record_id_for(cands[0].request_id)
-        _judge(judge, s, company, cands, d)
+        # No judge here: none of these profiles lists the audited company, so nothing in
+        # Crustdata can confirm any of them is our staff member; a model could only guess.
+        d.status = ResolutionStatus.ambiguous
+        d.notes.append(f"{len(cands)} namesakes of {name}, none lists {company} in their history")
 
     # enrich accepted profiles that have no facts yet, in one batch
     need = sorted(

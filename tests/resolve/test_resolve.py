@@ -354,12 +354,21 @@ def test_name_only_namesakes_are_never_auto_accepted() -> None:
     assert not [x for x in c.log if x[0] == "enrich_persons"]
 
 
-def test_judge_rejects_namesakes_and_counts_them() -> None:
+def test_name_only_namesakes_are_counted_and_never_sent_to_the_judge() -> None:
     namesakes = [pc("Rahul Verma", f"https://www.linkedin.com/in/rv{i}") for i in range(5)]
     c = FakeClient(search={("Rahul Verma", None): namesakes})
+    judge = judge_says("yes", 0)  # even a judge that would say yes is not asked
+    s = resolve_staff([staff("S5", "Rahul Verma", "rahul@halvexa.example")], c, judge=judge)[0]
+    assert s.resolution.status == "ambiguous" and s.resolution.candidates_considered == 5
+    assert judge.calls == [] and s.crustdata is None
+
+
+def test_judge_sees_the_audited_company_for_namesakes_who_worked_there() -> None:
+    urls = [f"https://www.linkedin.com/in/rv{i}" for i in range(2)]
+    c = FakeClient(search={("Rahul Verma", "Halvexa"): [pc("Rahul Verma", u) for u in urls]})
     judge = judge_says("no")
     s = resolve_staff([staff("S5", "Rahul Verma", "rahul@halvexa.example")], c, judge=judge)[0]
-    assert s.resolution.status == "unresolved" and s.resolution.candidates_considered == 5
+    assert s.resolution.status == "unresolved" and s.resolution.candidates_considered == 2
     assert judge.calls[0][2] == "person" and judge.calls[0][0]["employer"] == "Halvexa"
 
 
