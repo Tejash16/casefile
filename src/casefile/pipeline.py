@@ -124,6 +124,40 @@ def _people(staff: list[StaffRecord], vendors: list[VendorRecord]) -> list[str]:
     return names
 
 
+def _write_entities(
+    out: Path, vendors: list[VendorRecord], staff: list[StaffRecord], log_path: Path, redact: bool
+) -> None:
+    """out/entities.json for the UI: resolved vendors and staff with their Crustdata facts.
+    Under --redact, person names become initials (vendors keep their names)."""
+    from casefile.report.redact import Redactor
+
+    r = Redactor(_people(staff, vendors), keep=_vendor_names(vendors)) if redact else None
+
+    def scrub(obj: Any, key: str = "") -> Any:
+        if isinstance(obj, dict):
+            return {k: scrub(v, k) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [scrub(v, key) for v in obj]
+        if r and isinstance(obj, str) and key in {"name", "name_raw", "name_norm"}:
+            return r(obj)
+        return obj
+
+    m = _metrics_from_log(log_path)
+    data = {
+        "vendors": [
+            {
+                **v.model_dump(mode="json", exclude={"crustdata"}),
+                "crustdata": scrub(v.crustdata.model_dump(mode="json")) if v.crustdata else None,
+            }
+            for v in vendors
+        ],
+        "staff": [scrub(s.model_dump(mode="json")) for s in staff],
+        "credits_used": m["credits_used"],
+        "crustdata_calls": m["crustdata_calls"],
+    }
+    (out / "entities.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
 def _vendor_names(vendors: list[VendorRecord]) -> list[str]:
     """Company names --redact must leave alone, even where they contain a person's name."""
     names = [v.name_raw for v in vendors] + [v.crustdata.name for v in vendors if v.crustdata]
@@ -325,6 +359,7 @@ def run(
             stage("resolve", f"{n_res}/{len(vendors) + len(staff)} entities resolved")
             # b2's notes, e.g. records cited at fetch time; read again after enrich in `test`
             client_notes: list[str] = getattr(client, "notes", [])
+            _write_entities(out, vendors, staff, log_path, redact)
 
         # 4. test: rules + graph
         with _timed("test"):

@@ -107,6 +107,30 @@ def verify(
 
 
 @app.command()
+def ui(port: int = typer.Option(8501, help="Local port")) -> None:
+    """Open the local web page: pick a case, investigate, read every output."""
+    import subprocess
+    import sys
+
+    load_dotenv(override=True)
+    page = Path(__file__).parent / "ui" / "app.py"
+    cmd = [
+        sys.executable,
+        "-m",
+        "streamlit",
+        "run",
+        str(page),
+        "--server.port",
+        str(port),
+        "--theme.base",
+        "light",
+        "--browser.gatherUsageStats",
+        "false",
+    ]
+    raise typer.Exit(subprocess.call(cmd))
+
+
+@app.command()
 def credits() -> None:
     """Show remaining Crustdata credits."""
     load_dotenv(override=True)  # .env wins over stale shell keys
