@@ -197,6 +197,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--out", default=str(ROOT / "out" / "eval"))
     args = ap.parse_args(argv)
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env", override=True)  # as the CLI does: .env wins over stale shell keys
 
     specs = []
     for cj in sorted(Path(args.cases).glob("*/case.json")):
