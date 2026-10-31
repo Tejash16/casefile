@@ -15,7 +15,9 @@ def build(rows: list[LedgerRow], vendors: list[VendorRecord], staff: list[StaffR
     return G
 
 
-def path_evidence(G: nx.Graph, staff_id: str, vendor_id: str, max_len: int = 3) -> EvidenceObject | None:
+def path_evidence(
+    G: nx.Graph, staff_id: str, vendor_id: str, max_len: int = 3
+) -> EvidenceObject | None:
     return None
 
 

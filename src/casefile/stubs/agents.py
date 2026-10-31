@@ -19,8 +19,8 @@ from casefile.schemas import (
     StaffRecord,
     Tip,
     Typology,
-    Verdict,
     VendorRecord,
+    Verdict,
 )
 
 

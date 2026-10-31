@@ -119,14 +119,26 @@ def _next_id(evidence: list[EvidenceObject]) -> int:
 
 
 def _metrics_from_log(log_path: Path) -> dict[str, Any]:
-    m = {"crustdata_calls": 0, "cache_hits": 0, "credits_used": 0.0, "model_calls": 0,
-         "tokens_in": 0, "tokens_out": 0, "rule_tests": 0, "log_records": 0}
+    m = {
+        "crustdata_calls": 0,
+        "cache_hits": 0,
+        "credits_used": 0.0,
+        "model_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "rule_tests": 0,
+        "log_records": 0,
+    }
     for line in log_path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         rec = json.loads(line)
         m["log_records"] += 1
-        kind, detail, out = rec.get("action_type"), rec.get("action_detail") or {}, rec.get("outcome") or {}
+        kind, detail, out = (
+            rec.get("action_type"),
+            rec.get("action_detail") or {},
+            rec.get("outcome") or {},
+        )
         if rec.get("record_phase") == "pre_execution":
             if kind == "tool_call":
                 m["crustdata_calls"] += 1
@@ -162,9 +174,10 @@ def run(
     stage_seconds: dict[str, float] = {}
     STUBBED.clear()
 
-    def stage(name: str, msg: str = "") -> None:
-        if progress:
-            progress(name, msg)
+    info: dict[str, str] = {}
+
+    def stage(name: str, msg: str) -> None:
+        info[name] = msg  # shown when the stage finishes
 
     class _timed:
         def __init__(self, name: str) -> None:
@@ -172,15 +185,18 @@ def run(
 
         def __enter__(self) -> None:
             self.t = time.perf_counter()
-            stage(self.name, "start")
+            if progress:
+                progress(self.name, "start")
 
         def __exit__(self, *exc: object) -> None:
-            stage_seconds[self.name] = round(time.perf_counter() - self.t, 3)
-            if exc[0] is None:
-                stage(self.name, f"done {stage_seconds[self.name]:.2f}s")
+            stage_seconds[self.name] = secs = round(time.perf_counter() - self.t, 3)
+            if progress and exc[0] is None:
+                progress(self.name, f"{info.get(self.name, 'done')}  [dim]{secs:.2f}s[/]")
 
     # 0. audit log first, then hash the inputs
     log_path = out / "log.jsonl"
+    for old in (log_path, out / "root.txt"):  # a new run starts a new chain
+        old.unlink(missing_ok=True)
     audit = impl("audit", "AuditLog")(log_path)
     inputs = {"tip": tip_path, "ledger": ledger_path, "vendors": vendors_path, "staff": staff_path}
     for role, p in inputs.items():
@@ -235,8 +251,9 @@ def run(
                     e = path_evidence(G, s, v)
                     ids: list[str] = []
                     if e is not None:
-                        e = e.model_copy(update={"evidence_id": f"E{_next_id(evidence)}",
-                                                 "log_record_id": rid})
+                        e = e.model_copy(
+                            update={"evidence_id": f"E{_next_id(evidence)}", "log_record_id": rid}
+                        )
                         evidence.append(e)
                         ids = [e.evidence_id]
                     audit.post(rid, {"status": "ok", "evidence_ids": ids})
@@ -249,14 +266,19 @@ def run(
             for e in evs:
                 tags.setdefault(e.evidence_id, []).append(hid)
         evidence = [
-            e.model_copy(update={"hypothesis_ids": sorted({*e.hypothesis_ids, *tags.get(e.evidence_id, [])})})
+            e.model_copy(
+                update={"hypothesis_ids": sorted({*e.hypothesis_ids, *tags.get(e.evidence_id, [])})}
+            )
             for e in evidence
         ]
         by_id = {e.evidence_id: e for e in evidence}
         linked = {hid: [by_id[e.evidence_id] for e in evs] for hid, evs in linked.items()}
         n_sup = sum(e.direction == Direction.supports for e in evidence)
         n_ref = sum(e.direction == Direction.refutes for e in evidence)
-        stage("test", f"{len(test_ids)} tests, {len(evidence)} evidence ({n_sup} support, {n_ref} refute)")
+        stage(
+            "test",
+            f"{len(test_ids)} tests, {len(evidence)} evidence ({n_sup} support, {n_ref} refute)",
+        )
 
     # 5. critique and gate
     with _timed("critique_gate"):
@@ -292,9 +314,8 @@ def run(
             "hypotheses": hypotheses,
             "ledger_stats": stats,
             "scope": [
-                f"Ledger: {len(rows)} rows" + (
-                    f", {min(r.date for r in rows)} to {max(r.date for r in rows)}" if rows else ""
-                ),
+                f"Ledger: {len(rows)} rows"
+                + (f", {min(r.date for r in rows)} to {max(r.date for r in rows)}" if rows else ""),
                 f"Vendor master: {len(vendors)} vendors; staff list: {len(staff)} staff",
                 "External sources: Crustdata company and person records"
                 + (" (offline cache)" if offline else ""),
@@ -313,23 +334,38 @@ def run(
             "verify_command": f"python verify.py {log_path.as_posix()}",
         }
         case: CaseFile = impl("write", "write_case_file")(findings, evidence, meta)
+        case = case.model_copy(update={"hypotheses": hypotheses})
 
     with _timed("render"):
         evidence_index = {e.evidence_id: e for e in evidence}
         (out / "evidence.json").write_text(
             json.dumps([e.model_dump(mode="json") for e in evidence], indent=2), encoding="utf-8"
         )
+        try:
+            from casefile.audit import payloads
+
+            payloads.default_store.dump(out / "payloads")
+        except ImportError:
+            pass
+        render = impl("render", "render")
         errors = impl("check", "check_citations")(case, evidence_index)
         if errors:
+            audit.seal()
             raise CitationError(errors)
+        # the case file's root covers every record up to here; root.txt (seal) covers all
+        case.metrics.update(_metrics_from_log(log_path))
+        case.metrics |= {
+            "wall_seconds": round(time.perf_counter() - t0, 2),
+            "stage_seconds": stage_seconds,
+            "stubbed": sorted(STUBBED),
+            "log_records": audit.seq,
+        }
         case = case.model_copy(update={"merkle_root": audit.merkle_root()})
         rid = audit.pre("render", {"name": "case_file", "redact": redact})
-        path = impl("render", "render")(case, out, redact=redact)
+        path = render(case, out, redact=redact)
         audit.post(rid, {"status": "ok", "result_sha256": _sha256_file(Path(path))[0]})
-        (out / "root.txt").write_text(audit.merkle_root() + "\n", encoding="utf-8")
+        audit.seal()
+        audit.close()
 
-    case.metrics.update(_metrics_from_log(log_path))
     case.metrics["wall_seconds"] = round(time.perf_counter() - t0, 2)
-    case.metrics["stage_seconds"] = stage_seconds
-    case.metrics["stubbed"] = sorted(STUBBED)
     return case

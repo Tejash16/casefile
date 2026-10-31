@@ -18,8 +18,11 @@ def check_citations(case: CaseFile, evidence_index: dict[str, EvidenceObject]) -
     for s in sentences:
         if not s.evidence_ids:
             errors.append(f"uncited sentence: {s.text!r}")
-        errors += [f"unknown evidence id {i} in {s.text!r}" for i in s.evidence_ids
-                   if i not in evidence_index]
+        errors += [
+            f"unknown evidence id {i} in {s.text!r}"
+            for i in s.evidence_ids
+            if i not in evidence_index
+        ]
     return errors
 
 
@@ -47,8 +50,10 @@ def render(case: CaseFile, out_dir: str | Path, redact: bool = False) -> Path:
         lines += [f"### {f.hypothesis_id}: {f.verdict} ({f.verdict_by})", ""]
         lines += [f"- {_cite(s)}" for s in f.rationale] + [""]
     lines += ["## 9. Exhibits", ""]
-    lines += [f"- **{e.evidence_id}** {e.test_id} {e.direction} {e.strength}: `{e.quote}`"
-              for e in case.exhibits]
+    lines += [
+        f"- **{e.evidence_id}** {e.test_id} {e.direction} {e.strength}: `{e.quote}`"
+        for e in case.exhibits
+    ]
     path = out / "case_file.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     (out / "findings.json").write_text(

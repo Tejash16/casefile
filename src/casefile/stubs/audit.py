@@ -64,5 +64,16 @@ class AuditLog:
             }
         )
 
+    @property
+    def seq(self) -> int:
+        return self._seq
+
     def merkle_root(self) -> str:
         return self._prev
+
+    def seal(self) -> str:
+        self.path.with_name("root.txt").write_text(f"{self._prev} {self._seq}\n", encoding="utf-8")
+        return self._prev
+
+    def close(self) -> None:
+        pass

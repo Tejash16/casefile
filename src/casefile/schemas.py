@@ -322,6 +322,7 @@ class CaseFile(Model):
     executive_summary: list[Sentence] = Field(default_factory=list)
     scope: list[str] = Field(default_factory=list)
     approach: list[str] = Field(default_factory=list)
+    hypotheses: list[Hypothesis] = Field(default_factory=list)
     findings: list[Finding] = Field(default_factory=list)
     data_quality: list[str] = Field(default_factory=list)
     assumptions: dict[str, str] = Field(default_factory=dict)

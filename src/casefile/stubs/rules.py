@@ -35,8 +35,15 @@ def build_context(rows, vendors, staff, graph=None, audit=None) -> StubContext:
     return StubContext(rows=rows, vendors=vendors, staff=staff, graph=graph, audit=audit)
 
 
-def _evidence(ctx: StubContext, test_id: str, direction: Direction, strength: float, summary: str,
-              rows: list[LedgerRow], kind: SourceKind = SourceKind.ledger_rows) -> EvidenceObject:
+def _evidence(
+    ctx: StubContext,
+    test_id: str,
+    direction: Direction,
+    strength: float,
+    summary: str,
+    rows: list[LedgerRow],
+    kind: SourceKind = SourceKind.ledger_rows,
+) -> EvidenceObject:
     rid = ctx.audit.pre("rule_test", {"name": test_id}) if ctx.audit else "no-audit"
     ctx.evidence_counter += 1
     payload = json.dumps([r.model_dump(mode="json") for r in rows], sort_keys=True).encode()
@@ -64,15 +71,35 @@ def run_tests(test_ids: list[str], ctx: StubContext) -> list[EvidenceObject]:
     vid = ctx.vendors[0].vendor_id
     rows = [r for r in ctx.rows if r.vendor_id == vid] or ctx.rows[:1]
     return [
-        _evidence(ctx, "T15", Direction.supports, 0.9,
-                  "Stub: approver previously worked at the vendor.", rows[:1]),
-        _evidence(ctx, "T05", Direction.supports, 0.7,
-                  "Stub: invoices fall just under the approver's limit.", rows),
-        _evidence(ctx, "T02", Direction.neutral, 0.3,
-                  "Stub: vendor address is residential.", rows[:1], SourceKind.vendor_master),
+        _evidence(
+            ctx,
+            "T15",
+            Direction.supports,
+            0.9,
+            "Stub: approver previously worked at the vendor.",
+            rows[:1],
+        ),
+        _evidence(
+            ctx,
+            "T05",
+            Direction.supports,
+            0.7,
+            "Stub: invoices fall just under the approver's limit.",
+            rows,
+        ),
+        _evidence(
+            ctx,
+            "T02",
+            Direction.neutral,
+            0.3,
+            "Stub: vendor address is residential.",
+            rows[:1],
+            SourceKind.vendor_master,
+        ),
     ]
 
 
-def rerank(hypotheses: list[Hypothesis], evidence: list[EvidenceObject],
-           centrality: dict[str, float]) -> list[Hypothesis]:
+def rerank(
+    hypotheses: list[Hypothesis], evidence: list[EvidenceObject], centrality: dict[str, float]
+) -> list[Hypothesis]:
     return sorted(hypotheses, key=lambda h: -h.prior_score)
