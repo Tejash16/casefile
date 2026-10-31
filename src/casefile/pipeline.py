@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import inspect
 import json
 import os
 import time
@@ -49,6 +50,7 @@ REGISTRY: dict[str, tuple[str, str]] = {
     "rules_context": ("casefile.rules.context", "casefile.stubs.rules"),
     "thresholds": ("casefile.rules.config", "casefile.stubs.rules"),
     "rank": ("casefile.rules.rank", "casefile.stubs.rules"),
+    "registry": ("casefile.rules.registry", "casefile.stubs.rules"),
     "check": ("casefile.report.check", "casefile.stubs.report"),
     "render": ("casefile.report.render", "casefile.stubs.report"),
 }
@@ -131,14 +133,38 @@ def _assumptions(thresholds: dict[str, Any]) -> dict[str, str]:
     return out
 
 
-def _evidence_for(h: Hypothesis, evidence: list[EvidenceObject]) -> list[EvidenceObject]:
-    """Evidence tagged with h, or from one of h's tests on one of h's subjects/objects."""
+def _bears_on(h: Hypothesis, e: EvidenceObject, tests: dict[str, Any]) -> bool:
+    """Does this test's evidence, in this direction, speak to h's typology? (b3's registry)
+
+    A T05 refutation ("billing looks like the population") refutes threshold structuring, not a
+    conflict of interest; supports count for the test's `typologies`, refutes for its `refutes`.
+    """
+    test = tests.get(e.test_id)
+    if test is None:
+        return True
+    typ = str(h.typology)
+    supports = {str(t) for t in getattr(test, "typologies", ())}
+    refutes = {str(t) for t in getattr(test, "refutes", ())}
+    if e.direction == Direction.supports:
+        return typ in supports
+    if e.direction == Direction.refutes:
+        return typ in refutes
+    return typ in supports | refutes
+
+
+def _evidence_for(
+    h: Hypothesis, evidence: list[EvidenceObject], tests: dict[str, Any] | None = None
+) -> list[EvidenceObject]:
+    """Evidence tagged with h, or from one of h's tests on one of h's subjects/objects that
+    bears on h's typology in its direction."""
     out = []
     for e in evidence:
         if h.hypothesis_id in e.hypothesis_ids:
             out.append(e)
             continue
         if e.test_id not in h.tests_to_run and e.test_id != "T16":
+            continue
+        if not _bears_on(h, e, tests or {}):
             continue
         objs, subs = set(e.object_ids), set(e.subject_ids)
         if not objs and not subs:
@@ -186,7 +212,7 @@ def _metrics_from_log(log_path: Path) -> dict[str, Any]:
             elif kind == "rule_test":
                 m["rule_tests"] += 1
         else:
-            m["credits_used"] += float(out.get("credits_used") or 0)
+            m["credits_used"] = round(m["credits_used"] + float(out.get("credits_used") or 0), 2)
             m["tokens_in"] += int(out.get("tokens_in") or 0)
             m["tokens_out"] += int(out.get("tokens_out") or 0)
             m["cache_hits"] += bool(out.get("cache_hit"))
@@ -202,7 +228,7 @@ def run(
     offline: bool = False,
     redact: bool = False,
     case_id: str | None = None,
-    company_name: str = "Audited company",
+    company_name: str | None = None,
     progress: Callable[[str, str], None] | None = None,
 ) -> CaseFile:
     t0 = time.perf_counter()
@@ -279,14 +305,23 @@ def run(
             )
             judge = impl("match", "judge_candidates")
             vendors = impl("resolve", "resolve_vendors")(vendors, client, judge=judge)
-            staff = impl("resolve", "resolve_staff")(staff, client, judge=judge)
+            resolve_staff = impl("resolve", "resolve_staff")
+            if company_name and "company_name" in inspect.signature(resolve_staff).parameters:
+                staff = resolve_staff(staff, client, judge=judge, company_name=company_name)
+            else:  # b2 infers the employer from the staff list
+                staff = resolve_staff(staff, client, judge=judge)
             n_res = sum(x.resolution.status == "resolved" for x in [*vendors, *staff])
             stage("resolve", f"{n_res}/{len(vendors) + len(staff)} entities resolved")
 
         # 4. test: rules + graph
         with _timed("test"):
             G = impl("graph", "build")(rows, vendors, staff)
-            ctx = impl("rules_context", "build_context")(rows, vendors, staff, graph=G, audit=audit)
+            build_context = impl("rules_context", "build_context")
+            ctx = (
+                build_context(rows, vendors, staff, graph=G, audit=audit, hypotheses=hypotheses)
+                if "hypotheses" in inspect.signature(build_context).parameters
+                else build_context(rows, vendors, staff, graph=G, audit=audit)
+            )
             test_ids = sorted({t for h in hypotheses for t in h.tests_to_run})
             evidence: list[EvidenceObject] = list(impl("rules", "run_tests")(test_ids, ctx))
             path_evidence = impl("graph", "path_evidence")
@@ -309,7 +344,8 @@ def run(
             centrality = impl("graph", "centrality")(G)
             hypotheses = impl("rank", "rerank")(hypotheses, evidence, centrality)
             # tag evidence with the hypotheses it bears on
-            linked = {h.hypothesis_id: _evidence_for(h, evidence) for h in hypotheses}
+            tests = impl("registry", "TESTS")
+            linked = {h.hypothesis_id: _evidence_for(h, evidence, tests) for h in hypotheses}
             tags: dict[str, list[str]] = {}
             for hid, evs in linked.items():
                 for e in evs:
@@ -369,7 +405,7 @@ def run(
             }
             meta = {
                 "case_id": case_id,
-                "company_name": company_name,
+                "company_name": company_name or "Audited company",
                 "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
                 "tip": tip,
                 "hypotheses": hypotheses,

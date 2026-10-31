@@ -50,7 +50,9 @@ def investigate(
     offline: bool = typer.Option(False, help="Read Crustdata only from the disk cache"),
     redact: bool = typer.Option(False, help="Replace person names with initials in the output"),
     case_id: str | None = typer.Option(None, help="Case id (default: output directory name)"),
-    company: str = typer.Option("Audited company", help="Company name for the title block"),
+    company: str | None = typer.Option(
+        None, help="Audited company (title block; employer for staff search). Default: inferred"
+    ),
 ) -> None:
     """Run the six stages on one tip and write the case file."""
     load_dotenv(override=True)  # .env wins over stale shell keys

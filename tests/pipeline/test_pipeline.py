@@ -57,6 +57,38 @@ def test_one_failed_critique_does_not_abort_the_run(inputs, tmp_path, all_stubs,
     assert [f.verdict for f in case.findings] == ["Unsubstantiated"]
 
 
+def test_refutation_links_only_to_typologies_it_refutes():
+    from casefile.rules.registry import TESTS
+    from casefile.schemas import EvidenceObject, Hypothesis, Source
+
+    def ev(test_id: str, direction: str) -> EvidenceObject:
+        return EvidenceObject(
+            evidence_id=f"E{test_id}{direction}",
+            test_id=test_id,
+            subject_ids=["S004"],
+            object_ids=["V017"],
+            direction=direction,
+            strength=0.7,
+            summary="s",
+            quote="q",
+            source=Source(kind="ledger_rows"),
+            sha256="0" * 64,
+            log_record_id="r",
+        )
+
+    coi = Hypothesis(
+        hypothesis_id="H3",
+        typology="conflict_of_interest",
+        statement="s",
+        subjects=["S004"],
+        objects=["V017"],
+        tests_to_run=["T05", "T15"],
+    )
+    evidence = [ev("T05", "refutes"), ev("T15", "supports"), ev("T15", "refutes")]
+    linked = {e.evidence_id for e in pipeline._evidence_for(coi, evidence, TESTS)}
+    assert linked == {"ET15supports", "ET15refutes"}  # T05 refutes threshold structuring only
+
+
 def test_redact_hides_staff_names(inputs, tmp_path, all_stubs):
     out = tmp_path / "out"
     pipeline.run(

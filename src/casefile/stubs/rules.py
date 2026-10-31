@@ -18,6 +18,7 @@ from casefile.schemas import (
 )
 
 THRESHOLDS: dict[str, Any] = {}
+TESTS: dict[str, Any] = {}  # unknown tests link by entity overlap only
 
 
 @dataclass
