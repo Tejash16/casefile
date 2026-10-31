@@ -152,6 +152,11 @@ def _validator(vendor_ids: set[str], staff_ids: set[str], typologies: set[str], 
                 errors.append(f"hypothesis {i}: unknown vendor ids {bad_o}")
             if not h.subjects and not h.objects:
                 errors.append(f"hypothesis {i}: names neither a staff id nor a vendor id")
+        if out.hypotheses and not any(h.alternative_to_tip for h in out.hypotheses):
+            errors.append(
+                "no hypothesis has alternative_to_tip=true; add one whose support would refute "
+                "the tip's reading (a different subject, or an innocent explanation)"
+            )
         if errors:
             raise ValueError("; ".join(errors))
 
@@ -197,7 +202,8 @@ def propose(
             tests_to_run=list(dict.fromkeys(h.tests_to_run)),
             prior_score=h.prior_score,
             origin=h.origin,
-            rationale=h.rationale.strip(),
+            rationale=("Alternative to the tip. " if h.alternative_to_tip else "")
+            + h.rationale.strip(),
         )
         for i, h in enumerate(out.hypotheses, 1)
     ]

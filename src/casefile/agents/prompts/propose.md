@@ -18,6 +18,6 @@ Propose between 3 and 8 hypotheses for this investigation.
 - Name subjects and objects only by the staff and vendor ids listed above; never invent ids. A hypothesis may have no subject when no staff member is implicated.
 - Write each `statement` as one worst-case sentence with ids, not names.
 - Mark each hypothesis `origin: "tip"` if it comes from the tip, `"screen"` if it comes from the statistics alone.
-- Include at least one hypothesis that would refute the tip's reading if its tests support it.
+- Include at least one hypothesis that would refute the tip's reading if its tests support it, and mark it `alternative_to_tip: true` (all others false). Good alternatives: a different staff member is the one linked to the vendor; the vendor is an established company billing at population-normal patterns; the spend pattern belongs to another approver.
 - Do not repeat the same typology for the same subjects and objects.
 </instructions>

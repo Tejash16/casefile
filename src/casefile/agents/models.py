@@ -65,6 +65,9 @@ class ProposedHypothesis(BaseModel):
     tests_to_run: list[str] = Field(description="test ids from the registry, e.g. T15")
     prior_score: float = Field(ge=0, le=1)
     origin: Origin
+    alternative_to_tip: bool = Field(
+        description="true if support for this hypothesis would refute the tip's reading"
+    )
     rationale: str
 
 

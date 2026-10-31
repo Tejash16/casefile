@@ -19,6 +19,7 @@ def hyp(**kw):
         "tests_to_run": ["T15", "T05"],
         "prior_score": 0.6,
         "origin": "tip",
+        "alternative_to_tip": False,
         "rationale": "The tip names S004.",
     }
     return {**base, **kw}
@@ -39,6 +40,7 @@ GOOD = {
             subjects=["S001"],
             tests_to_run=["T15"],
             statement="Approver S001, not S004, holds the V017 link (conflict_of_interest).",
+            alternative_to_tip=True,
         ),
     ]
 }
@@ -73,6 +75,14 @@ def test_propose_returns_typed_hypotheses(fake):
     out = propose.propose(TIP, LEDGER_STATS, VENDORS, STAFF, [t.value for t in Typology])
     assert [h.hypothesis_id for h in out] == ["H1", "H2", "H3"]
     assert out[1].typology == Typology.shell_company and out[1].origin == "screen"
+    assert out[2].rationale.startswith("Alternative to the tip.")
+
+
+def test_propose_requires_an_alternative_to_tip(fake):
+    no_alt = {"hypotheses": [dict(h, alternative_to_tip=False) for h in GOOD["hypotheses"]]}
+    fake.responses = [message(no_alt), message(GOOD)]
+    propose.propose(TIP, LEDGER_STATS, VENDORS, STAFF)
+    assert "alternative_to_tip" in fake.calls[1]["messages"][0]["content"][-1]["text"]
     assert fake.calls[0]["model"] == client.MODEL_STRONG
     assert fake.calls[0]["output_config"]["effort"] == "high"
 
