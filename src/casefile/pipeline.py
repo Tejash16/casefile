@@ -92,6 +92,21 @@ def _set_agents_audit(audit: Any) -> None:
     except ImportError:
         return
     set_audit(audit)
+    if audit is not None:
+        try:
+            from casefile.agents.client import reset_usage_totals
+        except ImportError:
+            return
+        reset_usage_totals()  # per-run token totals; the eval harness runs cases in one process
+
+
+def _model_errors() -> tuple[type[BaseException], ...]:
+    """Errors that mean "the model gave no usable answer"; the gate then decides without it."""
+    try:
+        from casefile.agents.client import ModelCallError
+    except ImportError:
+        return ()
+    return (ModelCallError,)
 
 
 def _people(staff: list[StaffRecord], vendors: list[VendorRecord]) -> list[str]:
@@ -320,8 +335,17 @@ def run(
         # 5. critique and gate
         with _timed("critique_gate"):
             critique = impl("critique", "critique")
+            model_errors = _model_errors()
+
+            def critique_or_none(h: Hypothesis) -> Any:
+                # one refusal or bad output must not sink the run; gate.decide handles None
+                try:
+                    return critique(h, linked[h.hypothesis_id])
+                except model_errors:
+                    return None
+
             with ThreadPoolExecutor(max_workers=4) as pool:
-                critics = list(pool.map(lambda h: critique(h, linked[h.hypothesis_id]), hypotheses))
+                critics = list(pool.map(critique_or_none, hypotheses))
             resolutions = {v.vendor_id: v.resolution for v in vendors} | {
                 s.staff_id: s.resolution for s in staff
             }

@@ -63,10 +63,12 @@ def critique(hypothesis: Hypothesis, evidence: list[EvidenceObject]) -> CriticOu
 def decide(
     hypothesis: Hypothesis,
     evidence: list[EvidenceObject],
-    critic: CriticOutput,
+    critic: CriticOutput | None,
     resolutions: dict[str, Resolution],
     ledger_amounts: dict[str, Any] | None = None,
 ) -> Finding:
+    if critic is None:
+        critic = CriticOutput(model_verdict=Verdict.Unsubstantiated)
     return Finding(
         hypothesis_id=hypothesis.hypothesis_id,
         verdict=critic.model_verdict,
