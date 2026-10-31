@@ -76,4 +76,4 @@ Both recompute every record hash (RFC 8785 canonical JSON, SHA-256), the `prev_h
 
 ## Team
 
-Two builders, IIT Bombay: _names here_.
+**Builder**: Tejash Chauhan and Kedar Sharma.
