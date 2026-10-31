@@ -22,12 +22,19 @@ OUT = ROOT / "out"
 
 TABS = [  # (tab label, panel module, owner)
     ("Findings", "findings", "a2"),
-    ("Entities", "entities", "b2"),
+    ("Entities (Crustdata)", "entities", "b2"),
     ("Evidence", "evidence", "b3"),
     ("Inputs", "inputs", "b1"),
     ("Audit log", "audit", "a3"),
 ]
-STAGES = ["Ingest", "Hypotheses", "Crustdata", "Rules", "Gate", "Case file"]
+STAGES = [
+    "Ingest",
+    "Hypotheses",
+    "Crustdata: resolve vendors & staff",
+    "Rules",
+    "Gate",
+    "Case file",
+]
 
 
 @st.cache_resource
@@ -68,6 +75,42 @@ def _stage_index(log: Path) -> int:
             continue
         idx = max(idx, i)
     return idx
+
+
+def _crustdata_strip(out_dir: Path) -> None:
+    """Live counters: Crustdata calls and credits from log.jsonl; resolved companies and people
+    from entities.json (written right after the resolve stage)."""
+    calls, credits = 0, 0.0
+    log = out_dir / "log.jsonl"
+    if log.exists():
+        for line in log.read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if rec.get("action_type") != "tool_call":
+                continue
+            if rec.get("record_phase") == "pre_execution":
+                calls += 1
+            else:
+                credits += float((rec.get("outcome") or {}).get("credits_used") or 0)
+    companies = people = "—"
+    ent = out_dir / "entities.json"
+    if ent.exists():
+        try:
+            data = json.loads(ent.read_text(encoding="utf-8"))
+            companies = sum(v["resolution"]["status"] == "resolved" for v in data["vendors"])
+            companies = f"{companies}/{len(data['vendors'])}"
+            people = sum(s["resolution"]["status"] == "resolved" for s in data["staff"])
+            people = f"{people}/{len(data['staff'])}"
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+    st.markdown("**Powered by Crustdata identity graph**")
+    c = st.columns(4)
+    c[0].metric("Crustdata calls", calls)
+    c[1].metric("Companies resolved", companies)
+    c[2].metric("People resolved", people)
+    c[3].metric("Crustdata credits used", f"{credits:.2f}")
 
 
 def _stage_bar(out_dir: Path, running: bool, error: str | None) -> None:
@@ -200,6 +243,7 @@ def main() -> None:
     def live() -> None:
         s = _runs().get(str(out_dir), {})
         alive = bool(s.get("thread") and s["thread"].is_alive())
+        _crustdata_strip(out_dir)
         _stage_bar(out_dir, alive, s.get("error"))
         if running and not alive:  # the run just finished: redraw the panels once
             st.rerun()
