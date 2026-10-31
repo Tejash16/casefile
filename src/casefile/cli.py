@@ -53,7 +53,7 @@ def investigate(
     company: str = typer.Option("Audited company", help="Company name for the title block"),
 ) -> None:
     """Run the six stages on one tip and write the case file."""
-    load_dotenv()
+    load_dotenv(override=True)  # .env wins over stale shell keys
     from casefile import pipeline
 
     start = time.perf_counter()
@@ -107,7 +107,7 @@ def verify(
 @app.command()
 def credits() -> None:
     """Show remaining Crustdata credits."""
-    load_dotenv()
+    load_dotenv(override=True)  # .env wins over stale shell keys
     from casefile.pipeline import impl
 
     client = impl("crustdata", "CrustdataClient")(

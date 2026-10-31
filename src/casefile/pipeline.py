@@ -387,7 +387,6 @@ def run(
             render = impl("render", "render")
             errors = impl("check", "check_citations")(case, payload_store)
             if errors:
-                audit.seal()
                 raise CitationError(errors)
             # the case file's root covers every record up to here; root.txt (seal) covers all
             case.metrics.update(_metrics_from_log(log_path))
@@ -399,18 +398,22 @@ def run(
             }
             case = case.model_copy(update={"merkle_root": audit.merkle_root()})
             rid = audit.pre("render", {"name": "case_file", "redact": redact})
-            path = render(
-                case,
-                out,
-                redact=redact,
-                evidence_index=payload_store,
-                people=_people(staff, vendors),
-            )
+            try:
+                path = render(
+                    case,
+                    out,
+                    redact=redact,
+                    evidence_index=payload_store,
+                    people=_people(staff, vendors),
+                )
+            except BaseException as e:  # a3's CitationError is a SystemExit
+                audit.post(rid, {"status": "error", "error": f"{type(e).__name__}: {e}"})
+                raise
             audit.post(rid, {"status": "ok", "result_sha256": _sha256_file(Path(path))[0]})
-            audit.seal()
 
         case.metrics["wall_seconds"] = round(time.perf_counter() - t0, 2)
         return case
     finally:
         _set_agents_audit(None)
+        audit.seal()  # a crashed run still gets root.txt, so tail truncation stays detectable
         audit.close()
