@@ -91,7 +91,7 @@ def test_propose_requires_an_alternative_to_tip(fake):
     propose.propose(TIP, LEDGER_STATS, VENDORS, STAFF)
     assert "alternative_to_tip" in fake.calls[1]["messages"][0]["content"][-1]["text"]
     assert fake.calls[0]["model"] == client.MODEL_STRONG
-    assert fake.calls[0]["output_config"]["effort"] == "high"
+    assert fake.calls[0]["output_config"]["effort"] == "low"
 
 
 def test_propose_retries_on_unknown_ids_and_bad_count(fake):

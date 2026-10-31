@@ -188,7 +188,7 @@ def propose(
         output_schema=ProposeOutput,
         validate=validate,
         temperature=0.3,
-        effort="high",
+        effort="low",  # 12 s vs 24 s at medium on the fixture, same coverage
         audit=audit,
     )
     out: ProposeOutput = result.output

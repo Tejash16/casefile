@@ -255,7 +255,7 @@ def write_case_file(
                 messages,
                 model=client.MODEL_STRONG,
                 temperature=0,
-                effort="medium",
+                effort="low",  # 7.5 s vs 17 s at medium, same cited content
                 audit=audit,
             )
             sections, dropped = parse_sections(result.message, order)

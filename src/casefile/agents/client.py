@@ -240,6 +240,8 @@ def call(
 ) -> CallResult:
     """One logged model call. See module docstring for the contract."""
     model = model or MODEL_STRONG
+    # Per-call-site override for latency tuning, e.g. CASEFILE_EFFORT_PROPOSE=low.
+    effort = os.environ.get(f"CASEFILE_EFFORT_{name.upper()}", effort) or None
     client = get_client()
     audit = get_audit(audit)
     system = _system_param(system_blocks)
