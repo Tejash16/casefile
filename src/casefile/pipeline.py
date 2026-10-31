@@ -1,0 +1,335 @@
+"""Six stages wired together: ingest -> propose -> resolve -> test -> critique/gate -> write/render.
+
+Each function is looked up at call time through REGISTRY: the real module if it exists and exports
+the name, otherwise casefile.stubs.<group>. A real module replaces a stub by landing on main; no
+stage code changes. CASEFILE_FORCE_STUBS=rules,agents forces stubs for those keys.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import importlib
+import json
+import os
+import time
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime
+from decimal import Decimal
+from pathlib import Path
+from typing import Any
+
+from casefile.schemas import (
+    CaseFile,
+    Direction,
+    EvidenceObject,
+    Finding,
+    Hypothesis,
+    Typology,
+    Verdict,
+)
+
+# key -> (real module, stub module)
+REGISTRY: dict[str, tuple[str, str]] = {
+    "audit": ("casefile.audit.log", "casefile.stubs.audit"),
+    "ingest": ("casefile.ingest", "casefile.stubs.ingest"),
+    "stats": ("casefile.ingest.stats", "casefile.stubs.ingest"),
+    "crustdata": ("casefile.crustdata.client", "casefile.stubs.crustdata"),
+    "resolve": ("casefile.resolve", "casefile.stubs.crustdata"),
+    "propose": ("casefile.agents.propose", "casefile.stubs.agents"),
+    "match": ("casefile.agents.match", "casefile.stubs.agents"),
+    "critique": ("casefile.agents.critique", "casefile.stubs.agents"),
+    "gate": ("casefile.agents.gate", "casefile.stubs.agents"),
+    "write": ("casefile.agents.write", "casefile.stubs.agents"),
+    "graph": ("casefile.graph", "casefile.stubs.graph"),
+    "rules": ("casefile.rules", "casefile.stubs.rules"),
+    "rules_context": ("casefile.rules.context", "casefile.stubs.rules"),
+    "thresholds": ("casefile.rules.config", "casefile.stubs.rules"),
+    "rank": ("casefile.rules.rank", "casefile.stubs.rules"),
+    "check": ("casefile.report.check", "casefile.stubs.report"),
+    "render": ("casefile.report.render", "casefile.stubs.report"),
+}
+
+STUBBED: set[str] = set()
+
+VERDICT_ORDER = {Verdict.Substantiated: 0, Verdict.Unfounded: 1, Verdict.Unsubstantiated: 2}
+
+
+class CitationError(RuntimeError):
+    """The case file has sentences without valid evidence ids; render refused."""
+
+    def __init__(self, errors: list[str]) -> None:
+        super().__init__(f"{len(errors)} citation error(s): " + "; ".join(errors[:5]))
+        self.errors = errors
+
+
+def impl(key: str, attr: str) -> Any:
+    """The real `attr` for stage `key` if it has landed, else the stub's."""
+    real, stub = REGISTRY[key]
+    forced = {k.strip() for k in os.environ.get("CASEFILE_FORCE_STUBS", "").split(",")}
+    if key not in forced and real.split(".")[1] not in forced:
+        try:
+            return getattr(importlib.import_module(real), attr)
+        except ModuleNotFoundError as e:
+            # only a missing module falls back; a broken import inside a real module raises
+            if e.name is None or not real.startswith(e.name):
+                raise
+        except AttributeError:
+            pass
+    STUBBED.add(key)
+    return getattr(importlib.import_module(stub), attr)
+
+
+def _sha256_file(path: Path) -> tuple[str, int]:
+    data = path.read_bytes()
+    return hashlib.sha256(data).hexdigest(), len(data)
+
+
+def _assumptions(thresholds: dict[str, Any]) -> dict[str, str]:
+    out = {}
+    for name, t in thresholds.items():
+        value, unit = getattr(t, "value", t), getattr(t, "unit", "")
+        out[name] = f"{value} {unit}".strip()
+    return out
+
+
+def _evidence_for(h: Hypothesis, evidence: list[EvidenceObject]) -> list[EvidenceObject]:
+    """Evidence tagged with h, or from one of h's tests on one of h's subjects/objects."""
+    out = []
+    for e in evidence:
+        if h.hypothesis_id in e.hypothesis_ids:
+            out.append(e)
+            continue
+        if e.test_id not in h.tests_to_run and e.test_id != "T16":
+            continue
+        objs, subs = set(e.object_ids), set(e.subject_ids)
+        if not objs and not subs:
+            continue
+        if objs and h.objects and not objs & set(h.objects):
+            continue
+        if subs and h.subjects and not subs & set(h.subjects):
+            continue
+        out.append(e)
+    return out
+
+
+def _next_id(evidence: list[EvidenceObject]) -> int:
+    nums = [int(e.evidence_id[1:]) for e in evidence if e.evidence_id[1:].isdigit()]
+    return max(nums, default=0) + 1
+
+
+def _metrics_from_log(log_path: Path) -> dict[str, Any]:
+    m = {"crustdata_calls": 0, "cache_hits": 0, "credits_used": 0.0, "model_calls": 0,
+         "tokens_in": 0, "tokens_out": 0, "rule_tests": 0, "log_records": 0}
+    for line in log_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        rec = json.loads(line)
+        m["log_records"] += 1
+        kind, detail, out = rec.get("action_type"), rec.get("action_detail") or {}, rec.get("outcome") or {}
+        if rec.get("record_phase") == "pre_execution":
+            if kind == "tool_call":
+                m["crustdata_calls"] += 1
+                m["cache_hits"] += bool(detail.get("cache_hit"))
+            elif kind == "model_call":
+                m["model_calls"] += 1
+            elif kind == "rule_test":
+                m["rule_tests"] += 1
+        else:
+            m["credits_used"] += float(out.get("credits_used") or 0)
+            m["tokens_in"] += int(out.get("tokens_in") or 0)
+            m["tokens_out"] += int(out.get("tokens_out") or 0)
+            m["cache_hits"] += bool(out.get("cache_hit"))
+    return m
+
+
+def run(
+    tip_path: str | Path,
+    ledger_path: str | Path,
+    vendors_path: str | Path,
+    staff_path: str | Path,
+    out_dir: str | Path,
+    offline: bool = False,
+    redact: bool = False,
+    case_id: str | None = None,
+    company_name: str = "Audited company",
+    progress: Callable[[str, str], None] | None = None,
+) -> CaseFile:
+    t0 = time.perf_counter()
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    case_id = case_id or out.resolve().name
+    stage_seconds: dict[str, float] = {}
+    STUBBED.clear()
+
+    def stage(name: str, msg: str = "") -> None:
+        if progress:
+            progress(name, msg)
+
+    class _timed:
+        def __init__(self, name: str) -> None:
+            self.name = name
+
+        def __enter__(self) -> None:
+            self.t = time.perf_counter()
+            stage(self.name, "start")
+
+        def __exit__(self, *exc: object) -> None:
+            stage_seconds[self.name] = round(time.perf_counter() - self.t, 3)
+            if exc[0] is None:
+                stage(self.name, f"done {stage_seconds[self.name]:.2f}s")
+
+    # 0. audit log first, then hash the inputs
+    log_path = out / "log.jsonl"
+    audit = impl("audit", "AuditLog")(log_path)
+    inputs = {"tip": tip_path, "ledger": ledger_path, "vendors": vendors_path, "staff": staff_path}
+    for role, p in inputs.items():
+        p = Path(p)
+        sha, size = _sha256_file(p)
+        rid = audit.pre("file_read", {"name": role, "path": p.as_posix(), "args_sha256": sha})
+        audit.post(rid, {"status": "ok", "result_sha256": sha, "bytes": size})
+
+    # 1. ingest
+    with _timed("ingest"):
+        tip = impl("ingest", "load_tip")(tip_path)
+        rows, ledger_notes = impl("ingest", "load_ledger")(ledger_path)
+        vendors, vendor_notes = impl("ingest", "load_vendors")(vendors_path)
+        staff, staff_notes = impl("ingest", "load_staff")(staff_path)
+        rows = impl("ingest", "link_ledger")(rows, vendors, staff)
+        stats = impl("stats", "ledger_stats")(rows)
+        data_quality = [*ledger_notes, *vendor_notes, *staff_notes]
+        stage("ingest", f"{len(rows)} rows, {len(vendors)} vendors, {len(staff)} staff")
+
+    # 2. propose
+    with _timed("propose"):
+        hypotheses: list[Hypothesis] = impl("propose", "propose")(
+            tip, stats, vendors, staff, [t.value for t in Typology]
+        )
+        stage("propose", f"{len(hypotheses)} hypotheses")
+
+    # 3. resolve
+    with _timed("resolve"):
+        client = impl("crustdata", "CrustdataClient")(
+            api_key=os.environ.get("CRUSTDATA_API_KEY"),
+            cache_dir=Path(".cache/crustdata"),
+            offline=offline,
+            audit=audit,
+        )
+        judge = impl("match", "judge_candidates")
+        vendors = impl("resolve", "resolve_vendors")(vendors, client, judge=judge)
+        staff = impl("resolve", "resolve_staff")(staff, client, judge=judge)
+        n_res = sum(x.resolution.status == "resolved" for x in [*vendors, *staff])
+        stage("resolve", f"{n_res}/{len(vendors) + len(staff)} entities resolved")
+
+    # 4. test: rules + graph
+    with _timed("test"):
+        G = impl("graph", "build")(rows, vendors, staff)
+        ctx = impl("rules_context", "build_context")(rows, vendors, staff, graph=G, audit=audit)
+        test_ids = sorted({t for h in hypotheses for t in h.tests_to_run})
+        evidence: list[EvidenceObject] = list(impl("rules", "run_tests")(test_ids, ctx))
+        path_evidence = impl("graph", "path_evidence")
+        for h in hypotheses:
+            for s in h.subjects:
+                for v in h.objects:
+                    rid = audit.pre("rule_test", {"name": "T16", "args": [s, v]})
+                    e = path_evidence(G, s, v)
+                    ids: list[str] = []
+                    if e is not None:
+                        e = e.model_copy(update={"evidence_id": f"E{_next_id(evidence)}",
+                                                 "log_record_id": rid})
+                        evidence.append(e)
+                        ids = [e.evidence_id]
+                    audit.post(rid, {"status": "ok", "evidence_ids": ids})
+        centrality = impl("graph", "centrality")(G)
+        hypotheses = impl("rank", "rerank")(hypotheses, evidence, centrality)
+        # tag evidence with the hypotheses it bears on
+        linked = {h.hypothesis_id: _evidence_for(h, evidence) for h in hypotheses}
+        tags: dict[str, list[str]] = {}
+        for hid, evs in linked.items():
+            for e in evs:
+                tags.setdefault(e.evidence_id, []).append(hid)
+        evidence = [
+            e.model_copy(update={"hypothesis_ids": sorted({*e.hypothesis_ids, *tags.get(e.evidence_id, [])})})
+            for e in evidence
+        ]
+        by_id = {e.evidence_id: e for e in evidence}
+        linked = {hid: [by_id[e.evidence_id] for e in evs] for hid, evs in linked.items()}
+        n_sup = sum(e.direction == Direction.supports for e in evidence)
+        n_ref = sum(e.direction == Direction.refutes for e in evidence)
+        stage("test", f"{len(test_ids)} tests, {len(evidence)} evidence ({n_sup} support, {n_ref} refute)")
+
+    # 5. critique and gate
+    with _timed("critique_gate"):
+        critique = impl("critique", "critique")
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            critics = list(pool.map(lambda h: critique(h, linked[h.hypothesis_id]), hypotheses))
+        resolutions = {v.vendor_id: v.resolution for v in vendors} | {
+            s.staff_id: s.resolution for s in staff
+        }
+        ledger_amounts: dict[str, Decimal] = {r.row_id: r.amount for r in rows}
+        decide = impl("gate", "decide")
+        findings: list[Finding] = [
+            decide(h, linked[h.hypothesis_id], c, resolutions, ledger_amounts=ledger_amounts)
+            for h, c in zip(hypotheses, critics, strict=True)
+        ]
+        findings.sort(key=lambda f: VERDICT_ORDER[f.verdict])
+        counts = {v.value: sum(f.verdict == v for f in findings) for v in Verdict}
+        stage("critique_gate", ", ".join(f"{n} {v}" for v, n in counts.items()))
+
+    # 6. write, check, render
+    with _timed("write"):
+        thresholds = impl("thresholds", "THRESHOLDS")
+        metrics = _metrics_from_log(log_path) | {
+            "wall_seconds": round(time.perf_counter() - t0, 2),
+            "stage_seconds": stage_seconds,
+            "stubbed": sorted(STUBBED),
+        }
+        meta = {
+            "case_id": case_id,
+            "company_name": company_name,
+            "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "tip": tip,
+            "hypotheses": hypotheses,
+            "ledger_stats": stats,
+            "scope": [
+                f"Ledger: {len(rows)} rows" + (
+                    f", {min(r.date for r in rows)} to {max(r.date for r in rows)}" if rows else ""
+                ),
+                f"Vendor master: {len(vendors)} vendors; staff list: {len(staff)} staff",
+                "External sources: Crustdata company and person records"
+                + (" (offline cache)" if offline else ""),
+            ],
+            "approach": [
+                "Ingest and normalise inputs",
+                f"Propose {len(hypotheses)} hypotheses from a fixed ACFE typology menu",
+                "Resolve vendors and staff against Crustdata",
+                f"Run deterministic tests: {', '.join(test_ids) or 'none'}; graph paths (T16)",
+                "Fresh-context critique; deterministic gate decides each verdict",
+            ],
+            "data_quality": data_quality,
+            "assumptions": _assumptions(thresholds),
+            "metrics": metrics,
+            "merkle_root": audit.merkle_root(),
+            "verify_command": f"python verify.py {log_path.as_posix()}",
+        }
+        case: CaseFile = impl("write", "write_case_file")(findings, evidence, meta)
+
+    with _timed("render"):
+        evidence_index = {e.evidence_id: e for e in evidence}
+        (out / "evidence.json").write_text(
+            json.dumps([e.model_dump(mode="json") for e in evidence], indent=2), encoding="utf-8"
+        )
+        errors = impl("check", "check_citations")(case, evidence_index)
+        if errors:
+            raise CitationError(errors)
+        case = case.model_copy(update={"merkle_root": audit.merkle_root()})
+        rid = audit.pre("render", {"name": "case_file", "redact": redact})
+        path = impl("render", "render")(case, out, redact=redact)
+        audit.post(rid, {"status": "ok", "result_sha256": _sha256_file(Path(path))[0]})
+        (out / "root.txt").write_text(audit.merkle_root() + "\n", encoding="utf-8")
+
+    case.metrics.update(_metrics_from_log(log_path))
+    case.metrics["wall_seconds"] = round(time.perf_counter() - t0, 2)
+    case.metrics["stage_seconds"] = stage_seconds
+    case.metrics["stubbed"] = sorted(STUBBED)
+    return case
