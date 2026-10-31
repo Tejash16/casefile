@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "crustdata": {
+      "type": "http",
+      "url": "https://install.crustdata.com/mcp",
+      "headers": { "Authorization": "Bearer ${CRUSTDATA_API_KEY}" }
+    }
+  }
+}
