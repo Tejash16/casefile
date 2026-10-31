@@ -67,6 +67,30 @@ def log_rows(recs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def crustdata_rows(recs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """One row per completed Crustdata call (tool_call post_execution records), oldest first."""
+    rows = []
+    for r in recs:
+        if r.get("action_type") != "tool_call" or r.get("record_phase") != "post_execution":
+            continue
+        d, o = _detail(r), _outcome(r)
+        cache_hit = d.get("cache_hit", o.get("cache_hit"))
+        rows.append(
+            {
+                "seq": r.get("seq"),
+                "time": str(r.get("timestamp", ""))[11:23],
+                "endpoint": d.get("name", ""),
+                "method": d.get("method", ""),
+                "http_status": o.get("http_status"),
+                "cache_hit": None if cache_hit is None else bool(cache_hit),
+                "credits_used": _num(o.get("credits_used")),
+                "request_id": o.get("request_id", ""),
+                "status": o.get("status", ""),
+            }
+        )
+    return rows
+
+
 def _num(x: Any) -> float:
     try:
         return float(x)
@@ -91,6 +115,9 @@ def metrics(recs: list[dict[str, Any]]) -> dict[str, float]:
         "wall_seconds": round((max(stamps) - min(stamps)).total_seconds(), 1) if stamps else 0.0,
         "crustdata_calls": len(tool),
         "credits": round(sum(_num(_outcome(r).get("credits_used")) for r in tool), 2),
+        "cache_hits": sum(
+            1 for r in tool if _detail(r).get("cache_hit", _outcome(r).get("cache_hit"))
+        ),
         "model_calls": len(model),
         "tokens": int(
             sum(
@@ -174,8 +201,10 @@ def render(out_dir: Path, inputs: dict) -> None:
         m = metrics(recs)
         c = st.columns(5)
         c[0].metric("Wall time (s)", m["wall_seconds"])
-        c[1].metric("Crustdata calls", m["crustdata_calls"])
-        c[2].metric("Credits", m["credits"])
+        c[1].metric(
+            "Crustdata calls", m["crustdata_calls"], help=f"{m['cache_hits']} served from cache"
+        )
+        c[2].metric("Crustdata credits", m["credits"])
         c[3].metric("Model calls", m["model_calls"])
         c[4].metric("Model tokens", f"{m['tokens']:,}")
 
@@ -187,7 +216,14 @@ def render(out_dir: Path, inputs: dict) -> None:
             st.caption(
                 f"{m['records']} records so far; the Merkle root is sealed when the run ends."
             )
-        st.dataframe(log_rows(recs), hide_index=True, use_container_width=True, height=360)
+        if st.toggle("Crustdata calls only", key=f"cd_only_{out_dir}"):
+            rows = crustdata_rows(recs)
+            if rows:
+                st.dataframe(rows, hide_index=True, use_container_width=True, height=360)
+            else:
+                st.info("No Crustdata calls logged yet.")
+        else:
+            st.dataframe(log_rows(recs), hide_index=True, use_container_width=True, height=360)
 
     live()
 

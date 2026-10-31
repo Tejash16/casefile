@@ -70,3 +70,18 @@ def test_verify_and_tamper_demo(tmp_path: Path) -> None:
     fails = [ln for ln in lines if ln.startswith("FAIL")]
     assert fails == [fails[0]] and fails[0].startswith("FAIL record_hash: seq 8:")
     assert audit.run_verify(tmp_path / "log.jsonl")[0]  # the real log still verifies
+
+
+def test_crustdata_rows(tmp_path: Path) -> None:
+    recs = audit.read_log(make_run(tmp_path))
+    rows = audit.crustdata_rows(recs)
+    assert len(rows) == 1
+    r = rows[0]
+    assert (r["seq"], r["endpoint"], r["cache_hit"], r["credits_used"], r["request_id"]) == (
+        1,
+        "company/identify",
+        False,
+        2.5,
+        "r1",
+    )
+    assert audit.metrics(recs)["cache_hits"] == 0
