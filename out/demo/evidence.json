@@ -1,0 +1,310 @@
+[
+  {
+    "evidence_id": "E1",
+    "test_id": "T04",
+    "hypothesis_ids": [
+      "H7"
+    ],
+    "subject_ids": [
+      "S001"
+    ],
+    "object_ids": [
+      "V001"
+    ],
+    "direction": "refutes",
+    "strength": 0.7,
+    "summary": "None of vendor V001's 16 invoices repeats an invoice number or an amount within 30 days.",
+    "quote": "V001: 0 duplicates in 16 invoices: L000001 2024-04-26 TATA STEEL LTD 22,18,776 inv TSL/31574 approver S001 posted 2024-04-26 16:41; L000010 2024-06-27 Tata Steel Limited 12,25,048 inv TSL/31841 approver S001 posted 2024-06-27 13:05; L000017 2024-08-15 Tata Steel Limited 14,85,768 inv TSL/32055 approver S001 posted 2024-08-15 16:50; L000025 2024-11-05 Tata Steel Limited 20,36,837 inv TSL/32215 approver S001 posted 2024-11-05 15:20; L000029 2024-12-24 Tata Steel Ltd. 15,47,252 inv TSL/32460 approver S001 posted 2024-12-24 15:35; L000038 2025-03-03 Tata Steel Limited 18,25,427 inv TSL/32600 approver S001 posted 2025-03-03 14:12; L000039 2025-04-07 Tata Steel Ltd. 14,79,471.25 inv TSL/32744 approver S001 posted 2025-04-07 10:50; L000048 2025-06-20 Tata Steel Limited 15,32,987 inv TSL/33083 approver S001 posted 2025-06-20 16:20; L000057 2025-08-06 Tata Steel Limited 17,69,114 inv TSL/33437 approver S001 posted 2025-08-06 11:41; L000063 2025-10-13 Tata Steel Ltd. 16,87,582 inv TSL/33609 approver S001 posted 2025-10-13 09:50; L000068 2025-12-25 TATA STEEL LTD 21,60,381.25 inv TSL/33992 approver S001 posted 2025-12-25 16:20; L000076 2026-02-11 Tata Steel Limited 12,50,459.50 inv TSL/34178 approver S001 posted 2026-02-11 12:20; L000080 2026-03-24 Tata Steel Limited 14,92,707 inv TSL/34457 approver S001 posted 2026-03-24 15:35; L000092 2026-06-08 Tata Steel Limited 16,94,867 inv TSL/34624 approver S001 posted 2026-06-08 14:35; L000100 2026-08-07 TATA STEEL LTD 15,79,984 inv TSL/34991 approver S001 posted 2026-08-07 10:20; L000110 2026-09-30 Tata Steel Limited 20,49,845 inv TSL/35143 approver S001 posted 2026-09-30 17:05",
+    "source": {
+      "kind": "ledger_rows",
+      "refs": [
+        "L000001",
+        "L000010",
+        "L000017",
+        "L000025",
+        "L000029",
+        "L000038",
+        "L000039",
+        "L000048",
+        "L000057",
+        "L000063",
+        "L000068",
+        "L000076",
+        "L000080",
+        "L000092",
+        "L000100",
+        "L000110"
+      ],
+      "as_of": null
+    },
+    "sha256": "65b6e9ea3aaf1e6e941dfbacda7b2e0cc3780864e9e27846a41d7e1b36b7ebc1",
+    "log_record_id": "90e32cae-03f7-48e6-a64e-57337d3989fe"
+  },
+  {
+    "evidence_id": "E20",
+    "test_id": "T05",
+    "hypothesis_ids": [
+      "H3"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "refutes",
+    "strength": 0.7,
+    "summary": "Vendor V017's invoices sit just under the approver's limit no more often than the population (0.0% vs 0.0%), with no splits.",
+    "quote": "V017: 0/8 in band vs population 0.0%: L000077 2026-03-10 DocRack 1,15,972 inv DR/2026/585 approver S004 posted 2026-03-10 14:41; L000083 2026-04-09 DOCRACK 1,55,505.25 inv DR/2026/840 approver S004 posted 2026-04-09 15:12; L000088 2026-05-12 Docrak 2,00,801 inv DR/2026/974 approver S004 posted 2026-05-12 15:41; L000093 2026-06-09 DocRack 2,51,218 inv DR/2026/1059 approver S004 posted 2026-06-09 09:12; L000097 2026-07-13 DOCRACK 2,96,359 inv DR/2026/1276 approver S004 posted 2026-07-13 09:50; L000101 2026-08-12 Docrak 3,41,733 inv DR/2026/1472 approver S004 posted 2026-08-12 13:05; L000103 2026-09-14 DocRack 3,85,178 inv DR/2026/1561 approver S004 posted 2026-09-14 16:20; L000112 2026-10-12 DOCRACK 4,26,822 inv DR/2026/1747 approver S004 posted 2026-10-12 09:20",
+    "source": {
+      "kind": "ledger_rows",
+      "refs": [
+        "L000077",
+        "L000083",
+        "L000088",
+        "L000093",
+        "L000097",
+        "L000101",
+        "L000103",
+        "L000112"
+      ],
+      "as_of": null
+    },
+    "sha256": "9857ec6af5fe4d85e4a56a5eaf099f7de667446c9aa554205007cbf497277249",
+    "log_record_id": "c8c59304-a8d0-4675-8039-95014574f6e9"
+  },
+  {
+    "evidence_id": "E30",
+    "test_id": "T06",
+    "hypothesis_ids": [
+      "H2"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "refutes",
+    "strength": 0.7,
+    "summary": "Vendor V017's share of round amounts is no higher than the population's (0.0% vs 0.0%).",
+    "quote": "V017: 0/8 round vs population 0.0%: L000077 2026-03-10 DocRack 1,15,972 inv DR/2026/585 approver S004 posted 2026-03-10 14:41; L000083 2026-04-09 DOCRACK 1,55,505.25 inv DR/2026/840 approver S004 posted 2026-04-09 15:12; L000088 2026-05-12 Docrak 2,00,801 inv DR/2026/974 approver S004 posted 2026-05-12 15:41; L000093 2026-06-09 DocRack 2,51,218 inv DR/2026/1059 approver S004 posted 2026-06-09 09:12; L000097 2026-07-13 DOCRACK 2,96,359 inv DR/2026/1276 approver S004 posted 2026-07-13 09:50; L000101 2026-08-12 Docrak 3,41,733 inv DR/2026/1472 approver S004 posted 2026-08-12 13:05; L000103 2026-09-14 DocRack 3,85,178 inv DR/2026/1561 approver S004 posted 2026-09-14 16:20; L000112 2026-10-12 DOCRACK 4,26,822 inv DR/2026/1747 approver S004 posted 2026-10-12 09:20",
+    "source": {
+      "kind": "ledger_rows",
+      "refs": [
+        "L000077",
+        "L000083",
+        "L000088",
+        "L000093",
+        "L000097",
+        "L000101",
+        "L000103",
+        "L000112"
+      ],
+      "as_of": null
+    },
+    "sha256": "ff9e433aa164d39fc0994222fc232a7f158083f647082335d323a73461c172db",
+    "log_record_id": "19aed4cd-662a-40c6-b49f-dbdbfc262899"
+  },
+  {
+    "evidence_id": "E40",
+    "test_id": "T07",
+    "hypothesis_ids": [
+      "H2"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "refutes",
+    "strength": 0.5,
+    "summary": "Vendor V017's invoice numbers advance by 166 on average between our invoices, consistent with a vendor billing many customers.",
+    "quote": "V017: 8 invoice numbers 585..1747, mean step 166.0: L000077 2026-03-10 DocRack 1,15,972 inv DR/2026/585 approver S004 posted 2026-03-10 14:41; L000083 2026-04-09 DOCRACK 1,55,505.25 inv DR/2026/840 approver S004 posted 2026-04-09 15:12; L000088 2026-05-12 Docrak 2,00,801 inv DR/2026/974 approver S004 posted 2026-05-12 15:41; L000093 2026-06-09 DocRack 2,51,218 inv DR/2026/1059 approver S004 posted 2026-06-09 09:12; L000097 2026-07-13 DOCRACK 2,96,359 inv DR/2026/1276 approver S004 posted 2026-07-13 09:50; L000101 2026-08-12 Docrak 3,41,733 inv DR/2026/1472 approver S004 posted 2026-08-12 13:05; L000103 2026-09-14 DocRack 3,85,178 inv DR/2026/1561 approver S004 posted 2026-09-14 16:20; L000112 2026-10-12 DOCRACK 4,26,822 inv DR/2026/1747 approver S004 posted 2026-10-12 09:20",
+    "source": {
+      "kind": "ledger_rows",
+      "refs": [
+        "L000077",
+        "L000083",
+        "L000088",
+        "L000093",
+        "L000097",
+        "L000101",
+        "L000103",
+        "L000112"
+      ],
+      "as_of": null
+    },
+    "sha256": "b6064667aa0716729de5df8c908dd7e36b1572739b13a3744c5c44dcb7dbd007",
+    "log_record_id": "39c73ca3-db03-47ef-8a6e-c8ca5f791056"
+  },
+  {
+    "evidence_id": "E50",
+    "test_id": "T12",
+    "hypothesis_ids": [
+      "H1",
+      "H4"
+    ],
+    "subject_ids": [],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "supports",
+    "strength": 0.6,
+    "summary": "Vendor V017's growth in spend is 2.9 standard deviations above the other 9 vendors.",
+    "quote": "V017: spend 21,73,588.25 = 3.6% of 6,00,18,462.50 (share z -0.5); before 2025-07-19 0, from 2025-07-19 21,73,588.25 (growth z 2.9); L000077 2026-03-10 DocRack 1,15,972 inv DR/2026/585 approver S004 posted 2026-03-10 14:41; L000083 2026-04-09 DOCRACK 1,55,505.25 inv DR/2026/840 approver S004 posted 2026-04-09 15:12; L000088 2026-05-12 Docrak 2,00,801 inv DR/2026/974 approver S004 posted 2026-05-12 15:41; L000093 2026-06-09 DocRack 2,51,218 inv DR/2026/1059 approver S004 posted 2026-06-09 09:12; L000097 2026-07-13 DOCRACK 2,96,359 inv DR/2026/1276 approver S004 posted 2026-07-13 09:50; L000101 2026-08-12 Docrak 3,41,733 inv DR/2026/1472 approver S004 posted 2026-08-12 13:05; L000103 2026-09-14 DocRack 3,85,178 inv DR/2026/1561 approver S004 posted 2026-09-14 16:20; L000112 2026-10-12 DOCRACK 4,26,822 inv DR/2026/1747 approver S004 posted 2026-10-12 09:20",
+    "source": {
+      "kind": "ledger_rows",
+      "refs": [
+        "L000077",
+        "L000083",
+        "L000088",
+        "L000093",
+        "L000097",
+        "L000101",
+        "L000103",
+        "L000112"
+      ],
+      "as_of": null
+    },
+    "sha256": "b590785dcba3cf6859893aa8b59c4fb1d78989be5fb83413192d1924c65fd06f",
+    "log_record_id": "8d7b89ec-2d6f-4b97-bf5b-1fe361ce5812"
+  },
+  {
+    "evidence_id": "E56",
+    "test_id": "T13",
+    "hypothesis_ids": [
+      "H6"
+    ],
+    "subject_ids": [],
+    "object_ids": [
+      "V008"
+    ],
+    "direction": "supports",
+    "strength": 0.5,
+    "summary": "Vendor V008 has no matching Crustdata company record (resolution unresolved); its existence could not be confirmed.",
+    "quote": "vendor master V008 \"Zentravik Industrial Supplies Pvt Ltd\": Crustdata resolution unresolved, candidates considered 25",
+    "source": {
+      "kind": "vendor_master",
+      "refs": [
+        "vendor:V008"
+      ],
+      "as_of": null
+    },
+    "sha256": "5c4575edd28465384ad9dab35a79ef5ab2a3558d19f247c3f93cb75b77c9726f",
+    "log_record_id": "9cd69038-f0f9-4c40-b6ff-a00b024d07ca"
+  },
+  {
+    "evidence_id": "E60",
+    "test_id": "T13",
+    "hypothesis_ids": [
+      "H2",
+      "H5"
+    ],
+    "subject_ids": [],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "supports",
+    "strength": 0.5,
+    "summary": "Crustdata's record for vendor V017 shows headcount total 2 with website https://docrack.ai/.",
+    "quote": "crustdata:company:71095782@2026-10-30T00:23:30Z headcount_total 2; website https://docrack.ai/",
+    "source": {
+      "kind": "crustdata_company",
+      "refs": [
+        "crustdata:company:71095782@2026-10-30T00:23:30Z"
+      ],
+      "as_of": "2026-10-30T00:23:30Z"
+    },
+    "sha256": "3a946d97b41206419c28dd103408b20f46bf94fbd4cbc4a2e4279d3d463b3190",
+    "log_record_id": "9cd69038-f0f9-4c40-b6ff-a00b024d07ca"
+  },
+  {
+    "evidence_id": "E81",
+    "test_id": "T15",
+    "hypothesis_ids": [
+      "H1",
+      "H5"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "supports",
+    "strength": 0.9,
+    "summary": "Staff member S004's Crustdata career history includes vendor V017 (DocRack, 2026-03-01 to present), overlapping the payment period.",
+    "quote": "crustdata:person:177265563@2026-10-26T16:58:10.076880Z employment[0]: DocRack, Co-Founder, 2026-03-01 to present; first payment 2026-03-10 (L000077); last payment 2026-10-12 (L000112)",
+    "source": {
+      "kind": "crustdata_person",
+      "refs": [
+        "crustdata:person:177265563@2026-10-26T16:58:10.076880Z",
+        "crustdata:company:71095782@2026-10-30T00:23:30Z"
+      ],
+      "as_of": "2026-10-26T16:58:10.076880Z"
+    },
+    "sha256": "84f012a2aeaa3dd232c7bbbcd8d07294842e098985bd178be54ea431e44ba1b8",
+    "log_record_id": "ce39b037-cf66-4355-b7ba-d9cb9e64c736"
+  },
+  {
+    "evidence_id": "E94",
+    "test_id": "T17",
+    "hypothesis_ids": [
+      "H1",
+      "H2",
+      "H5"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "supports",
+    "strength": 0.9,
+    "summary": "Vendor V017's Co-Founder T.C. has the same LinkedIn profile as staff member S004.",
+    "quote": "crustdata:company:71095782@2026-10-30T00:23:30Z person \"T.C.\", Co-Founder, https://www.linkedin.com/in/T.C.-5424a9252; staff S004 \"T.C.\" linkedin.com/in/T.C.-5424a9252 (name score 100)",
+    "source": {
+      "kind": "crustdata_company",
+      "refs": [
+        "crustdata:company:71095782@2026-10-30T00:23:30Z"
+      ],
+      "as_of": "2026-10-30T00:23:30Z"
+    },
+    "sha256": "2bb599384a2276189d295514934f950a432c47e3dacf5cab989704c02fd9b889",
+    "log_record_id": "0f4535ce-5fa9-40e9-a0cc-bb1a9eda2a75"
+  },
+  {
+    "evidence_id": "E95",
+    "test_id": "T16",
+    "hypothesis_ids": [
+      "H1",
+      "H2",
+      "H5"
+    ],
+    "subject_ids": [
+      "S004"
+    ],
+    "object_ids": [
+      "V017"
+    ],
+    "direction": "supports",
+    "strength": 0.75,
+    "summary": "Staff member S004 is linked to vendor V017 in 3 steps through employment.",
+    "quote": "staff:S004 -[resolution: crustdata:person:177265563@2026-10-26T16:58:10.076880Z]- cdperson:177265563 -[employment: crustdata:person:177265563@2026-10-26T16:58:10.076880Z employment[0]: DocRack, Co-Founder, 2026-03-01 to present (overlapping the payment period)]- cdco:71095782 -[resolution: crustdata:company:71095782@2026-10-30T00:23:30Z]- vendor:V017",
+    "source": {
+      "kind": "graph",
+      "refs": [
+        "staff:S004",
+        "cdperson:177265563",
+        "cdco:71095782",
+        "vendor:V017"
+      ],
+      "as_of": null
+    },
+    "sha256": "3e3481178062b31c5bc4ace2f4cc0fe2373b094a2038ed1fd848794f14d63211",
+    "log_record_id": "a281a032-9d02-4ad0-8bd1-58fb785bbdfa"
+  }
+]

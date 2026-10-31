@@ -1,0 +1,315 @@
+[
+  {
+    "hypothesis_id": "H1",
+    "verdict": "Substantiated",
+    "verdict_by": "gate",
+    "model_verdict": "Substantiated",
+    "supporting_evidence": [
+      "E81",
+      "E94",
+      "E95",
+      "E50"
+    ],
+    "counter_evidence": [],
+    "confidence": 0.787,
+    "amount_at_issue_inr": "2173588.25",
+    "rationale": [
+      {
+        "text": "S004's Crustdata employment record lists DocRack, Co-Founder, 2026-03-01 to present; first payment 2026-03-10 (L000077); last payment 2026-10-12 (L000112).",
+        "evidence_ids": [
+          "E81"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "Crustdata's company record for V017 lists person \"T.C.\", Co-Founder, https://www.linkedin.com/in/T.C.-5424a9252, and staff S004 \"T.C.\" has linkedin.com/in/T.C.-5424a9252 (name score 100).",
+        "evidence_ids": [
+          "E94"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "V017's spend was 0 before 2025-07-19 and 21,73,588.25 from 2025-07-19 (growth z 2.9), and every listed invoice names approver S004.",
+        "evidence_ids": [
+          "E50"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [],
+    "typology": "conflict_of_interest",
+    "subjects": [
+      "S004"
+    ],
+    "objects": [
+      "V017"
+    ],
+    "statement": "Procurement manager S004 is the sole approver of all 8 invoices (INR 21.7 lakh) to vendor V017 and steered growing spend to it because of an undisclosed employment or ownership interest (conflict_of_interest)."
+  },
+  {
+    "hypothesis_id": "H3",
+    "verdict": "Unfounded",
+    "verdict_by": "gate",
+    "model_verdict": "Unfounded",
+    "supporting_evidence": [],
+    "counter_evidence": [
+      "E20"
+    ],
+    "confidence": 0.7,
+    "amount_at_issue_inr": null,
+    "rationale": [
+      {
+        "text": "V017 had 0/8 invoices in the band, against a population rate of 0.0%.",
+        "evidence_ids": [
+          "E20"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "The amounts rise steadily from 1,15,972 inv DR/2026/585 to 4,26,822 inv DR/2026/1747.",
+        "evidence_ids": [
+          "E20"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [],
+    "typology": "threshold_structuring",
+    "subjects": [
+      "S004"
+    ],
+    "objects": [
+      "V017"
+    ],
+    "statement": "S004 sized or split V017 invoices to sit just under the INR 5 lakh approval limit so they escaped senior review and were approved quickly (threshold_structuring)."
+  },
+  {
+    "hypothesis_id": "H7",
+    "verdict": "Unfounded",
+    "verdict_by": "gate",
+    "model_verdict": "Unfounded",
+    "supporting_evidence": [],
+    "counter_evidence": [
+      "E1"
+    ],
+    "confidence": 0.7,
+    "amount_at_issue_inr": null,
+    "rationale": [
+      {
+        "text": "The duplicate test over V001's 16 ledger invoices found no repeated invoice number and no repeated amount within 30 days.",
+        "evidence_ids": [
+          "E1"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "The quoted invoice numbers for V001 rise in sequence from TSL/31574 on 2024-04-26 to TSL/35143 on 2026-09-30, with no number appearing twice.",
+        "evidence_ids": [
+          "E1"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "The quoted posting dates for V001 are spaced weeks to months apart, and the amounts all differ, ranging from 12,25,048 to 22,18,776.",
+        "evidence_ids": [
+          "E1"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "All 16 V001 invoices list S001 as approver, but this concerns approval concentration rather than duplicate billing.",
+        "evidence_ids": [
+          "E1"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "The payee name appears in several spellings (TATA STEEL LTD, Tata Steel Ltd., Tata Steel Limited) within the single vendor V001. This evidence does not show whether invoices were also billed under another vendor record.",
+        "evidence_ids": [
+          "E1"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [
+      "staff S001 ambiguous in Crustdata"
+    ],
+    "typology": "duplicate_billing",
+    "subjects": [
+      "S001"
+    ],
+    "objects": [
+      "V001"
+    ],
+    "statement": "Vendor V001, the largest by spend at INR 2.7 crore and approved solely by S001, has been paid duplicate or resubmitted invoices (duplicate_billing)."
+  },
+  {
+    "hypothesis_id": "H5",
+    "verdict": "Unsubstantiated",
+    "verdict_by": "gate_override_of_model",
+    "model_verdict": "Unfounded",
+    "supporting_evidence": [
+      "E81",
+      "E94",
+      "E95",
+      "E60"
+    ],
+    "counter_evidence": [],
+    "confidence": 0.1,
+    "amount_at_issue_inr": null,
+    "rationale": [
+      {
+        "text": "V017's Crustdata record shows headcount_total 2; website https://docrack.ai/.",
+        "evidence_ids": [
+          "E60"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "S004 is linked to vendor V017 in 3 steps through employment.",
+        "evidence_ids": [
+          "E95"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [],
+    "typology": "pass_through",
+    "subjects": [
+      "S004"
+    ],
+    "objects": [
+      "V017"
+    ],
+    "statement": "V017 is an established document-management supplier with real headcount, and S004 has no employment or founder link to it, so the growth reflects a genuine new contract rather than a scheme by S004 (pass_through)."
+  },
+  {
+    "hypothesis_id": "H2",
+    "verdict": "Unsubstantiated",
+    "verdict_by": "gate",
+    "model_verdict": "Unsubstantiated",
+    "supporting_evidence": [
+      "E94",
+      "E95",
+      "E60"
+    ],
+    "counter_evidence": [
+      "E30",
+      "E40"
+    ],
+    "confidence": 0.1,
+    "amount_at_issue_inr": null,
+    "rationale": [
+      {
+        "text": "V017's Co-Founder T.C. has the same LinkedIn profile as staff member S004, and Crustdata's record for V017 shows headcount total 2.",
+        "evidence_ids": [
+          "E60",
+          "E94"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "Against this, V017's invoice numbers advance by 166 on average between our invoices, consistent with a vendor billing many customers.",
+        "evidence_ids": [
+          "E40"
+        ],
+        "require_citation": true
+      },
+      {
+        "text": "V017's share of round amounts is no higher than the population's (0.0% vs 0.0%).",
+        "evidence_ids": [
+          "E30"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [
+      "test T01 produced no evidence for H2",
+      "test T02 produced no evidence for H2",
+      "test T03 produced no evidence for H2",
+      "test T04 produced no evidence for H2",
+      "test T05 produced no evidence for H2"
+    ],
+    "typology": "shell_company",
+    "subjects": [
+      "S004"
+    ],
+    "objects": [
+      "V017"
+    ],
+    "statement": "Vendor V017, created 2025-10-06 shortly before its first invoices, is a shell set up by S004 to bill for services never delivered (shell_company)."
+  },
+  {
+    "hypothesis_id": "H6",
+    "verdict": "Unsubstantiated",
+    "verdict_by": "gate",
+    "model_verdict": "Unsubstantiated",
+    "supporting_evidence": [
+      "E56"
+    ],
+    "counter_evidence": [],
+    "confidence": 1.0,
+    "amount_at_issue_inr": null,
+    "rationale": [
+      {
+        "text": "The vendor master lists V008 as \"Zentravik Industrial Supplies Pvt Ltd\", with Crustdata resolution unresolved after 25 candidates were considered.",
+        "evidence_ids": [
+          "E56"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [
+      "staff S003 ambiguous in Crustdata",
+      "vendor V008 unresolved in Crustdata",
+      "evidence E56 (T13) not counted: it rests on the Crustdata record of unresolved V008",
+      "test T01 produced no evidence for H6",
+      "test T02 produced no evidence for H6",
+      "test T03 produced no evidence for H6",
+      "test T05 produced no evidence for H6",
+      "test T09 produced no evidence for H6"
+    ],
+    "typology": "ghost_vendor",
+    "subjects": [
+      "S003"
+    ],
+    "objects": [
+      "V008"
+    ],
+    "statement": "Vendor V008, created 2023-10 with a coined name and approved by S003, S007 and S008, is a fictitious record used to divert INR 15.1 lakh (ghost_vendor)."
+  },
+  {
+    "hypothesis_id": "H4",
+    "verdict": "Unsubstantiated",
+    "verdict_by": "gate",
+    "model_verdict": "Unsubstantiated",
+    "supporting_evidence": [
+      "E50"
+    ],
+    "counter_evidence": [],
+    "confidence": 0.4,
+    "amount_at_issue_inr": "2173588.25",
+    "rationale": [
+      {
+        "text": "V017's spend went from 0 before 2025-07-19 to 21,73,588.25 from 2025-07-19.",
+        "evidence_ids": [
+          "E50"
+        ],
+        "require_citation": true
+      }
+    ],
+    "data_gaps": [
+      "test T01 produced no evidence for H4",
+      "test T05 produced no evidence for H4",
+      "test T13 produced no evidence for H4"
+    ],
+    "typology": "kickback",
+    "subjects": [
+      "S004"
+    ],
+    "objects": [
+      "V017"
+    ],
+    "statement": "V017 pays S004 to keep fast-approved, rising-volume business while its billed volume outgrows its real capacity (kickback)."
+  }
+]

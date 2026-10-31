@@ -140,6 +140,8 @@ def _write_entities(
             return [scrub(v, key) for v in obj]
         if r and isinstance(obj, str) and key in {"name", "name_raw", "name_norm"}:
             return r(obj)
+        if r and key in {"linkedin_url", "profile_url", "email", "phone", "address"}:
+            return None  # contact fields identify real people even with names initialled
         return obj
 
     m = _metrics_from_log(log_path)
