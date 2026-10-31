@@ -1,7 +1,8 @@
 """T13 existence_and_capacity, from Crustdata CompanyFacts:
 
 - unresolved / no record: supports shell or ghost (data gap, `t13_unresolved`);
-- headcount <= `shell_headcount_max` or no website: supports (`t13_thin`);
+- no website: supports (`t13_thin`); headcount <= `shell_headcount_max` with a website: a
+  weaker lead (`t13_tiny_with_website`), since tiny real companies exist;
 - billed INR per head above `volume_per_head_max_inr`: supports (`t13_volume`);
 - headcount >= `established_headcount_min` with a website: refutes shell (`t13_refute`).
 Headcount falls back to the bounds of `employee_count_range` ("1-10", "51-200", "10001+")."""
@@ -71,14 +72,16 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
             records=cd.model_dump(mode="json"),
             object_ids=[vid],
         )
-        if (high is not None and high <= shell_max) or not website:
+        tiny = high is not None and high <= shell_max
+        if tiny or not website:
+            # FinCEN: "limited or no internet presence"; a tiny company with a website is a lead
             out.append(
                 ev.make(
                     direction=Direction.supports,
-                    strength=STRENGTH["t13_thin"],
+                    strength=STRENGTH["t13_thin" if not website else "t13_tiny_with_website"],
                     summary=f"Crustdata's record for vendor {vid} shows "
                     + (f"{hc_field.replace('_', ' ')}" if high is not None else "no headcount")
-                    + (" and no website." if not website else "."),
+                    + (" and no website." if not website else f" with website {website}."),
                     quote=f"{cd.citation} {fields}",
                     **common,
                 )

@@ -394,7 +394,8 @@ STRENGTH: dict[str, float] = {
     "t12_refute": 0.5,
     # T13 existence and capacity
     "t13_unresolved": 0.5,
-    "t13_thin": 0.7,
+    "t13_thin": 0.7,  # no website (with or without a headcount)
+    "t13_tiny_with_website": 0.5,  # tiny but present on the web: a lead
     "t13_volume": 0.6,
     "t13_refute": 0.8,
     # T14 look-alike names
