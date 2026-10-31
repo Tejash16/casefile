@@ -20,6 +20,8 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 from casefile.audit.payloads import default_store as payload_store
 from casefile.schemas import (
     CaseFile,
@@ -231,6 +233,7 @@ def run(
     company_name: str | None = None,
     progress: Callable[[str, str], None] | None = None,
 ) -> CaseFile:
+    load_dotenv(override=True)  # .env wins over stale shell keys, for the CLI and the eval harness
     t0 = time.perf_counter()
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
