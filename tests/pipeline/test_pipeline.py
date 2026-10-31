@@ -18,22 +18,39 @@ def inputs(tmp_path: Path) -> dict[str, Path]:
     return paths
 
 
+LANDED = {"audit", "check", "render"}  # real modules on main; everything else stubbed here
+
+
 @pytest.fixture
 def all_stubs(monkeypatch):
     monkeypatch.setenv(
-        "CASEFILE_FORCE_STUBS", ",".join(k for k in pipeline.REGISTRY if k != "audit")
+        "CASEFILE_FORCE_STUBS", ",".join(k for k in pipeline.REGISTRY if k not in LANDED)
     )
 
 
 def test_run_end_to_end_on_stubs(inputs, tmp_path, all_stubs):
     out = tmp_path / "out"
     case = pipeline.run(inputs["tip"], inputs["ledger"], inputs["vendors"], inputs["staff"], out)
-    for name in ("case_file.md", "evidence.json", "log.jsonl", "root.txt"):
+    for name in ("case_file.md", "exhibits.md", "evidence.json", "log.jsonl", "root.txt"):
         assert (out / name).exists(), name
     assert case.findings and case.hypotheses
     assert case.merkle_root
     assert case.metrics["log_records"] > 0
     assert "rules" in case.metrics["stubbed"]
+    assert "render" not in case.metrics["stubbed"]
+
+    from casefile.audit.verify import verify
+
+    assert verify(out / "log.jsonl").ok
+
+
+def test_redact_hides_staff_names(inputs, tmp_path, all_stubs):
+    out = tmp_path / "out"
+    pipeline.run(
+        inputs["tip"], inputs["ledger"], inputs["vendors"], inputs["staff"], out, redact=True
+    )
+    text = (out / "case_file.md").read_text(encoding="utf-8")
+    assert "Asha Rao" not in text  # stub staff name
 
 
 def test_uncited_sentence_exits_2(inputs, tmp_path, all_stubs, monkeypatch):

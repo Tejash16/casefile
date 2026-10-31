@@ -89,6 +89,7 @@ def write_case_file(
         for f in findings
     ]
     cited = {i for f in findings for i in f.supporting_evidence + f.counter_evidence}
+    cited |= {i for f in findings for s in f.rationale for i in s.evidence_ids}
     tip: Tip = meta["tip"]
     return CaseFile(
         case_id=meta["case_id"],

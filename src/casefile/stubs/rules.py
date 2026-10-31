@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from typing import Any
 
+from casefile.audit.payloads import put
 from casefile.schemas import (
     Direction,
     EvidenceObject,
@@ -46,7 +46,7 @@ def _evidence(
 ) -> EvidenceObject:
     rid = ctx.audit.pre("rule_test", {"name": test_id}) if ctx.audit else "no-audit"
     ctx.evidence_counter += 1
-    payload = json.dumps([r.model_dump(mode="json") for r in rows], sort_keys=True).encode()
+    quote = "; ".join(f"{r.row_id} {r.date} {r.vendor_name_raw} {r.amount}" for r in rows)
     ev = EvidenceObject(
         evidence_id=f"E{ctx.evidence_counter}",
         test_id=test_id,
@@ -55,9 +55,9 @@ def _evidence(
         direction=direction,
         strength=strength,
         summary=summary,
-        quote="; ".join(f"{r.row_id} {r.date} {r.vendor_name_raw} {r.amount}" for r in rows),
+        quote=quote,
         source=Source(kind=kind, refs=[r.row_id for r in rows]),
-        sha256=EvidenceObject.compute_sha256(payload),
+        sha256=put(quote),
         log_record_id=rid,
     )
     if ctx.audit:

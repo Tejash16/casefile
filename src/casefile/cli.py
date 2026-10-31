@@ -13,7 +13,6 @@ from pathlib import Path
 import typer
 from dotenv import load_dotenv
 from rich.console import Console
-from rich.table import Table
 
 app = typer.Typer(help="Casefile: autonomous forensic-audit agent.", no_args_is_help=True)
 console = Console(highlight=False)
@@ -39,26 +38,6 @@ def _progress(start: float):
         )
 
     return show
-
-
-def _metrics_table(metrics: dict) -> Table:
-    t = Table(title="Run metrics", show_header=False, title_justify="left")
-    t.add_column(style="bold")
-    t.add_column(justify="right")
-    for key in (
-        "wall_seconds",
-        "crustdata_calls",
-        "cache_hits",
-        "credits_used",
-        "model_calls",
-        "tokens_in",
-        "tokens_out",
-        "rule_tests",
-        "log_records",
-    ):
-        if key in metrics:
-            t.add_row(key.replace("_", " "), str(metrics[key]))
-    return t
 
 
 @app.command()
@@ -101,29 +80,13 @@ def investigate(
             console.print(f"  [red]-[/] {err}")
         raise typer.Exit(2) from None
 
+    from casefile.report.metrics import print_metrics
+
     console.print()
-    verdicts = Table(title="Findings", title_justify="left")
-    for col in ("hypothesis", "typology", "subjects", "objects", "verdict", "by"):
-        verdicts.add_column(col)
-    by_h = {h.hypothesis_id: h for h in case.hypotheses}
-    colour = {"Substantiated": "red", "Unfounded": "green", "Unsubstantiated": "yellow"}
-    for f in case.findings:
-        h = by_h.get(f.hypothesis_id)
-        verdicts.add_row(
-            f.hypothesis_id,
-            h.typology if h else "",
-            ", ".join(h.subjects) if h else "",
-            ", ".join(h.objects) if h else "",
-            f"[{colour[f.verdict]}]{f.verdict}[/]",
-            f.verdict_by,
-        )
-    console.print(verdicts)
-    console.print(_metrics_table(case.metrics))
+    print_metrics(case, console)
     if case.metrics.get("stubbed"):
         console.print(f"[yellow]stubbed stages:[/] {', '.join(case.metrics['stubbed'])}")
     console.print(f"[bold green]Case file[/] {out / 'case_file.md'}")
-    console.print(f"Merkle root [bold]{case.merkle_root}[/]")
-    console.print(f"Verify: [cyan]uv run casefile verify {(out / 'log.jsonl').as_posix()}[/]")
 
 
 @app.command()

@@ -19,13 +19,16 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from casefile.audit.payloads import default_store as payload_store
 from casefile.schemas import (
     CaseFile,
     Direction,
     EvidenceObject,
     Finding,
     Hypothesis,
+    StaffRecord,
     Typology,
+    VendorRecord,
     Verdict,
 )
 
@@ -89,6 +92,15 @@ def _set_agents_audit(audit: Any) -> None:
     except ImportError:
         return
     set_audit(audit)
+
+
+def _people(staff: list[StaffRecord], vendors: list[VendorRecord]) -> list[str]:
+    """Person names for --redact: staff, their Crustdata profiles, vendor founders and leaders."""
+    names = [s.name_raw for s in staff] + [s.crustdata.name for s in staff if s.crustdata]
+    for v in vendors:
+        if v.crustdata:
+            names += [p.name for p in [*v.crustdata.founders, *v.crustdata.decision_makers]]
+    return names
 
 
 def _sha256_file(path: Path) -> tuple[str, int]:
@@ -210,6 +222,7 @@ def run(
         old.unlink(missing_ok=True)
     audit = impl("audit", "AuditLog")(log_path)
     _set_agents_audit(audit)
+    payload_store.clear()  # quote payloads are per run; the eval harness runs in one process
     try:
         inputs = {
             "tip": tip_path,
@@ -365,19 +378,14 @@ def run(
             case = case.model_copy(update={"hypotheses": hypotheses})
 
         with _timed("render"):
-            evidence_index = {e.evidence_id: e for e in evidence}
-            (out / "evidence.json").write_text(
+            # every evidence object, cited or not; render writes the cited ones to evidence.json
+            (out / "evidence_all.json").write_text(
                 json.dumps([e.model_dump(mode="json") for e in evidence], indent=2),
                 encoding="utf-8",
             )
-            try:
-                from casefile.audit import payloads
-
-                payloads.default_store.dump(out / "payloads")
-            except ImportError:
-                pass
+            payload_store.dump(out / "payloads")
             render = impl("render", "render")
-            errors = impl("check", "check_citations")(case, evidence_index)
+            errors = impl("check", "check_citations")(case, payload_store)
             if errors:
                 audit.seal()
                 raise CitationError(errors)
@@ -391,7 +399,13 @@ def run(
             }
             case = case.model_copy(update={"merkle_root": audit.merkle_root()})
             rid = audit.pre("render", {"name": "case_file", "redact": redact})
-            path = render(case, out, redact=redact)
+            path = render(
+                case,
+                out,
+                redact=redact,
+                evidence_index=payload_store,
+                people=_people(staff, vendors),
+            )
             audit.post(rid, {"status": "ok", "result_sha256": _sha256_file(Path(path))[0]})
             audit.seal()
 

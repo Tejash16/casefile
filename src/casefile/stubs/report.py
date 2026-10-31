@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 from casefile.schemas import CaseFile, EvidenceObject, Sentence
 
@@ -12,21 +14,20 @@ def _cite(s: Sentence) -> str:
     return s.text + "".join(f" [{i}]" for i in s.evidence_ids)
 
 
-def check_citations(case: CaseFile, evidence_index: dict[str, EvidenceObject]) -> list[str]:
+def check_citations(case: CaseFile, evidence_index: Mapping[str, bytes]) -> list[str]:
+    exhibits: dict[str, EvidenceObject] = {e.evidence_id: e for e in case.exhibits}
     errors: list[str] = []
     sentences = list(case.executive_summary) + [s for f in case.findings for s in f.rationale]
     for s in sentences:
         if not s.evidence_ids:
             errors.append(f"uncited sentence: {s.text!r}")
         errors += [
-            f"unknown evidence id {i} in {s.text!r}"
-            for i in s.evidence_ids
-            if i not in evidence_index
+            f"unknown evidence id {i} in {s.text!r}" for i in s.evidence_ids if i not in exhibits
         ]
     return errors
 
 
-def render(case: CaseFile, out_dir: str | Path, redact: bool = False) -> Path:
+def render(case: CaseFile, out_dir: str | Path, redact: bool = False, **_: Any) -> Path:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -56,6 +57,9 @@ def render(case: CaseFile, out_dir: str | Path, redact: bool = False) -> Path:
     ]
     path = out / "case_file.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / "evidence.json").write_text(
+        json.dumps([e.model_dump(mode="json") for e in case.exhibits], indent=2), encoding="utf-8"
+    )
     (out / "findings.json").write_text(
         json.dumps([f.model_dump(mode="json") for f in case.findings], indent=2), encoding="utf-8"
     )
