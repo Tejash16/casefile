@@ -44,6 +44,19 @@ def test_run_end_to_end_on_stubs(inputs, tmp_path, all_stubs):
     assert verify(out / "log.jsonl").ok
 
 
+def test_one_failed_critique_does_not_abort_the_run(inputs, tmp_path, all_stubs, monkeypatch):
+    from casefile.agents.client import ModelRefusalError
+    from casefile.stubs import agents
+
+    def refuse(hypothesis, evidence):
+        raise ModelRefusalError("refused")
+
+    monkeypatch.setattr(agents, "critique", refuse)
+    out = tmp_path / "out"
+    case = pipeline.run(inputs["tip"], inputs["ledger"], inputs["vendors"], inputs["staff"], out)
+    assert [f.verdict for f in case.findings] == ["Unsubstantiated"]
+
+
 def test_redact_hides_staff_names(inputs, tmp_path, all_stubs):
     out = tmp_path / "out"
     pipeline.run(
