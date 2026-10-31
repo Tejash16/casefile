@@ -84,7 +84,7 @@ def test_planted_shell_v023(loaded):
     s3 = next(s for s in staff if s.staff_id == "S003")
     assert v23.phone == s3.phone
     assert v23.address_type == AddressType.residential
-    assert v23.website is None and v23.created_by == "adeshpande"
+    assert v23.website is None and v23.created_by == "anil.deshpande"
     inv = sorted((r for r in rows if r.vendor_id == "V023"), key=lambda r: r.date)
     assert {r.approver_id for r in inv} == {"S003"}
     assert all(r.amount % 1000 == 0 and r.amount < s3.approval_limit for r in inv)
