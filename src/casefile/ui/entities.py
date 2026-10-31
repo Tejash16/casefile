@@ -8,6 +8,7 @@ credit count. Names arrive already redacted under --redact; this panel never red
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -128,11 +129,12 @@ def vendor_rows(vendors: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "Method": r.get("method") or "",
                 "Confidence": _conf(r),
                 "Candidates": r.get("candidates_considered", 0),
-                "Crustdata id": cf.get("crustdata_company_id") or "",
-                "Crustdata name": cf.get("name") or "",
-                "Headcount": cf.get("headcount_total"),
-                "Founded": cf.get("year_founded"),
-                "Website": cf.get("website") or cf.get("primary_domain") or "",
+                "Crustdata: id": cf.get("crustdata_company_id") or "",
+                "Crustdata: name": cf.get("name") or "",
+                "Crustdata: headcount": cf.get("headcount_total"),
+                "Crustdata: founded": cf.get("year_founded"),
+                "Crustdata: website": cf.get("website") or cf.get("primary_domain") or "",
+                "Crustdata: updated_at": cf.get("updated_at") or "",
                 "Citation": _cite("company", cf, "crustdata_company_id"),
             }
         )
@@ -153,10 +155,11 @@ def staff_rows(staff: list[dict[str, Any]], subjects: set[str]) -> list[dict[str
                 "Method": r.get("method") or "",
                 "Confidence": _conf(r),
                 "Candidates": r.get("candidates_considered", 0),
-                "Crustdata id": pf.get("crustdata_person_id") or "",
-                "Current role": " at ".join(
+                "Crustdata: id": pf.get("crustdata_person_id") or "",
+                "Crustdata: current role": " at ".join(
                     x for x in (pf.get("current_title"), pf.get("current_company")) if x
                 ),
+                "Crustdata: updated_at": pf.get("updated_at") or "",
                 "Citation": _cite("person", pf, "crustdata_person_id"),
             }
         )
@@ -194,11 +197,195 @@ def _table(rows: list[dict[str, Any]], key: str) -> None:
         width="stretch",
         key=key,
         column_config={
-            "Website": st.column_config.LinkColumn("Website"),
-            "Headcount": st.column_config.NumberColumn("Headcount", format="%d"),
-            "Founded": st.column_config.NumberColumn("Founded", format="%d"),
+            "Crustdata: website": st.column_config.LinkColumn("Crustdata: website"),
+            "Crustdata: headcount": st.column_config.NumberColumn(
+                "Crustdata: headcount", format="%d"
+            ),
+            "Crustdata: founded": st.column_config.NumberColumn("Crustdata: founded", format="%d"),
         },
     )
+
+
+VENDOR_PATH = {
+    "domain": "POST /company/identify (by website domain) → POST /company/enrich → "
+    "POST /company/search (record updated_at)",
+    "identify_exact": "POST /company/identify (exact name) → POST /company/enrich → "
+    "POST /company/search (record updated_at)",
+    "identify_fuzzy": "POST /company/identify (fuzzy name) → POST /company/enrich → "
+    "POST /company/search (record updated_at)",
+    "llm_judge": "POST /company/identify → match judge on the tie list → POST /company/enrich → "
+    "POST /company/search (record updated_at)",
+}
+STAFF_PATH = {
+    "linkedin_url": "POST /person/enrich (LinkedIn URL from the staff list)",
+    "person_search": "POST /person/search (exact name + audited company) → POST /person/enrich",
+    "llm_judge": "POST /person/search → match judge on the shortlist → POST /person/enrich",
+    "person_identify_email": "POST /person/identify (email) → POST /person/enrich",
+}
+
+
+def record_lines(rec: dict[str, Any], kind: str) -> list[str]:
+    """What the 'Crustdata record' expander says for one vendor or staff row."""
+    r, facts = _res(rec), rec.get("crustdata") or {}
+    status, method = r.get("status", "not_attempted"), r.get("method")
+    paths = VENDOR_PATH if kind == "company" else STAFF_PATH
+    if method in paths:
+        path = paths[method]
+    elif kind == "company":
+        path = "POST /company/identify (domain, then exact and fuzzy name): no record accepted"
+    else:
+        path = "POST /person/search (name + audited company, then name only): no record accepted"
+    id_key = "crustdata_company_id" if kind == "company" else "crustdata_person_id"
+    lines = [
+        f"**Endpoints:** {path}",
+        f"**Resolution:** {status}" + (f" by `{method}`" if method else ""),
+        f"**confidence_score:** {_conf(r) or 'n/a'} · "
+        f"**candidates considered:** {r.get('candidates_considered', 0)}",
+    ]
+    if facts:
+        lines += [
+            f"**Crustdata id:** `{facts.get(id_key)}` · "
+            f"**updated_at:** `{facts.get('updated_at')}`",
+            f"**X-Request-Id:** `{facts.get('source_request_id') or 'n/a'}` · "
+            f"**served from cache:** {'yes' if facts.get('cache_hit') else 'no'}",
+            f"**Citation:** `{_cite(kind, facts, id_key)}`",
+        ]
+    return lines
+
+
+def _records(records: list[dict[str, Any]], kind: str, id_key: str) -> None:
+    for rec in records:
+        status = _res(rec).get("status", "not_attempted")
+        with st.expander(
+            f"Crustdata record · {rec.get(id_key)} {rec.get('name_raw', '')} ({status})"
+        ):
+            st.markdown("  \n".join(record_lines(rec, kind)))
+
+
+# ---------------------------------------------------------------- timeline
+
+
+@lru_cache(maxsize=8)
+def _first_payments(ledger: str, ledger_mtime: float, ents: str, ents_mtime: float) -> dict:
+    """vendor_id -> date of its first payment, via the project's own ledger loader (read only)."""
+    from casefile.ingest import link_ledger, load_ledger
+    from casefile.schemas import StaffRecord, VendorRecord
+
+    data = json.loads(Path(ents).read_text(encoding="utf-8"))
+    vendors = [VendorRecord.model_validate(v) for v in data.get("vendors") or []]
+    staff = [StaffRecord.model_validate(s) for s in data.get("staff") or []]
+    rows, _ = load_ledger(ledger)
+    out: dict[str, Any] = {}
+    for row in link_ledger(rows, vendors, staff):
+        if row.vendor_id and row.amount > 0:
+            out[row.vendor_id] = min(out.get(row.vendor_id, row.date), row.date)
+    return out
+
+
+def first_payments(out_dir: Path, inputs: dict[str, Any]) -> dict[str, Any]:
+    ledger = Path(inputs.get("ledger") or Path(out_dir) / "ledger.csv")
+    ents = Path(out_dir) / "entities.json"
+    if not ledger.exists() or not ents.exists():
+        return {}
+    try:
+        return _first_payments(str(ledger), ledger.stat().st_mtime, str(ents), ents.stat().st_mtime)
+    except Exception:  # noqa: BLE001 - a marker is a nicety; never break the tab
+        return {}
+
+
+def subject_vendors(out_dir: Path) -> dict[str, set[str]]:
+    """staff_id -> vendor ids it is paired with in any finding."""
+    p = Path(out_dir) / "findings.json"
+    pairs: dict[str, set[str]] = {}
+    try:
+        data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
+    except (OSError, ValueError):
+        return pairs
+    for f in data if isinstance(data, list) else data.get("findings", []):
+        if isinstance(f, dict):
+            for s in f.get("subjects") or []:
+                pairs.setdefault(str(s), set()).update(str(o) for o in f.get("objects") or [])
+    return pairs
+
+
+def _timeline(
+    person: dict[str, Any],
+    vendors: list[dict[str, Any]],
+    paired: set[str],
+    paid: dict[str, Any],
+) -> None:
+    import altair as alt
+
+    today = pd.Timestamp.today().normalize()
+    vendor_ids = {
+        (v.get("crustdata") or {}).get("crustdata_company_id"): v.get("vendor_id")
+        for v in vendors
+        if v.get("crustdata")
+    }
+    bars = []
+    linked: set[str] = set()
+    for e in person.get("employment") or []:
+        if not e.get("start_date"):
+            continue
+        vid = vendor_ids.get(e.get("crustdata_company_id"))
+        if vid:
+            linked.add(vid)
+        bars.append(
+            {
+                "Role": f"{e.get('company_name', '')}: {e.get('title') or ''}",
+                "start": pd.Timestamp(e["start_date"]),
+                "end": pd.Timestamp(e["end_date"]) if e.get("end_date") else today,
+                "Employer is a vendor": f"yes ({vid})" if vid else "no",
+            }
+        )
+    if not bars:
+        st.caption("No dated roles in the Crustdata record.")
+        return
+    names = {v.get("vendor_id"): v.get("name_raw", "") for v in vendors}
+    marks = [
+        {"date": pd.Timestamp(paid[v]), "label": f"first payment to {v} {names.get(v, '')}"}
+        for v in sorted(linked | paired)
+        if v in paid
+    ][:4]
+    base = (
+        alt.Chart(pd.DataFrame(bars))
+        .mark_bar(height=18)
+        .encode(
+            x=alt.X("start:T", title=None),
+            x2="end:T",
+            y=alt.Y("Role:N", sort=None, title=None),
+            color=alt.condition(
+                alt.datum["Employer is a vendor"] != "no",
+                alt.value("#7c3aed"),
+                alt.value("#94a3b8"),
+            ),
+            tooltip=["Role", "start:T", "end:T", "Employer is a vendor"],
+        )
+    )
+    chart = base
+    if marks:
+        m = pd.DataFrame(marks)
+        rule = (
+            alt.Chart(m)
+            .mark_rule(color="#dc2626", strokeDash=[6, 3], size=2)
+            .encode(x="date:T", tooltip=["label", "date:T"])
+        )
+        text = (
+            alt.Chart(m)
+            .mark_text(align="left", dx=5, dy=-4, color="#dc2626")
+            .encode(x="date:T", y=alt.value(8), text="label")
+        )
+        chart = base + rule + text
+    st.altair_chart(chart.properties(height=40 * len(bars) + 60), use_container_width=True)
+    if linked:
+        st.caption(
+            f"Crustdata lists an employer that is also a paid vendor: {', '.join(sorted(linked))}."
+        )
+    elif paired:
+        st.caption(
+            f"No role at {', '.join(sorted(paired))} in the Crustdata record "
+            "(the allegation names it)."
+        )
 
 
 def _count(records: list[dict[str, Any]], status: str = "resolved") -> int:
@@ -229,16 +416,12 @@ def _draw(out_dir: Path, inputs: dict[str, Any]) -> None:
     c4.metric("Staff resolved", f"{_count(staff)}/{len(staff)}")
     st.caption(STATUS_HELP)
 
-    st.subheader("Vendors")
-    _table(vendor_rows(vendors), key="b2_vendors")
-
     subjects = named_subjects(out_dir)
-    st.subheader("Staff")
-    _table(staff_rows(staff, subjects), key="b2_staff")
-
     people = [s for s in staff if (s.get("crustdata") or {}).get("employment")]
     if people:
-        st.subheader("Employment history (Crustdata)")
+        # the hidden link, on screen: Crustdata career timeline vs first payment to the vendor
+        st.subheader("Crustdata employment timeline: staff named in an allegation")
+        pairs, paid = subject_vendors(out_dir), first_payments(out_dir, inputs)
         for s in sorted(people, key=lambda s: s.get("staff_id") not in subjects):
             pf = s["crustdata"]
             label = (
@@ -246,7 +429,21 @@ def _draw(out_dir: Path, inputs: dict[str, Any]) -> None:
                 f"{_cite('person', pf, 'crustdata_person_id')}"
             )
             with st.expander(label, expanded=s.get("staff_id") in subjects):
+                try:
+                    _timeline(pf, vendors, pairs.get(str(s.get("staff_id")), set()), paid)
+                except Exception as e:  # noqa: BLE001 - the table below still shows the facts
+                    st.caption(f"timeline unavailable ({type(e).__name__})")
                 st.dataframe(pd.DataFrame(employment_rows(pf)), hide_index=True, width="stretch")
+
+    st.subheader("Vendors")
+    _table(vendor_rows(vendors), key="b2_vendors")
+    st.caption("Crustdata record per vendor: endpoints called, confidence, id, updated_at")
+    _records(vendors, "company", "vendor_id")
+
+    st.subheader("Staff")
+    _table(staff_rows(staff, subjects), key="b2_staff")
+    st.caption("Crustdata record per staff member: endpoints called, confidence, id, updated_at")
+    _records(staff, "person", "staff_id")
 
 
 def render(out_dir: Path, inputs: dict[str, Any]) -> None:
