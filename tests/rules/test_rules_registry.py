@@ -25,6 +25,42 @@ def test_all_seventeen_tests_registered_with_families_and_typologies():
         assert set(t.refutes) <= set(t.typologies) or t.id == "T13"
 
 
+def test_registry_covers_the_typology_menu():
+    """The proposer picks tests from docs/typologies.md and the pipeline drops supporting evidence
+    whose test does not list the hypothesis's typology, so every menu pairing must be registered."""
+    import re
+    from pathlib import Path
+
+    menu = Path(__file__).resolve().parents[2] / "docs" / "typologies.md"
+    for line in menu.read_text("utf-8").splitlines():
+        if not line.startswith("| `"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        typ = cells[0].strip("`")
+        for tid in re.findall(r"T\d\d", cells[5]):
+            assert typ in TESTS[tid].typologies, f"{tid} must list {typ}"
+
+
+def test_t16_leaves_hypothesis_pairs_to_the_pipeline():
+    from casefile.graph import build
+
+    b = Book()
+    b.add("V023", date(2025, 1, 18), 490000, approver_id="S003")
+    v = vendor("V023", phone="+91 98220 41736")
+    s = staff("S003", phone="9822041736")
+    G = build(b.rows, [v], [s])
+    assert len(run_tests(["T16"], ctx_for(b, [v], [s], graph=G))) == 1
+    h = Hypothesis(
+        hypothesis_id="H1",
+        typology="shell_company",
+        statement="s",
+        subjects=["S003"],
+        objects=["V023"],
+        tests_to_run=["T16"],
+    )
+    assert run_tests(["T16"], ctx_for(b, [v], [s], graph=G, hypotheses=[h])) == []
+
+
 def test_thresholds_are_documented():
     for name, t in THRESHOLDS.items():
         assert t.name == name and t.unit and t.rationale

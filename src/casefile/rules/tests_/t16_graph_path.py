@@ -1,6 +1,8 @@
-"""T16 graph_path: shortest strong path (<= `graph_max_len` edges, approvals excluded) from each
-approver, or hypothesis subject, to the vendor, via shared attributes or Crustdata ids. The
-pipeline also calls `graph.path_evidence` per hypothesis pair; this screens ledger pairs."""
+"""T16 graph_path: strongest path (<= `graph_max_len` edges, approvals excluded) from each approver
+to each vendor it approved, via shared attributes or Crustdata ids.
+
+The pipeline calls `graph.path_evidence` itself for every hypothesis subject-object pair, so when
+the context carries hypotheses those pairs are left to it here (one exhibit per pair, not two)."""
 
 from __future__ import annotations
 
@@ -19,7 +21,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
     df = ctx.rows[ctx.rows.vendor_id.notna() & ctx.rows.approver_id.notna()]
     pairs = set(zip(df.approver_id, df.vendor_id, strict=True))
     for h in ctx.hypotheses:
-        pairs |= {(s, v) for s in h.subjects for v in h.objects}
+        pairs -= {(s, v) for s in h.subjects for v in h.objects}
     out: list[EvidenceObject] = []
     for sid, vid in sorted(pairs):
         e = graph.path_evidence(G, sid, vid, max_len=ctx.th("graph_max_len"))
