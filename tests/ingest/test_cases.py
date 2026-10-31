@@ -3,7 +3,8 @@ its case.json expects (see cases/README.md)."""
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -58,8 +59,14 @@ def test_career_overlap_plant():
     _, rows, vendors, staff, _, _ = _load("career_overlap")
     s4 = next(s for s in staff if s.staff_id == "S004")
     assert s4.linkedin_url and "tejash-chauhan" in s4.linkedin_url
-    v17 = [r for r in rows if r.vendor_id == "V017"]
-    assert len(v17) == 6 and {r.approver_id for r in v17} == {"S004"}
+    v17 = sorted((r for r in rows if r.vendor_id == "V017"), key=lambda r: r.date)
+    assert len(v17) >= 6 and {r.approver_id for r in v17} == {"S004"}
+    # billing starts when S004's DocRack role does (2026-03-01) and grows every month
+    assert v17[0].date >= date(2026, 3, 1)
+    assert all(a.amount < b.amount for a, b in zip(v17, v17[1:], strict=False))
+    assert all(r.amount < s4.approval_limit * Decimal("0.95") for r in v17)
+    # other vendors keep billing through the extended ledger
+    assert max(r.date for r in rows if r.vendor_id != "V017") >= date(2026, 9, 1)
     v17 = next(v for v in vendors if v.vendor_id == "V017")
     assert v17.website is None  # docrack.ai resolves to another Crustdata record
     # ordinary vendor file: no thin-footprint, new-vendor or segregation-of-duties signal

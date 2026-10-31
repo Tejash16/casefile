@@ -42,6 +42,9 @@ SIX = {
     "shared_office_honest": ["shared_office"],
 }
 SEEDS = {name: 1000 + i for i, name in enumerate(SIX)}
+# career_overlap runs to today so DocRack's billing (from March 2026, when S004's role there
+# starts) has months to grow in; every other vendor keeps its cadence through the extra months.
+PERIOD_END = {"career_overlap": date(2026, 10, 31)}
 
 
 @dataclass
@@ -114,6 +117,7 @@ class Case:
     must_clear: list[str] = field(default_factory=list)
     tip: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    period: tuple[date, date] = PERIOD
 
 
 # ---------------------------------------------------------------- pools (checked 31 Oct 2026)
@@ -410,11 +414,12 @@ def upper_legal(name: str) -> str:
     return s
 
 
-def weekday_near(rng: random.Random, d: date, spread: int = 0) -> date:
+def weekday_near(rng: random.Random, d: date, spread: int = 0, end: date = PERIOD[1]) -> date:
     d = d + timedelta(days=rng.randint(-spread, spread)) if spread else d
-    d = min(max(d, PERIOD[0]), PERIOD[1])
+    d = min(max(d, PERIOD[0]), end)
+    step = timedelta(days=1 if d + timedelta(days=2) <= end else -1)
     while d.weekday() >= 5:
-        d += timedelta(days=1)
+        d += step
     return d
 
 
@@ -512,12 +517,14 @@ def approver_raw(rng: random.Random, s: Staff) -> str:
 def background_rows(case: Case, v: Vendor, k: int, exclude: set[str]) -> None:
     """k invoices spread over the period: weekday office hours, non-round, gap < 365 days."""
     rng = case.rng
-    span = (PERIOD[1] - PERIOD[0]).days
-    seg = span / k
+    start, end = case.period
+    seg = (end - start).days / k
     inv = rng.randint(1000, 90000)
     for i in range(k):
         d = weekday_near(
-            rng, PERIOD[0] + timedelta(days=int(seg * i + seg * rng.uniform(0.25, 0.75)))
+            rng,
+            start + timedelta(days=int(seg * i + seg * rng.uniform(0.25, 0.75))),
+            end=end,
         )
         amount = non_round(rng, v.lo, v.hi)
         appr = approvers_for(case, amount, exclude)
@@ -563,26 +570,22 @@ def plant_career_overlap(case: Case, vid: str = "V017") -> None:
         "Mumbai",
         "Maharashtra",
         desc="Document audit automation services",
-        created_on=date(2025, 1, 20),
+        created_on=date(2025, 10, 6),
         phone="022 4971 3302",
     )
     case.vendors[vid] = v
     rng = case.rng
-    targets = [
-        date(2025, 6, 12),
-        date(2025, 8, 14),
-        date(2025, 10, 9),
-        date(2025, 12, 11),
-        date(2026, 2, 5),
-        date(2026, 3, 19),
-    ]
+    # Monthly from March 2026, when S004's DocRack role starts, through the end of the ledger;
+    # amounts grow every month (T12) and stay below 95% of S004's limit.
+    end = case.period[1]
+    targets = [date(2026, m, 10) for m in range(3, 13) if date(2026, m, 10) <= end]
     # DocRack bills other clients too: invoice numbers jump like other real vendors' (no T07).
     # A separate generator keeps every other draw in the case unchanged.
     inv_rng = random.Random(case.seed + 17)
     inv = inv_rng.randint(100, 300)
     for k, t in enumerate(targets):
-        d = weekday_near(rng, t, spread=4)
-        amount = non_round(rng, 205_000 + 48_000 * k, 215_000 + 48_000 * k)
+        d = weekday_near(rng, t, spread=4, end=end)
+        amount = non_round(rng, 110_000 + 45_000 * k, 118_000 + 45_000 * k)
         inv += inv_rng.randint(37, 400)
         case.rows.append(
             Row(
@@ -609,16 +612,16 @@ def plant_career_overlap(case: Case, vid: str = "V017") -> None:
     )
     case.tip.append(
         "For the last year a manager in procurement has been pushing payments to "
-        "DocRack. They only started billing us in 2025, the amounts keep growing, and "
+        "DocRack. They only started billing us in March, the amounts grow every month, and "
         "the same manager signs off every one of their invoices."
     )
     case.notes.append(
         f"{s.sid} {s.name} (team member, consent) is Co-Founder at DocRack, "
         "Crustdata company 71095782, from 2026-03-01 (person 177265563). "
-        f"{vid}'s six invoices run 2025-06 to 2026-03, all approved by {s.sid}; the "
-        "last overlaps the employment, all are within 365 days of its start. "
+        f"{vid}'s {len(targets)} invoices run monthly from 2026-03 to {targets[-1]:%Y-%m}, "
+        f"all approved by {s.sid} and all during that employment, growing every month. "
         f"{vid}'s vendor file looks ordinary (commercial address, phone, created by mdm.admin on "
-        "2025-01-20); it has no website on purpose: docrack.ai resolves to another record."
+        "2025-10-06); it has no website on purpose: docrack.ai resolves to another record."
     )
 
 
@@ -832,10 +835,18 @@ def plant_shared_office(case: Case, shuffle: dict[str, str] | None = None) -> No
 
 
 def build(
-    name: str, seed: int, plants: list[str], n_vendors: int, n_rows: int, shuffle_ids: bool = False
+    name: str,
+    seed: int,
+    plants: list[str],
+    n_vendors: int,
+    n_rows: int,
+    shuffle_ids: bool = False,
+    period_end: date | None = None,
 ) -> Case:
     rng = random.Random(seed)
-    case = Case(name, seed, rng)
+    case = Case(name, seed, rng, period=(PERIOD[0], period_end or PERIOD[1]))
+    # n_rows is per standard two-year period; a longer ledger keeps the same monthly cadence
+    n_rows = round(n_rows * (case.period[1] - PERIOD[0]).days / (PERIOD[1] - PERIOD[0]).days)
     base_staff(case, alt_names=shuffle_ids)
     # clean vendors: the two controls, the duplicate host, one unresolved, then fill
     keys = [*CONTROLS, "sundram"]
@@ -1084,11 +1095,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--vendors", type=int, default=10)
     ap.add_argument("--rows", type=int, default=80)
     ap.add_argument("--shuffle-ids", action="store_true", help="fresh ids and names (held-out)")
+    ap.add_argument("--period-end", type=date.fromisoformat, default=None, help="YYYY-MM-DD")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
     if args.all:
         for name, plants in SIX.items():
-            case = build(name, SEEDS[name], plants, args.vendors, args.rows)
+            case = build(
+                name, SEEDS[name], plants, args.vendors, args.rows, period_end=PERIOD_END.get(name)
+            )
             write_case(case, ROOT / name)
             print(
                 f"{name}: {len(case.rows)} rows, {len(case.vendors)} vendors, "
@@ -1099,7 +1113,9 @@ def main(argv: list[str] | None = None) -> int:
     bad = [p for p in plants if p not in PLANTS]
     if bad:
         ap.error(f"unknown plant(s): {', '.join(bad)}")
-    case = build(args.name, args.seed, plants, args.vendors, args.rows, args.shuffle_ids)
+    case = build(
+        args.name, args.seed, plants, args.vendors, args.rows, args.shuffle_ids, args.period_end
+    )
     write_case(case, args.out or ROOT / args.name)
     print(f"{args.name}: {len(case.rows)} rows, {len(case.vendors)} vendors -> {args.out}")
     return 0
