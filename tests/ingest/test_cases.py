@@ -3,6 +3,7 @@ its case.json expects (see cases/README.md)."""
 
 from __future__ import annotations
 
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -59,7 +60,12 @@ def test_career_overlap_plant():
     assert s4.linkedin_url and "tejash-chauhan" in s4.linkedin_url
     v17 = [r for r in rows if r.vendor_id == "V017"]
     assert len(v17) == 6 and {r.approver_id for r in v17} == {"S004"}
-    assert next(v for v in vendors if v.vendor_id == "V017").website is None
+    v17 = next(v for v in vendors if v.vendor_id == "V017")
+    assert v17.website is None  # docrack.ai resolves to another Crustdata record
+    # ordinary vendor file: no thin-footprint, new-vendor or segregation-of-duties signal
+    assert v17.address_type == "commercial" and v17.phone
+    assert v17.created_by == "mdm.admin"
+    assert min(r.date for r in rows if r.vendor_id == "V017") - v17.created_on > timedelta(days=90)
 
 
 def test_shell_plant():

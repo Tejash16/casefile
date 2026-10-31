@@ -26,7 +26,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 PERIOD = (date(2024, 4, 1), date(2026, 3, 31))
 COMPANY = "Halvexa Precision Components Pvt Ltd"
-SHELL_VERDICT = "Substantiated"  # see docs/dataset-design.md section 3, open conflict with the gate
+SHELL_VERDICT = (
+    "Substantiated"  # reachable since contract s7 rev (31 Oct): see docs/dataset-design.md
+)
 MANAGER_LIMIT = 500_000
 BAND = Decimal("0.95")  # background amounts stay below 95% of the approver's limit
 
@@ -548,18 +550,21 @@ def plant_career_overlap(case: Case, vid: str = "V017") -> None:
         date(2025, 1, 15),
         "Aundh, Pune",
     )
+    # An ordinary-looking vendor file (decision 31 Oct, B/a1 option b): commercial address, phone,
+    # set up by master-data admin months before the first invoice, so the case reads as a
+    # conflict of interest only. No website on purpose: docrack.ai resolves to another record.
     v = Vendor(
         "docrack",
         vid,
         "DocRack",
         ["DOCRACK", "Docrak"],
         None,
-        "",
+        "Office 304, 3rd Floor, Powai",
         "Mumbai",
         "Maharashtra",
         desc="Document audit automation services",
-        created_on=date(2025, 5, 20),
-        created_by=s.user,
+        created_on=date(2025, 1, 20),
+        phone="022 4971 3302",
     )
     case.vendors[vid] = v
     rng = case.rng
@@ -607,7 +612,8 @@ def plant_career_overlap(case: Case, vid: str = "V017") -> None:
         "Crustdata company 71095782, from 2026-03-01 (person 177265563). "
         f"{vid}'s six invoices run 2025-06 to 2026-03, all approved by {s.sid}; the "
         "last overlaps the employment, all are within 365 days of its start. "
-        f"{vid} has no website on purpose: docrack.ai resolves to another record."
+        f"{vid}'s vendor file looks ordinary (commercial address, phone, created by mdm.admin on "
+        "2025-01-20); it has no website on purpose: docrack.ai resolves to another record."
     )
 
 
