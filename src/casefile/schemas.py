@@ -384,34 +384,19 @@ class MatchDecision(Model):
 
     decision: MatchVerdict
     index: int | None = None
-    confidence: float | None = Field(default=None, ge=0, le=1)
-    rationale: str | None = None
+    reason: str = ""
     log_record_id: str | None = None
 
 
 class CriticOutput(Model):
     """agents.critique.critique output (a2)."""
 
-    hypothesis_id: str
     model_verdict: Verdict
     rationale: list[Sentence] = Field(default_factory=list)
-    confidence: float | None = Field(default=None, ge=0, le=1)
-    data_gaps: list[str] = Field(default_factory=list)
+    strongest_counter: str | None = None
+    missing_tests: list[str] = Field(default_factory=list)
+    hypothesis_id: str | None = None
     log_record_id: str | None = None
-
-
-class RuleContext(Model):
-    """Everything a rule test may read (b3). Built by the pipeline; rules do no I/O."""
-
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
-
-    ledger: list[LedgerRow]
-    vendors: list[VendorRecord]
-    staff: list[StaffRecord]
-    hypotheses: list[Hypothesis] = Field(default_factory=list)
-    ledger_stats: dict[str, Any] = Field(default_factory=dict)
-    graph: Any = None  # networkx.Graph from graph.build
-    audit: Any = None  # AuditLog, for rule_test pre/post records
 
 
 # ---------------------------------------------------------------- 8. case spec (case.json)
