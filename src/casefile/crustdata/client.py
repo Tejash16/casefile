@@ -299,6 +299,8 @@ class CrustdataClient:
         self.credits_spent = 0.0
         self.scope: dict[str, dict[str, Any]] = {}
         self._record_ids: dict[str, str] = {}
+        # data-quality notes for the case file (e.g. which records are cited at fetch time)
+        self.notes: list[str] = []
 
     # ------------------------------------------------------------ plumbing
 
@@ -320,6 +322,18 @@ class CrustdataClient:
     def close(self) -> None:
         if self._http is not None:
             self._http.close()
+
+    def _noted(self, facts: Any, r: Response) -> Any:
+        """Record a data-quality note when a record carries no timestamp of its own."""
+        if facts.updated_at == r.fetched_at:
+            note = (
+                f"Crustdata {facts.citation.split(':')[1]} record "
+                f"{facts.citation.split(':')[2].split('@')[0]} has no updated_at; "
+                f"cited at fetch time {r.fetched_at} (request {r.request_id})"
+            )
+            if note not in self.notes:
+                self.notes.append(note)
+        return facts
 
     def record_id_for(self, request_id: str | None) -> str | None:
         """The audit `pre` record id of the call that returned `request_id`."""
@@ -553,7 +567,7 @@ class CrustdataClient:
                 for m in row.get("matches") or []:
                     cd = m.get("company_data") or {}
                     if cd.get("crustdata_company_id") is not None:
-                        out.append(_company_facts(cd, r))
+                        out.append(self._noted(_company_facts(cd, r), r))
         return out
 
     # ------------------------------------------------------------ people
@@ -607,7 +621,8 @@ class CrustdataClient:
                 if row.get("match_status", "matched") != "matched" or not matches:
                     out[url] = None
                     continue
-                out[url] = _person_facts(matches[0].get("person_data") or {}, url, r)
+                facts = _person_facts(matches[0].get("person_data") or {}, url, r)
+                out[url] = self._noted(facts, r)
         return out
 
     def identify_persons(self, emails: list[str]) -> list[PersonCandidate]:
@@ -810,7 +825,10 @@ def _person_facts(pd: dict[str, Any], url: str, r: Response) -> PersonFacts:
         current_company=current[0].company_name if current else None,
         location=loc.get("raw") or loc.get("full_location") if isinstance(loc, dict) else loc,
         employment=jobs,
-        updated_at=pd.get("updated_at") or (pd.get("metadata") or {}).get("updated_at") or "",
+        updated_at=pd.get("updated_at")
+        or (pd.get("metadata") or {}).get("updated_at")
+        or bp.get("last_updated")
+        or r.fetched_at,
         source_request_id=r.request_id or "",
         cache_hit=r.cache_hit,
     )

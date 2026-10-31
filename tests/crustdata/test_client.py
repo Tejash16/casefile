@@ -401,3 +401,23 @@ def test_person_enrich_maps_employment_and_skips_not_found(tmp_path: Path) -> No
     assert past and all(e.company_name for e in past)
     assert any(e.crustdata_company_id == "2199" and e.end_date for e in past)
     assert fake.bodies("/person/enrich")[0]["professional_network_profile_urls"] == urls
+
+
+def test_person_updated_at_never_empty_and_fetch_time_fallback_is_noted(tmp_path: Path) -> None:
+    pd = {
+        "crustdata_person_id": 5,
+        "basic_profile": {"name": "A B"},
+        "social_handles": {
+            "professional_network_identifier": {"profile_url": "https://www.linkedin.com/in/ab"}
+        },
+    }
+    row = {
+        "matched_on": "https://www.linkedin.com/in/ab",  # API drops the trailing slash
+        "match_status": "matched",
+        "matches": [{"person_data": pd}],
+    }
+    client, _ = make(tmp_path, Fake({"/person/enrich": ok([row], credits="1", rid="p-9")}))
+    p = client.enrich_persons(["https://www.linkedin.com/in/ab/"])[0]
+    assert p.updated_at and p.updated_at.endswith("Z")
+    assert p.citation == f"crustdata:person:5@{p.updated_at}"
+    assert any("person record 5 has no updated_at" in n and "p-9" in n for n in client.notes)
