@@ -682,6 +682,16 @@ def plant_shell(case: Case, name: str, vid: str = "V023") -> None:
             )
         )
     case.expected.append({"typology": "shell_company", "objects": [vid], "verdict": SHELL_VERDICT})
+    # The same plant is threshold structuring by design: 8 invoices in the 5% band under the
+    # owner's 5,00,000 limit, approved by the owner (a1, 31 Oct).
+    case.expected.append(
+        {
+            "typology": "threshold_structuring",
+            "subjects": [s.sid],
+            "objects": [vid],
+            "verdict": "Substantiated",
+        }
+    )
     case.tip.append(
         f"{brand} didn't exist before January 2025 and nobody on the shop floor has "
         "seen anything delivered from them. Their invoices are always just under five "

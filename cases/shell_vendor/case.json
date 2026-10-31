@@ -13,6 +13,16 @@
         "V023"
       ],
       "verdict": "Substantiated"
+    },
+    {
+      "typology": "threshold_structuring",
+      "subjects": [
+        "S003"
+      ],
+      "objects": [
+        "V023"
+      ],
+      "verdict": "Substantiated"
     }
   ],
   "must_clear": [
