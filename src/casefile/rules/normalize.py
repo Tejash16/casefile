@@ -91,12 +91,18 @@ def address(s: str | None) -> str | None:
     return out or None
 
 
+def _compact(s: str) -> str:
+    return _NON_ALNUM.sub("", s.lower())
+
+
 def is_coworking(raw_address: str | None, markers: Iterable[str] | None = None) -> bool:
+    """A marker appears in the address, ignoring case, spaces and punctuation, so "We Work",
+    "WeWork" and "We-Work" all match `wework`."""
     if not raw_address:
         return False
-    text = " ".join(raw_address.lower().split())
+    text = _compact(raw_address)
     marks = markers if markers is not None else THRESHOLDS["coworking_markers"].value
-    return any(m in text for m in marks)
+    return any(_compact(m) in text for m in marks)
 
 
 def address_type(raw_address: str | None, declared: AddressType | str | None = None) -> AddressType:
