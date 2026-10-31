@@ -10,6 +10,7 @@ __pycache__/
 out/*
 !out/demo/
 !out/eval/
+out/eval/*/
 dist/
 *.egg-info/
 .DS_Store
