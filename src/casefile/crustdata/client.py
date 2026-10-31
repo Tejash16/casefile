@@ -8,9 +8,10 @@ sends the request with retries on 429/5xx, (3) caches the raw body with `X-Credi
 a cache miss raises `OfflineMiss`.
 
 Facts we verified against the live API on 2026-10-31 (see docs/research-brief.md section 3):
-- Company Enrich returns `updated_at: null` even when the field is requested, so the citation
-  timestamp of a company record falls back to `metadata.updated_at`, then to the time we fetched
-  it (`fetched_at`, stored in the cache entry, so `--offline` reproduces the same citation).
+- Company Enrich returns `updated_at: null` even when the field is requested; Company Search
+  returns the record's `metadata.updated_at` (0.03 credits per company), so `enrich_companies`
+  asks Search for it. If that fails, the citation uses the time we fetched the record
+  (`fetched_at`, stored in the cache entry, so `--offline` reproduces it) and `notes` says so.
 - `POST /person/identify` is 403 on our plan; `preview: true` on Person Enrich is 400.
 - Person Enrich carries a top-level `updated_at`; Person Search carries `metadata.updated_at`.
 """
@@ -604,57 +605,113 @@ class CrustdataClient:
                 for m in row.get("matches") or []
             )
 
-        out: list[CompanyFacts] = []
         extra = {"fields": fields or COMPANY_FIELDS}
+        pairs: list[tuple[CompanyFacts, Response]] = []
         for _, row, r in self._batched(
-            "/company/enrich", "crustdata_company_ids", wire, extra, same
+            "/company/enrich",
+            wire,
+            lambda chunk: {"crustdata_company_ids": chunk, **extra},
+            same,
         ):
             for m in row.get("matches") or []:
                 cd = m.get("company_data") or {}
                 if cd.get("crustdata_company_id") is not None:
-                    out.append(self._noted(_company_facts(cd, r), r))
+                    pairs.append((_company_facts(cd, r), r))
                     break
+        # Enrich carries no record timestamp on our plan; Company Search does (0.03 credits each)
+        undated = [f.crustdata_company_id for f, r in pairs if f.updated_at == r.fetched_at]
+        stamps: dict[str, str] = {}
+        if undated:
+            try:
+                stamps = self.company_timestamps(undated)
+            except CrustdataError:
+                stamps = {}
+        out: list[CompanyFacts] = []
+        for f, r in pairs:
+            if f.crustdata_company_id in stamps:
+                f = f.model_copy(update={"updated_at": stamps[f.crustdata_company_id]})
+            out.append(self._noted(f, r))
+        return out
+
+    def company_timestamps(self, ids: list[str]) -> dict[str, str]:
+        """crustdata_company_id -> the record's `metadata.updated_at`, via POST /company/search."""
+        wire = [int(i) if str(i).isdigit() else i for i in dict.fromkeys(str(i) for i in ids if i)]
+
+        def body(chunk: list[Any]) -> dict[str, Any]:
+            return {
+                "filters": {"field": "crustdata_company_id", "type": "in", "value": chunk},
+                "fields": ["crustdata_company_id", "metadata"],
+                "limit": len(chunk),
+            }
+
+        def same(item: Any, row: dict[str, Any]) -> bool:
+            return str(row.get("crustdata_company_id")) == str(item)
+
+        def rows_of(b: Any) -> list[Any]:
+            return b.get("companies", []) if isinstance(b, dict) else []
+
+        def wrap(rows: list[dict[str, Any]]) -> Any:
+            return {"companies": rows, "next_cursor": None, "total_count": len(rows)}
+
+        out: dict[str, str] = {}
+        batched = self._batched("/company/search", wire, body, same, rows_of=rows_of, wrap=wrap)
+        for item, row, _ in batched:
+            ts = (row.get("metadata") or {}).get("updated_at")
+            if ts:
+                out[str(item)] = str(ts)
         return out
 
     def _batched(
         self,
         path: str,
-        key: str,
         items: list[Any],
-        extra: dict[str, Any],
+        make_body: Callable[[list[Any]], dict[str, Any]],
         same: Callable[[Any, dict[str, Any]], bool],
+        rows_of: Callable[[Any], list[Any]] | None = None,
+        wrap: Callable[[list[dict[str, Any]]], Any] | None = None,
     ) -> list[tuple[Any, dict[str, Any], Response]]:
         """Batched POST with one cache entry per item: (item, its response row, response).
 
         Items cached on their own are answered from the cache; the rest go out 25 at a time and
         each batch response is split into single-item entries, so a later run that asks for a
         different set (one judge verdict changed) still replays offline. Items whose batch
-        failed are left out; the first error is raised only if nothing succeeded.
+        failed are left out; the first error is raised only if nothing succeeded. `rows_of` and
+        `wrap` convert between a response body and its rows (default: the body is the list).
         """
+        if rows_of is None:
+
+            def rows_of(b: Any) -> list[Any]:
+                return b if isinstance(b, list) else []
+
+        if wrap is None:
+
+            def wrap(rows: list[dict[str, Any]]) -> Any:
+                return rows
+
         out: list[tuple[Any, dict[str, Any], Response]] = []
         missing: list[Any] = []
         for item in items:
-            single = {key: [item], **extra}
+            single = make_body([item])
             if self._read_cache(cache_key("POST", path, single)) is not None:
                 r = self._call("POST", path, single)
-                rows = r.body if isinstance(r.body, list) else []
-                out.append((item, rows[0] if rows and isinstance(rows[0], dict) else {}, r))
+                rows = [x for x in rows_of(r.body) if isinstance(x, dict)]
+                out.append((item, rows[0] if rows else {}, r))
             else:
                 missing.append(item)
         error: CrustdataError | None = None
         for chunk in _chunks(missing):
-            body = {key: chunk, **extra}
+            body = make_body(chunk)
             try:
                 r = self._call("POST", path, body)
             except CrustdataError as e:
                 error = error or e
                 continue
-            rows = [x for x in (r.body if isinstance(r.body, list) else []) if isinstance(x, dict)]
+            rows = [x for x in rows_of(r.body) if isinstance(x, dict)]
             for item in chunk:
                 row = next((x for x in rows if same(item, x)), {})
                 out.append((item, row, r))
                 if len(chunk) > 1 and r.status < 300:
-                    single = {key: [item], **extra}
+                    single = make_body([item])
                     self._write_cache(
                         cache_key("POST", path, single),
                         {
@@ -665,7 +722,7 @@ class CrustdataClient:
                                 "x-credits-used": "0",
                                 "x-split-from": cache_key("POST", path, body),
                             },
-                            "body": [row] if row else [],
+                            "body": wrap([row] if row else []),
                             "fetched_at": r.fetched_at,
                         },
                     )
@@ -716,10 +773,11 @@ class CrustdataClient:
         def same(url: Any, row: dict[str, Any]) -> bool:  # no positional fallback, by design
             return norm_profile_url(row.get("matched_on")) == norm_profile_url(url)
 
+        def body(chunk: list[Any]) -> dict[str, Any]:
+            return {"professional_network_profile_urls": chunk, "fields": PERSON_FIELDS}
+
         out: dict[str, PersonFacts | None] = {}
-        extra = {"fields": PERSON_FIELDS}
-        key = "professional_network_profile_urls"
-        for url, row, r in self._batched("/person/enrich", key, uniq, extra, same):
+        for url, row, r in self._batched("/person/enrich", uniq, body, same):
             matches = row.get("matches") or []
             if row.get("match_status", "matched") != "matched" or not matches:
                 out[url] = None

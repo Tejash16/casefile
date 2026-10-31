@@ -499,6 +499,34 @@ def test_batch_is_split_so_a_different_set_replays_offline(tmp_path: Path) -> No
     assert fake.bodies("/company/enrich")[-1]["crustdata_company_ids"] == [4]
 
 
+def test_company_citation_uses_the_search_record_timestamp(tmp_path: Path) -> None:
+    def search(req: httpx.Request) -> httpx.Response:
+        ids = json.loads(req.content)["filters"]["value"]
+        rows = [
+            {"crustdata_company_id": i, "metadata": {"updated_at": f"2026-10-30T00:00:0{i}Z"}}
+            for i in ids
+        ]
+        return ok({"companies": rows, "next_cursor": None}, credits="0.06", rid="s-1")
+
+    fake = Fake({"/company/enrich": _enrich_echo, "/company/search": search})
+    client, _ = make(tmp_path, fake)
+    facts = {f.crustdata_company_id: f for f in client.enrich_companies(["1", "2"])}
+    assert facts["1"].citation == "crustdata:company:1@2026-10-30T00:00:01Z"
+    assert facts["2"].updated_at == "2026-10-30T00:00:02Z"
+    assert not client.notes  # no fetch-time fallback needed
+    body = fake.bodies("/company/search")[0]
+    assert body["filters"] == {"field": "crustdata_company_id", "type": "in", "value": [1, 2]}
+    offline, _ = make(tmp_path, Fake({}), offline=True)
+    assert offline.enrich_companies(["2"])[0].updated_at == "2026-10-30T00:00:02Z"
+
+
+def test_company_search_failure_falls_back_to_fetch_time(tmp_path: Path) -> None:
+    fake = Fake({"/company/enrich": _enrich_echo, "/company/search": httpx.Response(403)})
+    client, _ = make(tmp_path, fake)
+    f = client.enrich_companies(["1"])[0]
+    assert f.updated_at.endswith("Z") and any("has no updated_at" in n for n in client.notes)
+
+
 def test_person_enrich_never_attaches_a_row_by_position(tmp_path: Path) -> None:
     row = {
         "matched_on": "https://www.linkedin.com/in/someone-else",
