@@ -14,7 +14,7 @@ from casefile.rules import evidence as ev
 from casefile.rules import normalize as norm
 from casefile.rules.config import STRENGTH
 from casefile.rules.context import RuleContext
-from casefile.rules.match import address_score
+from casefile.rules.match import address_score, coworking_building_score
 from casefile.schemas import (
     AddressType,
     Direction,
@@ -77,6 +77,8 @@ def _matches(a: Party, b: Party, fuzzy_min: int, min_tokens: int) -> dict[str, i
         if a.norm[attr] and a.norm[attr] == b.norm[attr]:
             found[attr] = 100
     score = address_score(a.norm["address"], b.norm["address"], fuzzy_min, min_tokens)
+    if score is None and a.coworking and b.coworking:
+        score = coworking_building_score(a.raw["address"], b.raw["address"], fuzzy_min, min_tokens)
     if score is not None:
         found["address"] = score
     return found

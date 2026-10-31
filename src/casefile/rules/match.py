@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
 
 from rapidfuzz import fuzz
 
 from casefile.rules import normalize as norm
+from casefile.rules.config import THRESHOLDS
 from casefile.schemas import Employment, StaffRecord, VendorRecord
 
 
@@ -55,6 +57,28 @@ def address_score(a: str | None, b: str | None, fuzzy_min: int, min_tokens: int)
         return None
     score = round(fuzz.token_set_ratio(a, b))
     return score if score >= fuzzy_min else None
+
+
+def coworking_building_score(
+    a: str | None, b: str | None, fuzzy_min: int, min_tokens: int
+) -> int | None:
+    """Two coworking addresses in one building: suite numbers dropped, spaced-out markers joined
+    ("We Work" -> "wework"), then the usual token set ratio. Unit numbers differ between tenants
+    of one building, which is exactly the shared-office case to recognise (and call neutral)."""
+    na, nb = (_building(norm.address(x)) for x in (a, b))
+    if not na or not nb or min(len(na.split()), len(nb.split())) < min_tokens:
+        return None
+    score = round(fuzz.token_set_ratio(na, nb))
+    return score if score >= fuzzy_min else None
+
+
+def _building(text: str | None) -> str:
+    if not text:
+        return ""
+    for m in THRESHOLDS["coworking_markers"].value:
+        compact = re.sub(r"[^a-z0-9]", "", m.lower())
+        text = re.sub(r"\s*".join(map(re.escape, compact)), compact, text)
+    return " ".join(t for t in text.split() if not any(c.isdigit() for c in t))
 
 
 def employment_timing(e: Employment, first: date, last: date, gap: int) -> str | None:

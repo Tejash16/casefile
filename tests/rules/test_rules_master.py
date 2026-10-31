@@ -384,3 +384,16 @@ def test_t15_past_job_without_end_date_is_not_open_ended():
     )
     evs = t15_career_overlap.run(ctx_for(_v017_book(), [_v017()], [_s004([emp])]))
     assert [(e.direction, e.strength) for e in evs] == [("neutral", STRENGTH["t15_old_employment"])]
+
+
+def test_t01_tenants_of_one_coworking_building_are_neutral():
+    """b1's shared_office_honest: different suites, "WeWork" vs "We Work", nothing else shared."""
+    a = vendor(
+        "V041", address="Suite 03-112, WeWork Futura, Magarpatta Road, Kirtane Baugh, Hadapsar"
+    )
+    b = vendor("V042", address="01-145 We Work Futura, Magarpatta Rd, Hadapsar")
+    evs = t01_identifier_match.run(ctx_for(_book("V041"), [a, b]))
+    assert [(e.direction, e.strength, e.object_ids) for e in evs] == [
+        ("neutral", STRENGTH["t01_coworking"], ["V041", "V042"])
+    ]
+    assert "share a coworking address" in evs[0].summary
