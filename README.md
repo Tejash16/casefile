@@ -85,6 +85,7 @@ Both recompute every record hash (RFC 8785 canonical JSON, SHA-256), the `prev_h
 - An unresolved vendor or person forces **Unsubstantiated**, and the gap is listed in the case file.
 - Tests emit refuting evidence too (a vendor with 50+ staff and a website is not a shell; a shared coworking address is not a link by itself).
 - A sentence without an evidence id, or an id whose quote does not appear in its hashed source, blocks the render.
+- The model never sees ledger rows, only summary statistics and evidence objects. Across the 18 eval runs: 152 model calls (propose 18, critique 116, write 18), every one a prompt-cache hit, 0 invalid outputs, 0 refusals.
 
 ## Team
 
