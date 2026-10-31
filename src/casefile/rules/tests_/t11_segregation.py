@@ -64,7 +64,9 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
             ev.make(
                 test_id=TEST,
                 direction=Direction.supports,
-                strength=STRENGTH["t11_same_user"],
+                strength=STRENGTH[
+                    "t11_same_user" if approved[hit.index].any() else "t11_posted_only"
+                ],
                 summary=f"The user who created vendor {vid} in the master ({creator}) also {roles} "
                 f"{len(rows)} of its invoices.",
                 quote=quote,

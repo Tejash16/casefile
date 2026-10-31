@@ -46,13 +46,15 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
         )
         rows = ledger_rows(ctx, g)
         if zs >= zmin or zg >= zmin:
-            which = "share of spend" if zs >= zg else "growth in spend"
+            # growth is the velocity signal; share alone flags the biggest supplier by nature
+            growth = zg >= zmin
+            which, z = ("growth in spend", zg) if growth else ("share of spend", zs)
             out.append(
                 ev.from_rows(
                     test_id=TEST,
                     direction=Direction.supports,
-                    strength=STRENGTH["t12_share" if zs >= zg else "t12_growth"],
-                    summary=f"Vendor {vid}'s {which} is {max(zs, zg):.1f} standard deviations "
+                    strength=STRENGTH["t12_growth" if growth else "t12_share"],
+                    summary=f"Vendor {vid}'s {which} is {z:.1f} standard deviations "
                     f"above the other {len(spend) - 1} vendors.",
                     rows=rows,
                     max_rows=max_rows,

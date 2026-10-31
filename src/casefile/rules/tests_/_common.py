@@ -36,7 +36,7 @@ def elevated(share: float, rest: float, ratio: float) -> bool:
 
 def invoice_key(s: str | None) -> str | None:
     """`SFL/24-25/0457` and `sfl 24-25 0457` compare equal."""
-    if not s:
+    if not isinstance(s, str) or not s:
         return None
     k = re.sub(r"[^A-Z0-9]", "", s.upper())
     return k or None
@@ -44,7 +44,7 @@ def invoice_key(s: str | None) -> str | None:
 
 def invoice_number(s: str | None) -> int | None:
     """Trailing integer of an invoice number: `PSL/INV/2025/3301` -> 3301."""
-    if not s:
+    if not isinstance(s, str) or not s:
         return None
     m = _TRAILING_INT.search(s)
     return int(m.group(1)) if m else None

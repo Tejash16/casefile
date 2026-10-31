@@ -11,7 +11,7 @@ from casefile.rules import evidence as ev
 from casefile.rules.config import STRENGTH
 from casefile.rules.context import RuleContext
 from casefile.rules.evidence import inr
-from casefile.rules.tests_._common import elevated, ledger_rows, pct, rest_share
+from casefile.rules.tests_._common import elevated, invoice_key, ledger_rows, pct, rest_share
 from casefile.schemas import Direction, EvidenceObject
 
 TEST = "T05"
@@ -78,7 +78,10 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
                         f"population {pct(rest)}): ",
                     )
                 )
-            for split in _splits(g, window):
+            # a repeated invoice number is a duplicate payment (T04), not a split
+            keys = g.invoice_no.map(invoice_key)
+            distinct = g[keys.isna() | ~keys.duplicated()]
+            for split in _splits(distinct, window):
                 vendor_has_signal = True
                 rows = ctx.rows_for(split)
                 total = sum(float(r.amount) for r in rows)

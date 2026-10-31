@@ -149,7 +149,7 @@ def test_t07_gap_free_and_narrow_support():
     b.background()
     for i in range(1, 6):
         b.add("V100", date(2025, 1, 1) + timedelta(days=30 * i), 1000 + i, f"BET/{i:03d}")
-    for i, n in enumerate([10, 11, 13]):
+    for i, n in enumerate([10, 11, 13, 14, 16]):  # mean step 1.5
         b.add("V101", date(2025, 1, 2) + timedelta(days=30 * i), 2000 + i, f"Q-{n}")
     evs = t07_sequential.run(ctx_for(b))
     assert of(evs, "T07", "supports", "V100")[0].strength == STRENGTH["t07_gap_free"]
@@ -288,3 +288,39 @@ def test_t12_even_spend_has_no_support():
     evs = t12_velocity.run(ctx_for(b))
     assert not of(evs, direction="supports")
     assert len(of(evs, direction="refutes")) == 5
+
+
+def test_t12_biggest_supplier_by_share_is_only_a_lead():
+    b = Book()
+    b.background()
+    for i in range(6):  # steady through the period: big share, no growth
+        b.add("V100", date(2024, 4, 10) + timedelta(days=37 * i), 900000 + i)
+    sup = of(t12_velocity.run(ctx_for(b)), "T12", "supports", "V100")
+    assert [e.strength for e in sup] == [STRENGTH["t12_share"]]
+
+
+def test_t07_too_few_invoices_do_not_flag():
+    b = Book()
+    b.background()
+    for i in range(th("sequential_min_invoices") - 1):
+        b.add("V100", date(2025, 1, 1) + timedelta(days=30 * i), 1000 + i, f"Q-{31 + i}")
+    assert not of(t07_sequential.run(ctx_for(b)), "T07", "supports", "V100")
+
+
+def test_t05_duplicate_payment_is_not_a_split():
+    b = Book()
+    b.background()
+    amount = float(LIMIT) * 0.7
+    b.add("V101", date(2025, 2, 6), amount, "SFL/0457", approver_id="S001")
+    b.add("V101", date(2025, 2, 15), amount, "SFL/0457", approver_id="S001")
+    evs = t05_threshold.run(ctx_for(b, staff_list=limited_staff()))
+    assert not of(evs, "T05", "supports", "V101")
+
+
+def test_t11_creator_who_only_posted_is_weaker():
+    b = Book()
+    b.add("V005", date(2025, 1, 18), 49000, approver_id="S008", created_by="spatil")
+    v = vendor("V005", created_by="spatil")
+    staff_list = [staff("S006", "Sunita Patil"), staff("S008", "Priya Nair")]
+    evs = t11_segregation.run(ctx_for(b, [v], staff_list))
+    assert [(e.strength, e.subject_ids) for e in evs] == [(STRENGTH["t11_posted_only"], ["S006"])]

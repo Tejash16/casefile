@@ -122,6 +122,13 @@ _ALL = [
         DILIGENT,
     ),
     Threshold(
+        "sequential_min_invoices",
+        5,
+        "invoices",
+        "T07 needs this many numbered invoices: three in a row from a small supplier is normal.",
+        SEQUENCE,
+    ),
+    Threshold(
         "sequential_step_max",
         1.5,
         "invoice numbers per invoice",
@@ -350,9 +357,10 @@ STRENGTH: dict[str, float] = {
     # T10 dormant
     "t10_dormant": 0.6,
     # T11 segregation of duties
-    "t11_same_user": 0.7,
+    "t11_same_user": 0.7,  # created the vendor and approved its invoices
+    "t11_posted_only": 0.5,  # created it and posted, an independent approver still signed
     # T12 velocity and share
-    "t12_share": 0.6,
+    "t12_share": 0.5,  # biggest supplier by share is a lead without a category field
     "t12_growth": 0.6,
     "t12_refute": 0.5,
     # T13 existence and capacity

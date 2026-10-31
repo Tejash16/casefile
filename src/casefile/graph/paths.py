@@ -77,7 +77,7 @@ def path_evidence(
         hops.append(f"-[{d.get('kind')}: {d.get('reason', '')}]-")
     quote = path[0] + "".join(f" {h} {n}" for h, n in zip(hops, path[1:], strict=True))
     kinds = [G.edges[a, b].get("kind") for a, b in zip(path, path[1:], strict=False)]
-    links = ", ".join(k for k in kinds if k not in IDENTITY)
+    links = ", ".join(dict.fromkeys(k for k in kinds if k not in IDENTITY))
     support = strength >= STRENGTH["t16_support_min"]
     summary = (
         f"Staff member {staff_id} is linked to vendor {vendor_id} in {len(path) - 1} steps "

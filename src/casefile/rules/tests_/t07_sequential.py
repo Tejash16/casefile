@@ -14,7 +14,7 @@ TEST = "T07"
 
 
 def run(ctx: RuleContext) -> list[EvidenceObject]:
-    max_rows, min_n = ctx.th("quote_max_rows"), ctx.th("pattern_min_invoices")
+    max_rows, min_n = ctx.th("quote_max_rows"), ctx.th("sequential_min_invoices")
     step_max, spread_min = ctx.th("sequential_step_max"), ctx.th("sequential_spread_min")
     out: list[EvidenceObject] = []
     for vid, g in vendor_groups(ctx):
