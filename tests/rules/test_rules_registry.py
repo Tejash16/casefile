@@ -171,6 +171,33 @@ def test_bears_on_scopes_refutations_to_their_typologies():
     assert bears_on(_ev("T05", Direction.refutes, 0.7), "threshold_structuring")
     assert bears_on(_ev("T05", Direction.supports, 0.7), "conflict_of_interest")
     assert bears_on(_ev("T15", Direction.refutes, 0.75), "conflict_of_interest")
+    # supports count only for the test's own typologies (same rule as pipeline._bears_on)
+    assert not bears_on(_ev("T13", Direction.supports, 0.7), "conflict_of_interest")
+    assert not bears_on(_ev("T15", Direction.supports, 0.9), "kickback")
+    assert bears_on(_ev("T13", Direction.neutral, 0.0), "ghost_vendor")
+    assert not bears_on(_ev("T13", Direction.neutral, 0.0), "kickback")
+
+
+def test_rerank_ignores_evidence_that_does_not_bear_on_the_typology():
+    def h(hid, typ):
+        return Hypothesis(
+            hypothesis_id=hid,
+            typology=typ,
+            statement="s",
+            objects=["V1"],
+            tests_to_run=["T05", "T13"],
+            prior_score=0.5,
+        )
+
+    evidence = [
+        _ev("T05", Direction.refutes, 0.7, "V1"),  # refutes threshold_structuring only
+        _ev("T13", Direction.supports, 0.7, "V1"),  # supports shell/pass/ghost only
+    ]
+    coi, thresh = rerank(
+        [h("H1", "conflict_of_interest"), h("H2", "threshold_structuring")], evidence, {}
+    )
+    assert coi.prior_score == 0.5  # neither counts for conflict_of_interest
+    assert thresh.hypothesis_id == "H2" and thresh.prior_score < 0.5
 
 
 def test_rerank_orders_by_evidence_and_centrality():

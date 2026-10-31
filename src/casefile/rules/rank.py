@@ -2,8 +2,9 @@
 
 prior' = prior + w_s (1 - e^-S) - w_r (1 - e^-R) + w_c c / max(c), clamped to [0, 1], where S and
 R are the summed strengths of supporting and refuting evidence bearing on the hypothesis (same
-tests, overlapping subjects/objects, refutations only from tests that refute its typology) and c
-is the highest centrality among its vendors. Weights: config.RANK_WEIGHTS.
+tests, overlapping subjects/objects, and `registry.bears_on`: the pipeline's rule, supports only
+from tests listing its typology, refutes only from tests that refute it) and c is the highest
+centrality among its vendors. Weights: config.RANK_WEIGHTS.
 """
 
 from __future__ import annotations

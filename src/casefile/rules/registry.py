@@ -141,12 +141,18 @@ def tests_for(typology: str) -> list[str]:
 
 
 def bears_on(evidence: EvidenceObject, typology: str) -> bool:
-    """False for refuting evidence from a test that does not refute this typology, e.g. T05's
-    "no threshold clustering" says nothing against conflict_of_interest."""
-    if evidence.direction != Direction.refutes:
-        return True
+    """Does this evidence speak to `typology` in its direction? The same rule as
+    pipeline._bears_on: supports count for the test's `typologies`, refutes for its `refutes`,
+    neutral for either. So T05's "no threshold clustering" says nothing against
+    conflict_of_interest, and T13's "tiny company" says nothing for it."""
     test = TESTS.get(evidence.test_id)
-    return test is None or typology in test.refutes
+    if test is None:
+        return True
+    if evidence.direction == Direction.supports:
+        return typology in test.typologies
+    if evidence.direction == Direction.refutes:
+        return typology in test.refutes
+    return typology in test.typologies or typology in test.refutes
 
 
 def family(test_id: str) -> str:
