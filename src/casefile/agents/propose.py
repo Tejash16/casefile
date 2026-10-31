@@ -20,7 +20,7 @@ from casefile.schemas import Hypothesis, StaffRecord, Tip, Typology, VendorRecor
 MIN_HYPOTHESES = 3
 MAX_HYPOTHESES = 8
 # Keys under which ingest.ledger_stats may carry per-vendor aggregates (spend, invoice count).
-PER_VENDOR_KEYS = ("per_vendor", "vendors", "by_vendor")
+PER_VENDOR_KEYS = ("per_vendor", "vendors", "by_vendor", "spend_per_vendor")
 
 
 class LedgerRowsInPrompt(ValueError):
@@ -46,7 +46,7 @@ def _per_vendor(ledger_stats: dict[str, Any]) -> tuple[dict[str, dict[str, Any]]
             raw = rest.pop(key)
             if isinstance(raw, dict):
                 return {
-                    str(k): v if isinstance(v, dict) else {"value": v} for k, v in raw.items()
+                    str(k): v if isinstance(v, dict) else {"spend": v} for k, v in raw.items()
                 }, rest
             if isinstance(raw, list):
                 out = {}

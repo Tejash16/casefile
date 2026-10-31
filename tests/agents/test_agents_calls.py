@@ -60,6 +60,13 @@ def test_propose_prompt_has_stats_not_rows_and_data_before_instructions():
     assert "T17" in system[2]
 
 
+def test_propose_reads_scalar_spend_per_vendor():
+    stats = {"row_count": 4, "spend_per_vendor": {"V017": "988000"}}
+    _, messages = propose.build_request(TIP, stats, VENDORS, STAFF)
+    user = messages[0]["content"]
+    assert '"spend_inr": "988000"' in user and "spend_per_vendor" not in user
+
+
 def test_propose_refuses_raw_rows():
     with pytest.raises(propose.LedgerRowsInPrompt):
         propose.build_request(TIP, {"sample": [{"row_id": "L1", "amount": 5}]}, VENDORS, STAFF)
