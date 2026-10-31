@@ -162,6 +162,58 @@ def run_case(case_dir: Path, spec: CaseSpec, runs: int, out_root: Path) -> list[
     return results
 
 
+def rescore_case(spec: CaseSpec, runs: int, out_root: Path) -> list[RunResult]:
+    """Score saved outputs (findings.json) against the current case.json, without running the
+    pipeline. Scoring is deterministic; citation validity, wall time and credits come from the
+    saved eval.json, and each log is verified again."""
+    from casefile.audit.verify import verify
+    from casefile.schemas import Finding
+
+    saved_path = out_root / "eval.json"
+    saved = json.loads(saved_path.read_text(encoding="utf-8")) if saved_path.is_file() else {}
+    by_run = {r["run"]: r for r in saved.get(spec.name, [])}
+    results = []
+    for i in range(1, runs + 1):
+        out = out_root / spec.name / f"run{i}"
+        prev = by_run.get(i, {})
+        if prev.get("error") or not (out / "findings.json").is_file():
+            err = prev.get("error") or f"no saved findings.json in {out}"
+            results.append(RunResult(run=i, error=err, mismatches=[f"run crashed: {err}"]))
+            continue
+        hyps, findings = [], []
+        for f in json.loads((out / "findings.json").read_text(encoding="utf-8")):
+            hyps.append(
+                Hypothesis(
+                    hypothesis_id=f["hypothesis_id"],
+                    typology=f["typology"],
+                    statement=f.get("statement") or "",
+                    subjects=f.get("subjects") or [],
+                    objects=f.get("objects") or [],
+                )
+            )
+            findings.append(Finding(hypothesis_id=f["hypothesis_id"], verdict=f["verdict"]))
+        case = CaseFile(
+            case_id=spec.name,
+            company_name="",
+            generated_at="",
+            predication={"text": ""},
+            hypotheses=hyps,
+            findings=findings,
+        )
+        res = score(case, spec, run=i)
+        rep = verify(out / "log.jsonl")
+        res.log_verifies = rep.ok
+        if not rep.ok:
+            res.mismatches.append("log does not verify: " + "; ".join(rep.lines()[:2]))
+        res.citation_validity = prev.get("citation_validity")
+        res.wall_seconds = prev.get("wall_seconds")
+        res.credits = prev.get("credits", 0)
+        res.stubbed = prev.get("stubbed", [])
+        res.ok = not res.mismatches
+        results.append(res)
+    return results
+
+
 def _pct(num: float, den: float) -> str:
     return "n/a" if not den else f"{100 * num / den:.0f}%"
 
@@ -207,6 +259,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--case", action="append", help="only these case names (repeatable)")
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--out", default=str(ROOT / "out" / "eval"))
+    ap.add_argument(
+        "--rescore",
+        action="store_true",
+        help="re-score the saved outputs in --out against the current case.json files; no runs",
+    )
     args = ap.parse_args(argv)
     from dotenv import load_dotenv
 
@@ -214,7 +271,8 @@ def main(argv: list[str] | None = None) -> int:
 
     specs = []
     for cj in sorted(Path(args.cases).glob("*/case.json")):
-        spec = CaseSpec.model_validate_json(cj.read_text(encoding="utf-8"))
+        # utf-8-sig: a case.json saved by a Windows editor may start with a BOM
+        spec = CaseSpec.model_validate_json(cj.read_text(encoding="utf-8-sig"))
         if not args.case or spec.name in args.case or cj.parent.name in args.case:
             specs.append((cj.parent, spec))
     if not specs:
@@ -224,16 +282,34 @@ def main(argv: list[str] | None = None) -> int:
     out_root = Path(args.out)
     out_root.mkdir(parents=True, exist_ok=True)
     all_results: dict[str, list[RunResult]] = {}
+    if args.rescore:
+        # keep rows for cases not selected with --case, so a partial rescore keeps the table whole
+        saved_path = out_root / "eval.json"
+        saved = json.loads(saved_path.read_text(encoding="utf-8")) if saved_path.is_file() else {}
+        chosen = {spec.name for _, spec in specs}
+        for name, rows in saved.items():
+            if name not in chosen:
+                all_results[name] = [RunResult(**r) for r in rows]
     t0 = time.perf_counter()
     for case_dir, spec in specs:
-        print(f"== {spec.name}: {args.runs} run(s)", flush=True)
-        all_results[spec.name] = rs = run_case(case_dir, spec, args.runs, out_root)
+        print(f"== {spec.name}: {args.runs} run(s){' (rescore)' if args.rescore else ''}")
+        if args.rescore:
+            rs = rescore_case(spec, args.runs, out_root)
+        else:
+            rs = run_case(case_dir, spec, args.runs, out_root)
+        all_results[spec.name] = rs
         for r in rs:
             status = "ok" if r.ok else "FAIL"
             print(f"   run {r.run}: {status}  {r.wall_seconds}s", flush=True)
             for m in r.mismatches:
                 print(f"      - {m}", flush=True)
 
+    all_results = dict(sorted(all_results.items()))
+    total_s = (
+        sum(r.wall_seconds or 0 for rs in all_results.values() for r in rs)
+        if args.rescore
+        else time.perf_counter() - t0
+    )
     tbl = table(all_results, args.runs)
     failures = [
         f"- {name} run {r.run}: {m}"
@@ -247,7 +323,12 @@ def main(argv: list[str] | None = None) -> int:
         "",
         f"{len(specs)} cases x {args.runs} runs; run 1 live, later runs from the Crustdata cache "
         f"(`--offline`). A case passes only if all {args.runs} runs are correct. "
-        f"Total {time.perf_counter() - t0:.0f} s.",
+        f"Total {total_s:.0f} s."
+        + (
+            " Scores recomputed from saved outputs against the current case.json."
+            if args.rescore
+            else ""
+        ),
         "",
         tbl,
         "**Fakes caught**: planted Substantiated allegations found Substantiated, per run. "
@@ -273,7 +354,7 @@ def main(argv: list[str] | None = None) -> int:
     if failures:
         print(f"EVAL FAILED: {len(failures)} mismatch(es); see {out_root / 'eval.md'}")
         return 1
-    print(f"EVAL PASSED: all {len(specs)} cases correct on {args.runs}/{args.runs} runs")
+    print(f"EVAL PASSED: all {len(all_results)} cases correct on {args.runs}/{args.runs} runs")
     return 0
 
 

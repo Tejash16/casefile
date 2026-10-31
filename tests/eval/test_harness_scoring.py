@@ -127,3 +127,45 @@ def test_unexpected_substantiated_against_unplanted_vendor_fails() -> None:
     r = harness.score(case, SPEC)
     assert r.mismatches == ["unexpected Substantiated H3 kickback ['S001']['V030']"]
     assert (r.substantiated_correct, r.substantiated) == (1, 3)
+
+
+def test_rescore_from_saved_outputs(tmp_path: Path) -> None:
+    import json
+
+    from casefile.audit.log import AuditLog
+
+    run = tmp_path / "career_overlap" / "run1"
+    run.mkdir(parents=True)
+    with AuditLog(run / "log.jsonl") as log:
+        with log.step("gate", {"name": "H1"}):
+            pass
+        log.seal()
+    (run / "findings.json").write_text(
+        json.dumps(
+            [
+                {
+                    "hypothesis_id": "H1",
+                    "verdict": "Substantiated",
+                    "typology": "conflict_of_interest",
+                    "subjects": ["S004"],
+                    "objects": ["V017"],
+                    "statement": "s",
+                },
+                {
+                    "hypothesis_id": "H2",
+                    "verdict": "Unfounded",
+                    "typology": "shell_company",
+                    "subjects": [],
+                    "objects": ["V023"],
+                    "statement": "s",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    saved = {"career_overlap": [{"run": 1, "citation_validity": 1.0, "wall_seconds": 12.5}]}
+    (tmp_path / "eval.json").write_text(json.dumps(saved), encoding="utf-8")
+    (r,) = harness.rescore_case(SPEC, 1, tmp_path)
+    assert r.ok, r.mismatches
+    assert (r.planted_caught, r.citation_validity, r.wall_seconds) == (1, 1.0, 12.5)
+    assert r.log_verifies
