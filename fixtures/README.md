@@ -18,7 +18,7 @@ Small, deliberately messy inputs for every module's tests. Audited company: Halv
 - One blank row (`,,,,,,,,,`) before data row 22; the header row repeated before data row 43.
 - Dates rotate `22/04/2024`, `2024-04-30`, `16-May-24`.
 - Amounts rotate `18,47,350`, `84250.00`, `₹ 7,34,210.00`.
-- Vendor spellings: V023 as `Brindora Engineering Traders Pvt Ltd`, `BRINDORA ENGINEERING TRADERS PRIVATE LIMITED`, `Brindora Enginering Traders`; V017 as `DocRack`, `DOCRACK`, `Docrak`; V031 as `HCL Technologies Ltd` / `HCLTech`; V001 `TATA STEEL LTD` / `Tata Steel Limited`; V003 `Sundram Fasteners Ltd.`; V008 without suffix.
+- Vendor spellings: V023 as `Brindora Engineering Traders Pvt Ltd`, `BRINDORA ENGINEERING TRADERS PRIVATE LIMITED`, `Brindora Enginering Traders`; V017 as `DocRack`, `DOCRACK`, `Docrak`; V031 as `HCL Technologies Ltd` / `HCL TECHNOLOGIES LIMITED`; V001 `TATA STEEL LTD` / `Tata Steel Limited`; V003 `Sundram Fasteners Ltd.`; V008 without suffix.
 - Approver spellings: `A. Deshpande` / `Anil Deshpande` (staff list has `Mr. Anil Deshpande`), `farhan qureshi`.
 
 `vendors.csv` and `staff.csv` also mix the three date formats; approval limits are in lakh format (`5,00,000`); S003's phone is `9822041736` in staff and `+91 98220 41736` in vendors.
