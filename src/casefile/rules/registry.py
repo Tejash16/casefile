@@ -130,6 +130,16 @@ _TESTS = [
 TESTS: dict[str, Test] = {t.id: t for t in _TESTS}
 
 
+def tests_for(typology: str) -> list[str]:
+    """Every test whose evidence can count for or against `typology`. Running all of them for a
+    hypothesis, not only the ones the proposer picked, makes its verdict a function of the data:
+    a refutation (e.g. T06 "no round amounts" against shell_company) is never missed because the
+    model left that test out on one run."""
+    return sorted(
+        tid for tid, t in TESTS.items() if typology in t.typologies or typology in t.refutes
+    )
+
+
 def bears_on(evidence: EvidenceObject, typology: str) -> bool:
     """False for refuting evidence from a test that does not refute this typology, e.g. T05's
     "no threshold clustering" says nothing against conflict_of_interest."""

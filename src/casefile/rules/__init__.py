@@ -2,7 +2,7 @@
 
 from casefile.rules.config import STRENGTH, THRESHOLDS, Threshold
 from casefile.rules.context import RuleContext, build_context
-from casefile.rules.registry import TESTS, Test, bears_on, run_tests
+from casefile.rules.registry import TESTS, Test, bears_on, run_tests, tests_for
 
 __all__ = [
     "STRENGTH",
@@ -14,4 +14,5 @@ __all__ = [
     "bears_on",
     "build_context",
     "run_tests",
+    "tests_for",
 ]

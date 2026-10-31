@@ -53,6 +53,17 @@ def test_registry_covers_the_typology_menu():
     assert "kickback" not in TESTS["T15"].typologies
 
 
+def test_tests_for_includes_supporting_and_refuting_tests():
+    from casefile.rules import tests_for
+
+    shell = tests_for("shell_company")
+    assert {"T01", "T03", "T06", "T07", "T13", "T16", "T17"} <= set(shell)
+    assert "T06" in shell  # refutes shell when amounts look like the population
+    assert set(tests_for("duplicate_billing")) == {"T04", "T14"}
+    assert "T15" in tests_for("conflict_of_interest") and "T15" not in tests_for("kickback")
+    assert tests_for("no_such_typology") == []
+
+
 def test_t16_leaves_hypothesis_pairs_to_the_pipeline():
     from casefile.graph import build
 
