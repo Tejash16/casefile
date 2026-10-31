@@ -115,6 +115,35 @@ _ALL = [
         SEQUENCE,
     ),
     Threshold(
+        "pattern_min_hits",
+        2,
+        "invoices",
+        "A vendor-level pattern (band, round, off-hours) needs at least this many hits "
+        "(T05, T06, T09).",
+        SEQUENCE,
+    ),
+    Threshold(
+        "band_majority_share",
+        0.5,
+        "share of invoices",
+        "Above this share of a vendor's invoices in the band, T05 rates the pattern stronger.",
+        DILIGENT,
+    ),
+    Threshold(
+        "velocity_min_vendors",
+        3,
+        "vendors",
+        "Share and growth z-scores need at least this many paid vendors (T12).",
+        WEAVER,
+    ),
+    Threshold(
+        "benford_full_z_mult",
+        2.0,
+        "x benford_z",
+        "A spike reaches the Benford strength cap at this multiple of benford_z (T08).",
+        JOFA_BENFORD,
+    ),
+    Threshold(
         "duplicate_window_days",
         30,
         "days",
@@ -375,6 +404,7 @@ STRENGTH: dict[str, float] = {
     "t15_overlap": 0.9,
     "t15_non_approver": 0.5,  # career link, but no spend control
     "t15_old_employment": 0.3,  # neutral
+    "t15_unresolved": 0.0,  # neutral data-gap note
     "t15_refute": 0.75,
     "t15_refute_low_confidence": 0.5,
     # T16 graph path, by weakest edge on the path
@@ -382,6 +412,7 @@ STRENGTH: dict[str, float] = {
     "t16_career": 0.75,
     "t16_address": 0.6,
     "t16_coworking": 0.2,
+    "t16_stale_career": 0.2,  # employment more than career_gap_days from the payments
     "t16_support_min": 0.5,
     # T17 founders
     "t17_same_profile": 0.9,

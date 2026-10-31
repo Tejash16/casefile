@@ -23,7 +23,7 @@ def _z(x: pd.Series, sd_floor: float) -> pd.Series:
 
 def run(ctx: RuleContext) -> list[EvidenceObject]:
     df = ctx.rows[ctx.rows.vendor_id.notna()]
-    if df.vendor_id.nunique() < 3:
+    if df.vendor_id.nunique() < ctx.th("velocity_min_vendors"):
         return []
     mid = df.date.min() + (df.date.max() - df.date.min()) / 2
     spend = df.groupby("vendor_id").amount.sum()

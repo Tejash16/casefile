@@ -66,7 +66,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
             ev.from_rows(
                 test_id=TEST,
                 direction=Direction.supports,
-                strength=min(cap, cap * float(z[i]) / (2 * zcrit)),
+                strength=min(cap, cap * float(z[i]) / (ctx.th("benford_full_z_mult") * zcrit)),
                 summary=f"Amounts starting with {digit} make up {100 * observed[i]:.2f}% of the "
                 f"population against Benford's {100 * EXPECTED[i]:.2f}%; a lead, not proof.",
                 rows=rows,

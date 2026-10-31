@@ -13,12 +13,18 @@ edges carry `weight` = number of approved invoices. Fuzzy-equal addresses (token
 from __future__ import annotations
 
 from collections import Counter
+from datetime import date
 
 import networkx as nx
 
 from casefile.rules import normalize as norm
 from casefile.rules.config import THRESHOLDS
-from casefile.rules.match import address_score, employment_at_vendor, staff_profile
+from casefile.rules.match import (
+    address_score,
+    employment_at_vendor,
+    employment_timing,
+    staff_profile,
+)
 from casefile.schemas import LedgerRow, StaffRecord, VendorRecord
 
 
@@ -124,6 +130,17 @@ def build(rows: list[LedgerRow], vendors: list[VendorRecord], staff: list[StaffR
                         kind="founder",
                         reason=f'{cd.citation} {role} "{p.name}", {p.title or "title unknown"}',
                     )
+    gap = THRESHOLDS["career_gap_days"].value
+    windows: dict[str, tuple[date, date]] = {}
+    for r in rows:
+        if r.vendor_id:
+            lo, hi = windows.get(r.vendor_id, (r.date, r.date))
+            windows[r.vendor_id] = (min(lo, r.date), max(hi, r.date))
+    vendors_of: dict[str, list[str]] = {}
+    for v in vendors:
+        vendors_of.setdefault(f"vendor:{v.vendor_id}", []).append(v.vendor_id)
+        if v.vendor_id in cdco_of:
+            vendors_of.setdefault(cdco_of[v.vendor_id], []).append(v.vendor_id)
     for s in staff:
         snode = f"staff:{s.staff_id}"
         url = staff_profile(s)
@@ -151,12 +168,24 @@ def build(rows: list[LedgerRow], vendors: list[VendorRecord], staff: list[StaffR
             )
             start = e.start_date.isoformat() if e.start_date else "unknown"
             for t in sorted(targets):
+                # T15's rule: a career link counts only near the vendor's payments
+                timing = next(
+                    (
+                        when
+                        for vid in vendors_of.get(t, [])
+                        if vid in windows
+                        and (when := employment_timing(e, *windows[vid], gap)) is not None
+                    ),
+                    None,
+                )
                 G.add_node(t, kind=G.nodes[t].get("kind", "cdco") if t in G else "cdco")
                 G.add_edge(
                     pnode,
                     t,
                     kind="employment",
+                    timing=timing,
                     reason=f"{p.citation} employment[{i}]: {e.company_name}, "
-                    f"{e.title or 'title unknown'}, {start} to {end}",
+                    f"{e.title or 'title unknown'}, {start} to {end} "
+                    f"({timing or 'not near the payments'})",
                 )
     return G

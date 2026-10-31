@@ -324,3 +324,17 @@ def test_t11_creator_who_only_posted_is_weaker():
     staff_list = [staff("S006", "Sunita Patil"), staff("S008", "Priya Nair")]
     evs = t11_segregation.run(ctx_for(b, [v], staff_list))
     assert [(e.strength, e.subject_ids) for e in evs] == [(STRENGTH["t11_posted_only"], ["S006"])]
+
+
+def test_missing_invoice_numbers_and_users_do_not_crash():
+    """Review finding: pandas stored None as NaN and T04/T07/T11 crashed on .upper()."""
+    b = Book()
+    b.background()
+    b.add("V100", date(2025, 2, 6), 342180, "SFL/0457", created_by="anil.deshpande")
+    b.add("V100", date(2025, 2, 15), 342180, "SFL/0457", created_by=None)
+    b.add("V100", date(2025, 3, 1), 1000, None, created_by=None)
+    ctx = ctx_for(b, [vendor("V100", created_by="anil.deshpande")], [staff("S900")])
+    assert of(t04_duplicates.run(ctx), "T04", "supports", "V100")
+    t07_sequential.run(ctx)
+    t11_segregation.run(ctx)
+    t05_threshold.run(ctx)

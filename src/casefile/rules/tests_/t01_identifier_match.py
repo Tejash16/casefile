@@ -1,9 +1,9 @@
 """T01 vendor_staff_identifier_match: a vendor shares bank account, tax id, phone, email or
 address (fuzzy >= `fuzzy_identifier_min`) with a staff member or with another vendor.
 
-Coworking rule (judges: "separate a fraud ring from companies that simply share an office"): an
-address match where either address is a coworking address is neutral unless phone, bank account
-or tax id also match."""
+Coworking rule (judges: "separate a fraud ring from companies that simply share an office"): when
+the only match is an address and either address is a coworking address, the evidence is neutral;
+a phone, bank account, tax id or email match alongside it still supports."""
 
 from __future__ import annotations
 
@@ -25,7 +25,6 @@ from casefile.schemas import (
 )
 
 TEST = "T01"
-HARD = ("bank_account", "tax_id", "phone")  # identifiers that survive a shared office
 STRENGTH_KEY = {
     "bank_account": "t01_bank",
     "tax_id": "t01_tax_id",
@@ -85,18 +84,17 @@ def _matches(a: Party, b: Party, fuzzy_min: int, min_tokens: int) -> dict[str, i
 
 def _evidence(a: Party, b: Party, found: dict[str, int]) -> EvidenceObject:
     coworking = "address" in found and (a.coworking or b.coworking)
-    hard = [k for k in found if k in HARD]
     parts = []
     for attr, score in found.items():
         part = f'{a.kind} {a.id} {attr} "{a.raw[attr]}" = {b.kind} {b.id} {attr} "{b.raw[attr]}"'
         parts.append(part + (f" (score {score})" if score < 100 else ""))
     quote = "; ".join(parts)
     names = ", ".join(k.replace("_", " ") for k in found)
-    if coworking and not hard:
+    if coworking and set(found) == {"address"}:
         direction, strength = Direction.neutral, STRENGTH["t01_coworking"]
         summary = (
             f"{a.kind.capitalize()} {a.id} and {b.kind} {b.id} share a coworking address and no "
-            "phone, bank account or tax id."
+            "phone, bank account, tax id or email."
         )
     else:
         scored = [k for k in found if not (k == "address" and coworking)]

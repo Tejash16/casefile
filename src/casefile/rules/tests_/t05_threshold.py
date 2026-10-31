@@ -51,6 +51,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
     df["in_band"] = (df.amount >= lo) & (df.amount <= df.limit)
     max_rows, min_n = ctx.th("quote_max_rows"), ctx.th("pattern_min_invoices")
     ratio, window = ctx.th("band_ratio_min"), ctx.th("split_window_days")
+    min_hits, majority = ctx.th("pattern_min_hits"), ctx.th("band_majority_share")
     out: list[EvidenceObject] = []
 
     linked = df[df.vendor_id.notna()]
@@ -61,14 +62,14 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
             k, n = int(g.in_band.sum()), len(g)
             share = k / n
             rest = rest_share(df.in_band, df.vendor_id, vid)
-            if k >= 2 and elevated(share, rest, ratio):
+            if k >= min_hits and elevated(share, rest, ratio):
                 vendor_has_signal = True
                 band = g[g.in_band]
                 out.append(
                     ev.from_rows(
                         test_id=TEST,
                         direction=Direction.supports,
-                        strength=STRENGTH["t05_band_majority" if share > 0.5 else "t05_band"],
+                        strength=STRENGTH["t05_band_majority" if share > majority else "t05_band"],
                         summary=f"{k} of {n} invoices from vendor {vid} approved by {aid} fall "
                         f"just under {aid}'s INR {inr(limit)} limit, against {pct(rest)} of "
                         "other invoices.",

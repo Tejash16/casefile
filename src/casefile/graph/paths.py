@@ -32,6 +32,8 @@ def _edge_strength(G: nx.Graph, a: str, b: str) -> float | None:
         addr = a if a.startswith("addr:") else b
         if G.nodes[addr].get("coworking"):
             return STRENGTH["t16_coworking"]
+    if kind == "employment" and not data.get("timing"):
+        return STRENGTH["t16_stale_career"]  # job far from the payments (T15's rule)
     return STRENGTH.get(EDGE_STRENGTH.get(kind, ""), STRENGTH["t16_coworking"])
 
 
@@ -79,12 +81,20 @@ def path_evidence(
     kinds = [G.edges[a, b].get("kind") for a, b in zip(path, path[1:], strict=False)]
     links = ", ".join(dict.fromkeys(k for k in kinds if k not in IDENTITY))
     support = strength >= STRENGTH["t16_support_min"]
+    weak = [
+        "a shared coworking address"
+        if G.edges[a, b].get("kind") == "address"
+        else "employment far from the payments"
+        for a, b in zip(path, path[1:], strict=False)
+        if (st := _edge_strength(G, a, b)) is not None and st < STRENGTH["t16_support_min"]
+    ]
     summary = (
         f"Staff member {staff_id} is linked to vendor {vendor_id} in {len(path) - 1} steps "
         f"through {links or 'shared identity'}."
         if support
-        else f"Staff member {staff_id} is linked to vendor {vendor_id} only through a shared "
-        "coworking address."
+        else f"Staff member {staff_id} is linked to vendor {vendor_id} only through "
+        + " and ".join(dict.fromkeys(weak))
+        + "."
     )
     return ev.make(
         test_id=TEST,

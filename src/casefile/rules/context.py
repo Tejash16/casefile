@@ -52,20 +52,26 @@ def _naive(ts: Any) -> Any:
     return ts.replace(tzinfo=None) if ts is not None and ts.tzinfo else ts
 
 
+def _text(values: list[str | None]) -> pd.Series:
+    """Object dtype keeps a missing value as None; pandas' string dtype would make it NaN, a
+    truthy float that breaks `s or ""` and `.upper()` in the tests."""
+    return pd.Series(values, dtype=object)
+
+
 def ledger_frame(rows: list[LedgerRow]) -> pd.DataFrame:
     df = pd.DataFrame(
         {
-            "row_id": [r.row_id for r in rows],
+            "row_id": _text([r.row_id for r in rows]),
             "date": pd.to_datetime([r.date for r in rows]),
-            "vendor": [r.vendor_id or f"key:{r.vendor_key}" for r in rows],
-            "vendor_id": [r.vendor_id for r in rows],
-            "vendor_name_raw": [r.vendor_name_raw for r in rows],
-            "invoice_no": [(r.invoice_no or "").strip() or None for r in rows],
+            "vendor": _text([r.vendor_id or f"key:{r.vendor_key}" for r in rows]),
+            "vendor_id": _text([r.vendor_id for r in rows]),
+            "vendor_name_raw": _text([r.vendor_name_raw for r in rows]),
+            "invoice_no": _text([(r.invoice_no or "").strip() or None for r in rows]),
             "amount": [float(r.amount) for r in rows],
-            "approver_id": [r.approver_id for r in rows],
-            "created_by": [r.created_by for r in rows],
+            "approver_id": _text([r.approver_id for r in rows]),
+            "created_by": _text([r.created_by for r in rows]),
             "posted_at": pd.to_datetime([_naive(r.posted_at) for r in rows]),
-            "po_number": [r.po_number for r in rows],
+            "po_number": _text([r.po_number for r in rows]),
         },
         columns=LEDGER_COLUMNS,
     )

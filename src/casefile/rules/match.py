@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 from rapidfuzz import fuzz
 
 from casefile.rules import normalize as norm
@@ -53,6 +55,35 @@ def address_score(a: str | None, b: str | None, fuzzy_min: int, min_tokens: int)
         return None
     score = round(fuzz.token_set_ratio(a, b))
     return score if score >= fuzzy_min else None
+
+
+def employment_timing(e: Employment, first: date, last: date, gap: int) -> str | None:
+    """How an employment sits against a payment window [first, last]: a phrase for the summary,
+    or None when it is more than `gap` days away or its dates cannot place it.
+
+    A past job without an end date has an unknown end, not an open one: it counts only when its
+    start falls within `gap` days of the window."""
+    start = e.start_date
+    if not e.is_current and e.end_date is None:
+        if start is None or not (
+            first - timedelta(days=gap) <= start <= last + timedelta(days=gap)
+        ):
+            return None
+        if start < first:
+            return f"starting {(first - start).days} days before the first payment (end unknown)"
+        if start > last:
+            return f"starting {(start - last).days} days after the last payment (end unknown)"
+        return "starting during the payment period (end unknown)"
+    end = None if e.is_current else e.end_date
+    if start is None and end is None:
+        return None if not e.is_current else "current, overlapping the payment period"
+    if (start is None or start <= last) and (end is None or end >= first):
+        return "overlapping the payment period"
+    if end is not None and 0 <= (first - end).days <= gap:
+        return f"ending {(first - end).days} days before the first payment"
+    if start is not None and 0 <= (start - last).days <= gap:
+        return f"starting {(start - last).days} days after the last payment"
+    return None
 
 
 def staff_profile(s: StaffRecord) -> str | None:

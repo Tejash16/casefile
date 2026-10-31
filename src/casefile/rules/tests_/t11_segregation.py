@@ -16,7 +16,7 @@ TEST = "T11"
 
 
 def _key(s: str | None) -> str:
-    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+    return re.sub(r"[^a-z0-9]", "", s.lower()) if isinstance(s, str) else ""
 
 
 def user_index(staff: dict[str, StaffRecord]) -> dict[str, str]:

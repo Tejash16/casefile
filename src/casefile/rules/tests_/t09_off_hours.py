@@ -37,7 +37,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
         m = mask[g.index]
         k, n = int(m.sum()), len(g)
         rest = rest_share(mask, df.vendor_id, vid)
-        if k >= 2 and elevated(k / n, rest, ratio):
+        if k >= ctx.th("pattern_min_hits") and elevated(k / n, rest, ratio):
             out.append(
                 ev.from_rows(
                     test_id=TEST,

@@ -33,7 +33,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
         k, n = int(mask.sum()), len(g)
         share = k / n
         rest = rest_share(df.is_round, df.vendor_id, vid)
-        if k >= 2 and elevated(share, rest, ratio):
+        if k >= ctx.th("pattern_min_hits") and elevated(share, rest, ratio):
             out.append(
                 ev.from_rows(
                     test_id=TEST,

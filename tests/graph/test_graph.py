@@ -99,3 +99,20 @@ def test_centrality_ranks_the_connected_vendor_first():
 def test_centrality_without_links_is_zero():
     c = centrality(build([], [vendor("V1"), vendor("V2")], []))
     assert c == {"V1": 0.0, "V2": 0.0}
+
+
+def test_old_job_is_a_weak_link_not_a_career_path():
+    """Review finding: T16 ignored dates; a 2008-2012 job scored 0.75 against 2025 payments."""
+    cd = company("C17", "Persistent Systems")
+    v = vendor("V017", resolution=resolved(), crustdata=cd)
+    emp = Employment(
+        company_name="Persistent Systems",
+        crustdata_company_id="C17",
+        start_date=date(2008, 1, 1),
+        end_date=date(2012, 1, 1),
+    )
+    s = staff("S1", resolution=resolved(), crustdata=person("p1", "Someone", [emp]))
+    e = path_evidence(build(_rows(("S1", "V017")), [v], [s]), "S1", "V017")
+    assert e is not None and e.direction == "neutral"
+    assert e.strength == STRENGTH["t16_stale_career"]
+    assert "not near the payments" in e.quote and "employment far from the payments" in e.summary

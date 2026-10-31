@@ -362,3 +362,25 @@ def test_t15_non_approver_career_link_is_below_allegation_grade():
     sup = of(evs, "T15", "supports", "V017", "S005")
     assert [e.strength for e in sup] == [STRENGTH["t15_non_approver"]]
     assert "approved none of its invoices" in sup[0].summary
+
+
+def test_t01_coworking_plus_shared_mailbox_supports():
+    """Review finding: two vendors in one virtual office sharing a mailbox is the ring case."""
+    regus = "Regus, Level 5, Tower B, Cyber City, Gurugram 122002"
+    a = vendor("V1", address=regus, email="accounts.vk@gmail.com")
+    b = vendor("V2", address=regus, email="Accounts.VK@gmail.com")
+    evs = t01_identifier_match.run(ctx_for(_book("V1"), [a, b]))
+    assert [(e.direction, e.strength) for e in evs] == [("supports", STRENGTH["t01_email"])]
+
+
+def test_t15_past_job_without_end_date_is_not_open_ended():
+    """Review finding: a 2008 job with no end date must not 'overlap' 2025 payments."""
+    emp = Employment(
+        company_name="Persistent Systems",
+        crustdata_company_id="C17",
+        start_date=date(2008, 1, 1),
+        end_date=None,
+        is_current=False,
+    )
+    evs = t15_career_overlap.run(ctx_for(_v017_book(), [_v017()], [_s004([emp])]))
+    assert [(e.direction, e.strength) for e in evs] == [("neutral", STRENGTH["t15_old_employment"])]

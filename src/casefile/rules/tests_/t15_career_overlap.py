@@ -20,29 +20,14 @@ from datetime import date
 from casefile.rules import evidence as ev
 from casefile.rules.config import STRENGTH
 from casefile.rules.context import RuleContext
-from casefile.rules.match import employment_at_vendor
-from casefile.schemas import Direction, Employment, EvidenceObject, SourceKind
+from casefile.rules.match import employment_at_vendor, employment_timing
+from casefile.schemas import Direction, EvidenceObject, SourceKind
 
 TEST = "T15"
 
 
 def _d(x: date | None) -> str:
     return x.isoformat() if x else "unknown"
-
-
-def _timing(e: Employment, first: date, last: date, gap: int) -> str | None:
-    """How the employment sits against the payment window [first, last], or None if it is more
-    than `gap` days away (or its dates are unknown)."""
-    end = None if e.is_current else e.end_date
-    if e.start_date is None and end is None and not e.is_current:
-        return None
-    if (e.start_date is None or e.start_date <= last) and (end is None or end >= first):
-        return "overlapping the payment period"
-    if end is not None and 0 <= (first - end).days <= gap:
-        return f"ending {(first - end).days} days before the first payment"
-    if e.start_date is not None and 0 <= (e.start_date - last).days <= gap:
-        return f"starting {(e.start_date - last).days} days after the last payment"
-    return None
 
 
 def pairs(ctx: RuleContext) -> list[tuple[str, str]]:
@@ -77,7 +62,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
                 ev.make(
                     test_id=TEST,
                     direction=Direction.neutral,
-                    strength=0.0,
+                    strength=STRENGTH["t15_unresolved"],
                     summary=f"Staff member {sid} could not be matched to a Crustdata profile "
                     f"(resolution {s.resolution.status}), so their career history at vendor "
                     f"{vid} was not checked.",
@@ -108,7 +93,7 @@ def run(ctx: RuleContext) -> list[EvidenceObject]:
         if hits:
             best = None
             for i, e, _ in hits:
-                when = _timing(e, first, last, gap)
+                when = employment_timing(e, first, last, gap)
                 if when:
                     best = (i, e, when)
                     break
