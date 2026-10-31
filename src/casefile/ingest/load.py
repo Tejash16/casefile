@@ -178,10 +178,17 @@ def load_tip(path: str | Path) -> Tip:
 
 
 def load_ledger(path: str | Path) -> tuple[list[LedgerRow], list[str]]:
+    rows, notes, _ = load_ledger_lines(path)
+    return rows, notes
+
+
+def load_ledger_lines(path: str | Path) -> tuple[list[LedgerRow], list[str], list[int]]:
+    """`load_ledger` plus the 1-based physical file line of each loaded row (for the UI)."""
     table = read_table(path, LEDGER_SYNONYMS)
     notes = list(table.notes)
     _require(table, ["date", "vendor_name_raw", "amount"], notes)
     rows: list[LedgerRow] = []
+    lines: list[int] = []
     flagged: dict[str, list[str]] = defaultdict(list)
     dropped: list[str] = []
     for rec, line in zip(table.rows, table.line_numbers, strict=True):
@@ -219,6 +226,7 @@ def load_ledger(path: str | Path) -> tuple[list[LedgerRow], list[str]]:
                 quality_flags=flags,
             )
         )
+        lines.append(line)
         for x in flags:
             flagged[x].append(row_id)
     if dropped:
@@ -228,7 +236,7 @@ def load_ledger(path: str | Path) -> tuple[list[LedgerRow], list[str]]:
         )
     notes += _summarise_flags(table.name, flagged)
     notes.append(f"{table.name}: {len(rows)} ledger rows loaded as L000001-L{len(rows):06d}.")
-    return rows, notes
+    return rows, notes, lines
 
 
 # ---------------------------------------------------------------- vendors
