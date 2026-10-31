@@ -48,7 +48,7 @@ Rules detect, the model proposes and explains, the log anchors everything. The r
 
 ## Crustdata endpoints used
 
-`POST /company/identify` (free, resolves messy vendor names), `POST /company/enrich` (by Crustdata id only: headcount, founding year, website, HQ, founders), `POST /person/identify` (by email), `POST /person/search` (name + employer, exact mode), `POST /person/enrich` (career history with dates), `GET /account/credits`. Every response is cached with its `X-Request-Id` and credits used, and every record is cited as `crustdata:<kind>:<id>@<updated_at>`. 429s back off on `X-RateLimit-Reset`.
+`POST /company/identify` (free, resolves messy vendor names), `POST /company/enrich` (by Crustdata id only: headcount, founding year, website, HQ, founders), `POST /company/search` (the record's `updated_at` for citations, which Enrich leaves empty), `POST /person/search` (name + employer, exact mode), `POST /person/enrich` (career history with dates), `GET /account/credits`. Every response is cached with its `X-Request-Id` and credits used, and every record is cited as `crustdata:<kind>:<id>@<updated_at>`. 429s back off on `X-RateLimit-Reset`.
 
 ## Evaluation on planted cases
 
