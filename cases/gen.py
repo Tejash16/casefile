@@ -1,7 +1,7 @@
 """Seeded planted-case generator (b1). Writes case directories per docs/contract.md section 8.
 
     uv run python cases/gen.py --all                         # the six named cases into cases/
-    uv run python cases/gen.py --name heldout --seed 9137 --plants career_overlap,false_lead,\
+    uv run python cases/gen.py --name heldout --seed <private> --plants career_overlap,false_lead,\
 duplicate,shell --vendors 14 --rows 140 --shuffle-ids --out <dir outside the repo>
 
 Real companies and people come from docs/dataset-design.md: every real vendor was checked with
@@ -1001,8 +1001,13 @@ def write_case(case: Case, out: Path) -> None:
     tip = (
         "Subject: procurement payments - please look\n\n"
         f"I work in finance at {COMPANY.split()[0]} and I see most of the payment runs before "
-        "they go out. I have kept quiet for a while because I could be wrong, but some things "
-        "do not add up. "
+        "they go out. "
+        + (
+            ""
+            if len(case.tip) > 2
+            else "I have kept quiet for a while because I could be "
+            "wrong, but some things do not add up. "
+        )
         + " ".join(case.tip)
         + " Something is off with how fast these get approved. Please look at the invoices "
         "from last year. I'd rather not say who I am.\n"
