@@ -1,12 +1,15 @@
 """The verdict gate: deterministic rules from docs/contract.md section 7. The model never decides.
 
 Rules, in order:
-1. Any subject or object whose `resolution.status != resolved` (or with no resolution at all)
-   forces Unsubstantiated and adds a data gap, regardless of the evidence or the model.
-2. Substantiated: >= 2 supporting evidence objects from >= 2 different test families, each with
-   strength >= 0.6, and no refuting evidence with strength >= 0.7.
+1. Any subject or object whose `resolution.status != resolved` (or with no resolution at all) adds
+   a data gap, and evidence that depends on that entity's Crustdata record does not count: source
+   kind crustdata_company / crustdata_person, or tests T13, T15, T17, naming that entity.
+2. On the remaining evidence: Substantiated if >= 2 supporting evidence objects from >= 2 different
+   test families, each with strength >= 0.6, and no refuting evidence with strength >= 0.7.
 3. Unfounded: >= 1 refuting evidence with strength >= 0.7 and no supporting evidence >= 0.6.
 4. Otherwise Unsubstantiated.
+So a fictional shell vendor can be Substantiated on ledger and master-file families, while a
+career-overlap allegation about an unresolved person cannot.
 If the gate's verdict differs from the critic's, `verdict_by = gate_override_of_model` and the gate
 log record says which rule fired.
 """
@@ -43,10 +46,12 @@ GATE_ASSUMPTIONS = {
     "gate_refute_min_strength": str(REFUTE_MIN_STRENGTH),
     "gate_min_supporting_evidence": str(MIN_SUPPORTING),
     "gate_min_test_families": str(MIN_FAMILIES),
-    "gate_unresolved_entity": "forces Unsubstantiated",
+    "gate_unresolved_entity": "evidence from its Crustdata record (T13, T15, T17) does not count",
 }
 
-RULE_UNRESOLVED = "unresolved_entity"
+CRUSTDATA_KINDS = {SourceKind.crustdata_company, SourceKind.crustdata_person}
+CRUSTDATA_TESTS = {"T13", "T15", "T17"}
+
 RULE_SUBSTANTIATED = "substantiated_two_families"
 RULE_UNFOUNDED = "unfounded_strong_refutation"
 RULE_DEFAULT = "default_unsubstantiated"
@@ -77,15 +82,26 @@ def _two_families(strong: Sequence[EvidenceObject], families: Mapping[str, list[
     return False
 
 
-def _unresolved(h: Hypothesis, resolutions: Mapping[str, Resolution | None]) -> list[str]:
+def _unresolved(
+    h: Hypothesis, resolutions: Mapping[str, Resolution | None]
+) -> tuple[set[str], list[str]]:
+    """(unresolved entity ids, data-gap lines) for the hypothesis' subjects and objects."""
+    ids: set[str] = set()
     gaps = []
-    for kind, ids in (("staff", h.subjects), ("vendor", h.objects)):
-        for entity_id in ids:
+    for kind, entity_ids in (("staff", h.subjects), ("vendor", h.objects)):
+        for entity_id in entity_ids:
             res = resolutions.get(entity_id)
             status = res.status if res is not None else ResolutionStatus.not_attempted
             if status != ResolutionStatus.resolved:
+                ids.add(entity_id)
                 gaps.append(f"{kind} {entity_id} {status} in Crustdata")
-    return gaps
+    return ids, gaps
+
+
+def depends_on_crustdata(e: EvidenceObject, entity_ids: set[str]) -> bool:
+    """True if `e` rests on the Crustdata record of one of `entity_ids`."""
+    named = entity_ids & (set(e.subject_ids) | set(e.object_ids))
+    return bool(named) and (e.source.kind in CRUSTDATA_KINDS or e.test_id in CRUSTDATA_TESTS)
 
 
 def _amount(
@@ -109,24 +125,32 @@ def evaluate(
     h: Hypothesis,
     evidence: Sequence[EvidenceObject],
     resolutions: Mapping[str, Resolution | None],
-) -> tuple[Verdict, str, float, list[str]]:
-    """Pure rule evaluation: (verdict, rule, confidence, data_gaps). No logging."""
+) -> tuple[Verdict, str, float, list[str], list[str]]:
+    """Pure rule evaluation: (verdict, rule, confidence, data_gaps, excluded evidence ids)."""
     families = test_families()
-    supports = [e for e in evidence if e.direction == Direction.supports]
-    refutes = [e for e in evidence if e.direction == Direction.refutes]
+    unresolved, gaps = _unresolved(h, resolutions)
+    excluded = [e for e in evidence if depends_on_crustdata(e, unresolved)]
+    gaps += [
+        f"evidence {e.evidence_id} ({e.test_id}) not counted: it rests on the Crustdata record of "
+        f"unresolved {', '.join(sorted(unresolved & (set(e.subject_ids) | set(e.object_ids))))}"
+        for e in excluded
+    ]
+    excluded_ids = [e.evidence_id for e in excluded]
+    counted = [e for e in evidence if e.evidence_id not in set(excluded_ids)]
+
+    supports = [e for e in counted if e.direction == Direction.supports]
+    refutes = [e for e in counted if e.direction == Direction.refutes]
     strong_s = [e for e in supports if e.strength >= SUPPORT_MIN_STRENGTH]
     strong_r = [e for e in refutes if e.strength >= REFUTE_MIN_STRENGTH]
     top = max((e.strength for e in supports + refutes), default=0.0)
 
-    gaps = _unresolved(h, resolutions)
-    if gaps:
-        return Verdict.Unsubstantiated, RULE_UNRESOLVED, round(1 - top, 3), gaps
     if len(strong_s) >= MIN_SUPPORTING and _two_families(strong_s, families) and not strong_r:
         conf = sum(e.strength for e in strong_s) / len(strong_s)
-        return Verdict.Substantiated, RULE_SUBSTANTIATED, round(conf, 3), []
+        return Verdict.Substantiated, RULE_SUBSTANTIATED, round(conf, 3), gaps, excluded_ids
     if strong_r and not strong_s:
-        return Verdict.Unfounded, RULE_UNFOUNDED, round(max(e.strength for e in strong_r), 3), []
-    return Verdict.Unsubstantiated, RULE_DEFAULT, round(1 - top, 3), []
+        conf = max(e.strength for e in strong_r)
+        return Verdict.Unfounded, RULE_UNFOUNDED, round(conf, 3), gaps, excluded_ids
+    return Verdict.Unsubstantiated, RULE_DEFAULT, round(1 - top, 3), gaps, excluded_ids
 
 
 def decide(
@@ -150,7 +174,7 @@ def decide(
             "evidence_ids": [e.evidence_id for e in ev],
         },
     )
-    verdict, rule, confidence, gaps = evaluate(hypothesis, ev, resolutions)
+    verdict, rule, confidence, gaps, excluded = evaluate(hypothesis, ev, resolutions)
     override = model_verdict is not None and model_verdict != verdict
 
     ev_ids = {e.evidence_id for e in ev}
@@ -180,6 +204,7 @@ def decide(
             "rule": rule,
             "override": override,
             "confidence": confidence,
+            "excluded_evidence": excluded,
             "data_gaps": gaps,
         },
     )

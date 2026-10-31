@@ -12,6 +12,7 @@ from casefile.schemas import (
     Resolution,
     ResolutionStatus,
     Sentence,
+    SourceKind,
     Verdict,
     VerdictBy,
 )
@@ -104,20 +105,69 @@ def test_no_evidence_is_unsubstantiated():
     assert f.verdict == Verdict.Unsubstantiated and f.verdict_by == VerdictBy.gate
 
 
-def test_unresolved_entity_forces_unsubstantiated(audit_log):
-    evidence = [ev("E1", "T15", S, 0.9), ev("E2", "T05", S, 0.9)]
-    res = dict(RESOLUTIONS, V017=Resolution(status=ResolutionStatus.unresolved))
+UNRESOLVED = Resolution(status=ResolutionStatus.unresolved)
+SHELL = H1.model_copy(
+    update={"typology": "shell_company", "subjects": [], "objects": ["V023"], "tests_to_run": []}
+)
+
+
+def test_unresolved_shell_substantiated_on_ledger_and_master_families(audit_log):
+    evidence = [
+        ev("E1", "T01", S, 0.9),  # identity: shares S003's address and phone
+        ev("E2", "T11", S, 0.8),  # control: same user created and approved
+        ev("E3", "T13", S, 0.9),  # footprint from Crustdata (no record): not counted
+    ]
+    evidence = [e.model_copy(update={"object_ids": ["V023"]}) for e in evidence]
+    f = gate.decide(SHELL, evidence, critic(Verdict.Substantiated, "E1"), {"V023": UNRESOLVED})
+    assert f.verdict == Verdict.Substantiated
+    assert "vendor V023 unresolved in Crustdata" in f.data_gaps
+    assert any(g.startswith("evidence E3 (T13) not counted") for g in f.data_gaps)
+    out = read_log(audit_log)[-1]["outcome"]
+    assert out["rule"] == gate.RULE_SUBSTANTIATED and out["excluded_evidence"] == ["E3"]
+
+
+def test_unresolved_shell_with_one_ledger_family_stays_unsubstantiated():
+    evidence = [ev("E1", "T01", S, 0.9), ev("E3", "T13", S, 0.9)]
+    evidence = [e.model_copy(update={"object_ids": ["V023"]}) for e in evidence]
+    assert gate.decide(SHELL, evidence, None, {"V023": UNRESOLVED}).verdict == (
+        Verdict.Unsubstantiated
+    )
+
+
+def test_unresolved_person_coi_with_only_career_support_stays_unsubstantiated(audit_log):
+    evidence = [
+        ev("E1", "T15", S, 0.95),  # career overlap from S004's Crustdata record: not counted
+        ev("E2", "T17", S, 0.9, kind=SourceKind.crustdata_company),  # founders match: not counted
+        ev("E3", "T05", S, 0.8),  # billing: counts, but one family only
+    ]
+    res = dict(RESOLUTIONS, S004=UNRESOLVED)
     f = gate.decide(H1, evidence, critic(Verdict.Substantiated, "E1"), res)
     assert f.verdict == Verdict.Unsubstantiated
     assert f.verdict_by == VerdictBy.gate_override_of_model
-    assert "vendor V017 unresolved in Crustdata" in f.data_gaps
-    assert read_log(audit_log)[-1]["outcome"]["rule"] == gate.RULE_UNRESOLVED
+    assert "staff S004 unresolved in Crustdata" in f.data_gaps
+    assert read_log(audit_log)[-1]["outcome"]["excluded_evidence"] == ["E1", "E2"]
+
+
+def test_unresolved_person_refutation_does_not_count():
+    # T15 "no employment at the vendor" means nothing if we never found the right person
+    res = dict(RESOLUTIONS, S004=UNRESOLVED)
+    f = gate.decide(H1, [ev("E1", "T15", R, 0.95)], None, res)
+    assert f.verdict == Verdict.Unsubstantiated
+
+
+def test_crustdata_evidence_about_a_resolved_entity_still_counts():
+    # S004 unresolved, but E1 is V017's own (resolved) company record and names only V017
+    e1 = ev("E1", "T13", S, 0.9, kind=SourceKind.crustdata_company).model_copy(
+        update={"subject_ids": []}
+    )
+    res = dict(RESOLUTIONS, S004=UNRESOLVED)
+    f = gate.decide(H1, [e1, ev("E2", "T05", S, 0.9)], None, res)
+    assert f.verdict == Verdict.Substantiated
 
 
 def test_missing_resolution_counts_as_unresolved():
-    evidence = [ev("E1", "T15", R, 0.95)]
     res = {"V017": RESOLUTIONS["V017"]}
-    f = gate.decide(H1, evidence, None, res)
+    f = gate.decide(H1, [ev("E1", "T15", R, 0.95)], None, res)
     assert f.verdict == Verdict.Unsubstantiated
     assert "staff S004 not_attempted in Crustdata" in f.data_gaps
 
