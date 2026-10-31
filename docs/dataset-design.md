@@ -52,7 +52,7 @@ Resolve real vendors by **website domain** or by the suffix-stripped name, not t
 
 Known noise: S005 is also DocRack's co-founder (from 2025-06), so a Crustdata path S005–V017 exists in any case that contains both. S005 approves nothing; in single-plant cases only one of them is on the staff list.
 
-**Open conflict (needs A / a2):** the gate forces `Unsubstantiated` when any subject or object is not `resolved` (CLAUDE.md says the same). V023 is fictional, so it is always `unresolved`, and every fictional staff member comes back `ambiguous` or `unresolved` (b2, 11:55). As written, the planted shell case (S003 + V023) can never be `Substantiated`, which contradicts `cases/README.md`. b2's proposal: apply the rule only when the hypothesis rests on Crustdata evidence about that entity (T13/T15/T17), and let T13 treat `unresolved` as support for shell_company. Until decided, `cases/shell_vendor/case.json` expects whatever A decides.
+**Settled (31 Oct, contract section 7 rev, a1/a2):** an unresolved entity now voids only the evidence resting on its Crustdata record (T13, T15, T17, Crustdata sources), not the whole allegation. The fictional shell V023 can reach `Substantiated` on ledger and master-file evidence, and `shell_vendor` keeps that expected verdict.
 
 Rejected: "Orbital Fasteners" (the brief's example shell name) collides with a real UK company, Orbital Fasteners Ltd (id 9469227); "Quorvane" exists (id 69779436); "Larsen & Toubro" returns two 1.0 matches (2744 and 28126659).
 

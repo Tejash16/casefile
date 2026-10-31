@@ -18,7 +18,7 @@ Audited company: Halvexa Precision Components Pvt Ltd (fictional), Pune; ledger 
 | `clean_controls` | 1004 | The tip accuses V001 and V002; nothing is planted | none | every real vendor |
 | `shared_office_honest` | 1005 | V041 TechLadd (958646) and V042 E Giraffes Digital (615149) are real, unrelated tenants of WeWork Futura, Magarpatta Road, Pune; the tip calls them a ring. They share no phone, bank, tax id, email or staff link | none | V041, V042 + every real vendor |
 
-**Open (A / a2):** the gate forces `Unsubstantiated` when any subject or object is not `resolved`, and V023 is fictional, so it is always `unresolved`. `shell_vendor` therefore cannot reach `Substantiated` until the gate scopes that rule to Crustdata-dependent evidence. `SHELL_VERDICT` in `gen.py` is one line to change once A decides.
+**Shell and the gate (settled 31 Oct, contract section 7 rev, a1/a2):** an unresolved entity now voids only the evidence resting on its Crustdata record (T13, T15, T17 and Crustdata sources), so the fictional V023 can reach `Substantiated` on its ledger and master-file families alone. `SHELL_VERDICT` in `gen.py` stays `Substantiated`.
 
 **Known noise:** S005 Kedar Sharma is also DocRack's co-founder (Crustdata, from 2025-06). Only the held-out case has both S004/V017 and S005 on one staff list; S005 approves nothing, so T15 support stays at 0.5, below the gate's 0.6.
 
