@@ -123,7 +123,7 @@ _ALL = [
     ),
     Threshold(
         "sequential_step_max",
-        2.0,
+        1.5,
         "invoice numbers per invoice",
         "Mean step between a vendor's invoice numbers at or below this: we are its only "
         "customer (T07).",
@@ -140,8 +140,7 @@ _ALL = [
         "fuzzy_identifier_min",
         92,
         "RapidFuzz score",
-        "Address and person-name matches at or above this score count as the same (T01, T15, "
-        "T17).",
+        "Address and person-name matches at or above this score count as the same (T01, T15, T17).",
         TULSA,
     ),
     Threshold(
@@ -177,9 +176,9 @@ _ALL = [
         FINCEN,
     ),
     Threshold(
-        "personal_email_domains",
-        ["gmail.com", "yahoo.com", "yahoo.co.in", "hotmail.com", "outlook.com", "rediffmail.com"],
-        "domains",
+        "personal_email_providers",
+        ["gmail", "yahoo", "ymail", "hotmail", "outlook", "rediffmail", "protonmail"],
+        "mail providers (first domain label)",
         "A vendor using a personal mailbox has a thin footprint (T02).",
         MN_AUDITOR,
     ),
@@ -217,6 +216,14 @@ _ALL = [
         2.0,
         "z-score",
         "Vendor spend share or growth this many standard deviations above other vendors (T12).",
+        WEAVER,
+    ),
+    Threshold(
+        "velocity_sd_floor",
+        0.25,
+        "x mean share; absolute on the -1..1 growth index",
+        "z-scores use at least this standard deviation, so near-equal vendors never look like "
+        "outliers (T12).",
         WEAVER,
     ),
     Threshold(
@@ -358,6 +365,7 @@ STRENGTH: dict[str, float] = {
     "t14_same_tax_id": 0.8,
     # T15 career overlap
     "t15_overlap": 0.9,
+    "t15_non_approver": 0.5,  # career link, but no spend control
     "t15_old_employment": 0.3,  # neutral
     "t15_refute": 0.75,
     "t15_refute_low_confidence": 0.5,
@@ -372,3 +380,6 @@ STRENGTH: dict[str, float] = {
     "t17_name_only": 0.5,
     "t17_namesake": 0.2,  # neutral
 }
+
+# rules/rank.py: prior' = prior + support*(1-e^-S) - refute*(1-e^-R) + centrality*c/max(c)
+RANK_WEIGHTS: dict[str, float] = {"support": 0.3, "refute": 0.2, "centrality": 0.1}
