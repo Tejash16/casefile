@@ -16,6 +16,7 @@ Think through the tip and the statistics before answering. Your final answer is 
 Propose between 3 and 8 hypotheses for this investigation.
 - Use only typology ids from the menu and test ids from the registry; `tests_to_run` must be non-empty.
 - Name subjects and objects only by the staff and vendor ids listed above; never invent ids. A hypothesis may have no subject when no staff member is implicated.
+- Keep each hypothesis specific: at most 2 staff ids and at most 2 vendor ids (two vendor ids only when the scheme itself links them, such as a look-alike copy of a vendor record). Do not list every approver or every vendor; name the ones the tip or the statistics single out.
 - Write each `statement` as one worst-case sentence with ids, not names.
 - Mark each hypothesis `origin: "tip"` if it comes from the tip, `"screen"` if it comes from the statistics alone.
 - Include at least one hypothesis that would refute the tip's reading if its tests support it, and mark it `alternative_to_tip: true` (all others false). Good alternatives: a different staff member is the one linked to the vendor; the vendor is an established company billing at population-normal patterns; the spend pattern belongs to another approver.

@@ -106,6 +106,30 @@ def test_propose_returns_typed_hypotheses(fake):
     assert out[2].rationale.startswith("Alternative to the tip.")
 
 
+def test_propose_caps_subjects_and_objects(fake):
+    wide = {
+        "hypotheses": [
+            dict(
+                GOOD["hypotheses"][0], subjects=["S004", "S001", "S004"], objects=["V017", "V002"]
+            ),
+            *GOOD["hypotheses"][1:],
+        ]
+    }
+    fake.responses = [message(wide), message(GOOD)]
+    out = propose.propose(TIP, LEDGER_STATS, VENDORS, STAFF)
+    assert len(fake.calls) == 1 and out[0].subjects == ["S004", "S001"]  # 2 distinct ids is fine
+    staff3 = [*STAFF, STAFF[0].model_copy(update={"staff_id": "S009"})]
+    too_wide = {
+        "hypotheses": [
+            dict(GOOD["hypotheses"][0], subjects=["S004", "S001", "S009"]),
+            *GOOD["hypotheses"][1:],
+        ]
+    }
+    fake.responses = [message(too_wide), message(GOOD)]
+    propose.propose(TIP, LEDGER_STATS, VENDORS, staff3)
+    assert "at most 2 staff ids" in fake.calls[-1]["messages"][0]["content"][-1]["text"]
+
+
 def test_propose_requires_an_alternative_to_tip(fake):
     no_alt = {"hypotheses": [dict(h, alternative_to_tip=False) for h in GOOD["hypotheses"]]}
     fake.responses = [message(no_alt), message(GOOD)]

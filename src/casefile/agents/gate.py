@@ -45,9 +45,13 @@ GATE_ASSUMPTIONS = {
     "gate_support_min_strength": str(SUPPORT_MIN_STRENGTH),
     "gate_refute_min_strength": str(REFUTE_MIN_STRENGTH),
     "gate_min_supporting_evidence": str(MIN_SUPPORTING),
-    "gate_min_test_families": str(MIN_FAMILIES),
+    "gate_min_test_families": f"{MIN_FAMILIES} (graph paths corroborate but do not count)",
     "gate_unresolved_entity": "evidence from its Crustdata record (T13, T15, T17) does not count",
 }
+
+# Families that corroborate but do not count toward MIN_FAMILIES: a graph path (T16) is built from
+# the same edges other tests report (e.g. T15's employment edge), so it is not independent.
+CORROBORATIVE_FAMILIES = {"graph"}
 
 CRUSTDATA_KINDS = {SourceKind.crustdata_company, SourceKind.crustdata_person}
 CRUSTDATA_TESTS = {"T13", "T15", "T17"}
@@ -75,8 +79,8 @@ def _two_families(strong: Sequence[EvidenceObject], families: Mapping[str, list[
     for a, b in combinations(strong, 2):
         if a.test_id == b.test_id:
             continue
-        fa = set(families.get(a.test_id, [a.test_id]))
-        fb = set(families.get(b.test_id, [b.test_id]))
+        fa = set(families.get(a.test_id, [a.test_id])) - CORROBORATIVE_FAMILIES
+        fb = set(families.get(b.test_id, [b.test_id])) - CORROBORATIVE_FAMILIES
         if any(x != y for x in fa for y in fb):
             return True
     return False
@@ -144,7 +148,11 @@ def evaluate(
     strong_r = [e for e in refutes if e.strength >= REFUTE_MIN_STRENGTH]
     top = max((e.strength for e in supports + refutes), default=0.0)
 
-    if len(strong_s) >= MIN_SUPPORTING and _two_families(strong_s, families) and not strong_r:
+    # corroborative (graph) evidence counts toward neither the two objects nor the two families
+    counting_s = [
+        e for e in strong_s if set(families.get(e.test_id, [e.test_id])) - CORROBORATIVE_FAMILIES
+    ]
+    if len(counting_s) >= MIN_SUPPORTING and _two_families(counting_s, families) and not strong_r:
         conf = sum(e.strength for e in strong_s) / len(strong_s)
         return Verdict.Substantiated, RULE_SUBSTANTIATED, round(conf, 3), gaps, excluded_ids
     if strong_r and not strong_s:

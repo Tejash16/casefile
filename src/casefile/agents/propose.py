@@ -19,6 +19,9 @@ from casefile.schemas import Hypothesis, StaffRecord, Tip, Typology, VendorRecor
 
 MIN_HYPOTHESES = 3
 MAX_HYPOTHESES = 8
+# A hypothesis about four approvers and four vendors cannot be tested as one allegation.
+MAX_SUBJECTS = 2
+MAX_OBJECTS = 2
 # Keys under which ingest.ledger_stats may carry per-vendor aggregates (spend, invoice count).
 PER_VENDOR_KEYS = ("per_vendor", "vendors", "by_vendor", "spend_per_vendor")
 
@@ -173,6 +176,11 @@ def _validator(vendor_ids: set[str], staff_ids: set[str], typologies: set[str], 
                 errors.append(f"hypothesis {i}: unknown vendor ids {bad_o}")
             if not h.subjects and not h.objects:
                 errors.append(f"hypothesis {i}: names neither a staff id nor a vendor id")
+            if len(set(h.subjects)) > MAX_SUBJECTS or len(set(h.objects)) > MAX_OBJECTS:
+                errors.append(
+                    f"hypothesis {i}: at most {MAX_SUBJECTS} staff ids and {MAX_OBJECTS} vendor "
+                    "ids; split it into one hypothesis per staff-vendor pair"
+                )
         if out.hypotheses and not any(h.alternative_to_tip for h in out.hypotheses):
             errors.append(
                 "no hypothesis has alternative_to_tip=true; add one whose support would refute "

@@ -66,6 +66,18 @@ def test_no_critic_means_no_override(audit_log):
     assert read_log(audit_log)[-1]["outcome"]["override"] is False
 
 
+def test_graph_path_does_not_count_as_a_second_family():
+    # kickback-style: one billing signal plus graph paths built from the same employment edge
+    evidence = [ev("E1", "T12", S, SUP), ev("E2", "T16", S, 0.75), ev("E3", "T16", S, 0.75)]
+    assert gate.decide(H1, evidence, None, RESOLUTIONS).verdict == Verdict.Unsubstantiated
+
+
+def test_graph_path_with_two_real_families_still_substantiates():
+    evidence = [ev("E1", "T15", S, 0.9), ev("E2", "T12", S, SUP), ev("E3", "T16", S, 0.75)]
+    f = gate.decide(H1, evidence, None, RESOLUTIONS)
+    assert f.verdict == Verdict.Substantiated and "E3" in f.supporting_evidence
+
+
 def test_weak_support_is_not_enough():
     evidence = [ev("E1", "T15", S, 0.9), ev("E2", "T05", S, SUP - 0.01)]
     assert gate.decide(H1, evidence, None, RESOLUTIONS).verdict == Verdict.Unsubstantiated
