@@ -26,6 +26,9 @@ PREDICATION_CHARS = 400
 # stops an uncited clause ("..., and he steered contracts to it") riding on a cited one.
 MIN_CITED_SHARE = 0.6
 _TRIM = set(" \t\r\n-*•")
+# A summary sentence naming more findings than this ties one fact to several verdicts; dropped.
+MAX_FINDINGS_PER_SUMMARY_SENTENCE = 2
+_HYP_ID = re.compile(r"\bH\d+\b")
 ABBREVIATIONS = {"pvt", "ltd", "inc", "co", "corp", "llp", "no", "rs", "mr", "ms", "dr", "st", "vs"}
 
 _HEADING = re.compile(r"^\s*#{1,4}\s*(.+?)\s*$")
@@ -195,7 +198,11 @@ def parse_sections(
             known = section == "summary" or (
                 section != "other" and (finding_ids is None or section in finding_ids)
             )
-            if ids and known and total and cited / total >= MIN_CITED_SHARE:
+            grouped = (
+                section == "summary"
+                and len(set(_HYP_ID.findall(text))) > MAX_FINDINGS_PER_SUMMARY_SENTENCE
+            )
+            if ids and known and not grouped and total and cited / total >= MIN_CITED_SHARE:
                 sections.setdefault(section, []).append(
                     Sentence(text=text, evidence_ids=ids, require_citation=True)
                 )

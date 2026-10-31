@@ -135,6 +135,24 @@ def test_mostly_cited_sentence_with_short_lead_in_is_kept():
     assert sections["H1"][0].text.startswith("The ledger shows L000002")
 
 
+def test_summary_sentence_grouping_many_findings_is_dropped():
+    msg = message(
+        [
+            text_block("## Executive summary\nH5, H2, H3 and H6 are Unsubstantiated; "),
+            text_block(
+                "Crustdata's record for vendor V017 shows headcount total 2.", [cite(E3, 2)]
+            ),
+            text_block("\nH4 and H7 are Unfounded: "),
+            text_block("no V017 invoice sits in the band under the limit.", [cite(E2, 1)]),
+        ]
+    )
+    sections, dropped = write.parse_sections(msg, ORDER, {"H1"})
+    assert [s.text for s in sections["summary"]] == [
+        "H4 and H7 are Unfounded: no V017 invoice sits in the band under the limit."
+    ]
+    assert dropped[0].startswith("H5, H2, H3 and H6")
+
+
 def test_unknown_finding_section_is_dropped():
     msg = message(
         [

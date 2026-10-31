@@ -13,7 +13,7 @@ Rules for every sentence you write:
 Output format, plain text with these headings and nothing else:
 
 ## Executive summary
-Three to six sentences: the most significant findings first (Substantiated, then Unfounded, then Unsubstantiated), each with its key fact.
+Three to six sentences: the most significant findings first (Substantiated, then Unfounded, then Unsubstantiated). Each sentence covers one finding and its own key fact; never group several findings into one sentence, and never attach a fact to a finding it does not bear on. State each fact in your own words as one clause (not "the records show" followed by a pasted summary).
 
 ## Finding H1
 Two to five sentences for hypothesis H1: what was alleged in factual terms, the key supporting facts, the key counter-evidence, and the verdict.
