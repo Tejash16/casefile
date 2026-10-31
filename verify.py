@@ -5,11 +5,13 @@ the writer, so it can be run from a fresh clone:
     python verify.py out/demo/log.jsonl            # reads out/demo/root.txt if present
     python verify.py out/demo/log.jsonl --root <64-hex>
 
-Checks, per line: valid JSON; record_hash = SHA-256(RFC 8785 JSON without record_hash);
-prev_hash = previous line's record_hash (64 zeros first); seq = line number; each post points
-at an earlier, still-open pre of the same action type. Then the RFC 6962 Merkle root over all
-record hashes against root.txt (catches truncation), and against the root printed in
-case_file.md if one sits next to the log. Exit 0 if all pass, 1 otherwise.
+Checks, per line: valid JSON; record_hash = SHA-256(RFC 8785 JSON without record_hash); the
+line is itself canonical JSON (no hand edits, no duplicate keys); prev_hash = previous line's
+record_hash (64 zeros first); seq = line number; each post points at an earlier, still-open pre
+of the same action type. Then the RFC 6962 Merkle root over all record hashes against root.txt
+(catches truncation); every file next to the log that a `render` record hashed (case_file.md,
+exhibits.md, ...) against that hash; and the root printed in case_file.md against the prefix
+of the log it covers. Exit 0 if all pass, 1 otherwise.
 """
 
 from __future__ import annotations
@@ -38,6 +40,8 @@ FIELDS = (
     "prev_hash",
     "record_hash",
 )
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
+CASE_ROOT_RE = re.compile(r"Merkle root[^0-9a-f]*([0-9a-f]{64})[^\n]*?(\d+) records")
 
 # --- RFC 8785 JSON Canonicalization Scheme (vendored) -------------------------------------
 
@@ -138,26 +142,40 @@ def merkle_root(hashes):
 
 
 def read_root_file(path):
-    """root.txt holds '<64-hex root> <record count>'; returns (root, size or None)."""
+    """root.txt holds '<64-hex root> <record count>'; (None, None) if malformed."""
     parts = Path(path).read_text(encoding="utf-8").split()
-    return parts[0].lower(), (int(parts[1]) if len(parts) > 1 else None)
+    if not parts or not HEX64.match(parts[0].lower()):
+        return None, None
+    size = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else None
+    return parts[0].lower(), size
 
 
-def read_case_file_root(path):
-    m = re.search(
-        r"Merkle root[^0-9a-f]*([0-9a-f]{64})[^\n]*?(\d+) records",
-        Path(path).read_text(encoding="utf-8"),
-    )
-    return (m.group(1), int(m.group(2))) if m else None
+def rendered_files(rec):
+    """Files and hashes a `render` post_execution record vouches for."""
+    out = rec.get("outcome")
+    if not isinstance(out, dict):
+        return {}
+    files = {k: v for k, v in (out.get("files") or {}).items() if isinstance(v, str)}
+    detail = rec.get("action_detail")
+    name = detail.get("name") if isinstance(detail, dict) else None
+    if isinstance(out.get("result_sha256"), str) and name == "case_file":
+        files.setdefault("case_file.md", out["result_sha256"])
+    return files
 
 
-def verify(log_path, expected_root=None, expected_size=None, case_root=None):
-    """Return (failures, warnings, info). Each failure is (check, seq_or_None, message)."""
+def verify(log_path, expected_root=None, expected_size=None):
+    """Return (failures, warnings, info). Each failure is (check, seq_or_None, message).
+    Without expected_root, reads root.txt next to the log if present."""
+    log_path = Path(log_path)
     failures, warnings = [], []
-    hashes, open_pre = [], {}
+    root_txt = log_path.with_name("root.txt")
+    if expected_root is None and root_txt.is_file():
+        expected_root, expected_size = read_root_file(root_txt)
+        if expected_root is None:
+            failures.append(("root", None, "root.txt is empty or malformed"))
+    hashes, open_pre, rendered = [], {}, {}
     prev = ZERO_HASH
-    with open(log_path, "rb") as fh:
-        lines = [ln for ln in fh.read().split(b"\n") if ln.strip()]
+    lines = [ln for ln in log_path.read_bytes().split(b"\n") if ln.strip()]
     for i, raw in enumerate(lines):
         try:
             rec = json.loads(raw)
@@ -175,11 +193,13 @@ def verify(log_path, expected_root=None, expected_size=None, case_root=None):
         if missing:
             failures.append(("fields", seq, f"seq {seq}: missing fields {missing}"))
         stored = rec.get("record_hash")
-        hashes.append(stored)
+        stored_ok = isinstance(stored, str) and bool(HEX64.match(stored))
+        hashes.append(stored if stored_ok else None)
         try:
             recomputed = record_hash(rec)
+            canonical_ok = canonical(rec) == raw.rstrip(b"\r")
         except (TypeError, ValueError) as exc:
-            recomputed = f"<{exc}>"
+            recomputed, canonical_ok = f"<{exc}>", False
         if recomputed != stored:
             failures.append(
                 (
@@ -187,6 +207,14 @@ def verify(log_path, expected_root=None, expected_size=None, case_root=None):
                     seq,
                     f"seq {seq}: record_hash mismatch, stored {str(stored)[:12]}... "
                     f"recomputed {recomputed[:12]}... (record content altered)",
+                )
+            )
+        elif not canonical_ok:
+            failures.append(
+                (
+                    "canonical",
+                    seq,
+                    f"seq {seq}: line is not RFC 8785 canonical JSON (edited, or duplicate keys)",
                 )
             )
         elif prev is not None and rec.get("prev_hash") != prev:
@@ -202,16 +230,21 @@ def verify(log_path, expected_root=None, expected_size=None, case_root=None):
             failures.append(
                 ("seq", seq, f"line {i + 1}: expected seq {i}, found {seq} (sequence gap)")
             )
-        prev = stored
+        prev = stored if stored_ok else None
+
         phase, rid = rec.get("record_phase"), rec.get("record_id")
+        parent = rec.get("parent_record_id")
         if phase not in PHASES:
             failures.append(
                 ("pairing", seq, f"seq {seq}: record_phase {phase!r} is not one of {PHASES}")
             )
+        elif not isinstance(rid, str) or not (parent is None or isinstance(parent, str)):
+            failures.append(
+                ("pairing", seq, f"seq {seq}: record_id/parent_record_id must be strings")
+            )
         elif phase == "pre_execution":
             open_pre[rid] = rec.get("action_type")
         else:
-            parent = rec.get("parent_record_id")
             if parent not in open_pre:
                 failures.append(
                     (
@@ -224,10 +257,14 @@ def verify(log_path, expected_root=None, expected_size=None, case_root=None):
                 failures.append(
                     ("pairing", seq, f"seq {seq}: action_type differs from its pre_execution")
                 )
+            if rec.get("action_type") == "render":
+                for name, sha in rendered_files(rec).items():
+                    rendered[name] = (sha, seq)
     for rid in open_pre:
         warnings.append(f"pre_execution {rid} has no post_execution (run interrupted?)")
 
-    root = merkle_root([h for h in hashes if h]) if all(hashes) else None
+    complete = [h for h in hashes if h]
+    root = merkle_root(complete) if len(complete) == len(hashes) else None
     if root and expected_root:
         if root != expected_root:
             sealed = f" sealed at {expected_size} records" if expected_size is not None else ""
@@ -246,23 +283,42 @@ def verify(log_path, expected_root=None, expected_size=None, case_root=None):
                     f"{expected_root[:12]}...{sealed}{hint}",
                 )
             )
-    elif expected_root is None:
+    elif expected_root is None and not root_txt.is_file():
         warnings.append("no root.txt or --root given: chain verified, tail truncation not checked")
-    if case_root and all(hashes):
-        c_root, c_size = case_root
-        if c_size > len(hashes):
-            failures.append(
-                ("root", None, f"case_file.md cites {c_size} records, log has {len(hashes)}")
-            )
-        elif merkle_root(hashes[:c_size]) != c_root:
+
+    for name, (sha, seq) in sorted(rendered.items()):
+        target = log_path.with_name(name)
+        if "/" in name or "\\" in name or not target.is_file():
+            continue
+        actual = hashlib.sha256(target.read_bytes()).hexdigest()
+        if actual != sha:
             failures.append(
                 (
-                    "root",
+                    "files",
                     None,
-                    f"case_file.md Merkle root {c_root[:12]}... does not match records "
-                    f"0..{c_size - 1}",
+                    f"{name} sha256 {actual[:12]}... != {sha[:12]}... logged by render record "
+                    f"seq {seq} (file edited after it was rendered)",
                 )
             )
+
+    case_md = log_path.with_name("case_file.md")
+    if root and case_md.is_file():
+        m = CASE_ROOT_RE.search(case_md.read_text(encoding="utf-8"))
+        if m:
+            c_root, c_size = m.group(1), int(m.group(2))
+            if c_size > len(complete):
+                failures.append(
+                    ("root", None, f"case_file.md cites {c_size} records, log has {len(complete)}")
+                )
+            elif merkle_root(complete[:c_size]) != c_root:
+                failures.append(
+                    (
+                        "root",
+                        None,
+                        f"case_file.md Merkle root {c_root[:12]}... does not match records "
+                        f"0..{c_size - 1}",
+                    )
+                )
     return failures, warnings, {"records": len(hashes), "root": root}
 
 
@@ -287,14 +343,7 @@ def main(argv=None):
     if not log.is_file():
         print(f"FAIL: {log} not found")
         return 1
-    size = None
-    root = args.root.lower() if args.root else None
-    if root is None and (log.parent / "root.txt").is_file():
-        root, size = read_root_file(log.parent / "root.txt")
-    case_root = None
-    if (log.parent / "case_file.md").is_file():
-        case_root = read_case_file_root(log.parent / "case_file.md")
-    failures, warnings, info = verify(log, root, size, case_root)
+    failures, warnings, info = verify(log, args.root.lower() if args.root else None)
     for w in warnings:
         print(f"warn: {w}")
     if args.verbose:

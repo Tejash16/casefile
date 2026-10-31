@@ -290,3 +290,100 @@ def test_vendored_jcs_matches_random_floats() -> None:
     for _ in range(5000):
         x = rng.uniform(-1, 1) * 10 ** rng.randint(-30, 30)
         assert standalone.canonical(x) == rfc8785.dumps(x), x
+
+
+# --- review fixes ------------------------------------------------------------------------
+
+
+def both(path: Path) -> list[tuple[str, int | None]]:
+    """(check, seq) failures, asserting both verifiers agree."""
+    pkg = [(f.check, f.seq) for f in verify(path).failures]
+    alone = [(c, s) for c, s, _ in standalone.verify(path)[0]]
+    assert pkg == alone
+    return pkg
+
+
+def test_duplicate_key_fails_canonical(tmp_path: Path) -> None:
+    path = build_log(tmp_path)
+    lines = lines_of(path)
+    lines[7] = lines[7].replace(b"{", b'{"outcome":{"verdict":"Substantiated"},', 1)
+    path.write_bytes(b"".join(lines))
+    assert both(path) == [("canonical", 7)]
+
+
+def test_respaced_line_fails_canonical(tmp_path: Path) -> None:
+    path = build_log(tmp_path)
+    lines = lines_of(path)
+    lines[3] = json.dumps(json.loads(lines[3])).encode() + b"\n"
+    path.write_bytes(b"".join(lines))
+    assert both(path) == [("canonical", 3)]
+
+
+def test_crlf_checkout_still_verifies(tmp_path: Path) -> None:
+    path = build_log(tmp_path)
+    path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+    assert both(path) == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    [1e16, -2.5e300, float("nan"), float("inf"), 2**60, "lone \ud800 surrogate", {"\ud83d": 1}],
+)
+def test_awkward_values_round_trip(tmp_path: Path, value: object) -> None:
+    path = tmp_path / "log.jsonl"
+    with AuditLog(path) as log:
+        rid = log.pre("rule_test", {"name": "T08", "stat": value})
+        log.post(rid, {"status": "ok", "value": value})
+        log.seal()
+    assert both(path) == []
+
+
+def test_resume_refuses_torn_line(tmp_path: Path) -> None:
+    path = build_log(tmp_path, pairs=2)
+    path.write_bytes(path.read_bytes() + b'{"record_id":"x"')
+    with pytest.raises(ValueError, match="partial record"):
+        AuditLog(path)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "check"),
+    [
+        ("record_hash", "not-hex", "record_hash"),
+        ("record_hash", 12345, "record_hash"),
+        ("record_id", ["a", "b"], "record_hash"),
+    ],
+)
+def test_malformed_fields_fail_without_crashing(
+    tmp_path: Path, field: str, value: object, check: str
+) -> None:
+    path = build_log(tmp_path)
+    lines = lines_of(path)
+    rec = json.loads(lines[4])
+    rec[field] = value
+    lines[4] = rfc8785.dumps(rec) + b"\n"
+    path.write_bytes(b"".join(lines))
+    fails = both(path)
+    assert fails and fails[0] == (check, 4)
+    proc = run_cli(path)
+    assert proc.returncode == 1 and "Traceback" not in proc.stderr
+
+
+def test_unhashable_record_id_with_valid_hash(tmp_path: Path) -> None:
+    """A record whose hash was recomputed after making record_id a list: pairing, no crash."""
+    path = tmp_path / "log.jsonl"
+    with AuditLog(path) as log:
+        log.pre("gate", {"name": "H1"})
+    rec = json.loads(lines_of(path)[0])
+    rec["record_id"] = ["x"]
+    from casefile.audit.log import record_hash
+
+    rec["record_hash"] = record_hash(rec)
+    path.write_bytes(rfc8785.dumps(rec) + b"\n")
+    assert both(path) == [("pairing", 0)]
+
+
+def test_empty_root_txt_fails(tmp_path: Path) -> None:
+    path = build_log(tmp_path)
+    (tmp_path / "root.txt").write_text("", encoding="utf-8")
+    assert both(path) == [("root", None)]
+    assert run_cli(path).returncode == 1

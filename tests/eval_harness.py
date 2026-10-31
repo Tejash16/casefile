@@ -92,6 +92,14 @@ def score(case: CaseFile, spec: CaseSpec, run: int = 1) -> RunResult:
         res.substantiated += 1
         if any(_matches(e, h, exact=False) for e in expected_subst):
             res.substantiated_correct += 1
+        elif not any(set(h.objects) & set(e.objects) for e in expected_subst):
+            # a Substantiated allegation against a vendor nobody planted is a false accusation,
+            # even if that vendor is not on must_clear (another typology on a planted vendor
+            # only costs precision)
+            res.mismatches.append(
+                f"unexpected Substantiated {h.hypothesis_id} {h.typology.value} "
+                f"{h.subjects}{h.objects}"
+            )
         for v in sorted(set(h.objects) & set(spec.must_clear)):
             if v not in res.turned_away:
                 res.turned_away.append(v)
@@ -133,15 +141,18 @@ def run_case(case_dir: Path, spec: CaseSpec, runs: int, out_root: Path) -> list[
             results.append(res)
             continue
         res = score(case, spec, run=i)
+        # citation validity from the payloads written to disk only, not the live in-memory store
         store_dir = out / "payloads"
-        index = (
-            payloads.PayloadStore.load(store_dir) if store_dir.is_dir() else payloads.default_store
-        )
+        index = payloads.PayloadStore.load(store_dir) if store_dir.is_dir() else {}
+        payloads.default_store.clear()
         res.citation_validity = citation_validity(case, index)
-        rep = verify(out / "log.jsonl")
-        res.log_verifies = rep.ok
-        if not rep.ok:
-            res.mismatches.append("log does not verify: " + "; ".join(rep.lines()[:2]))
+        try:
+            rep = verify(out / "log.jsonl")
+            res.log_verifies = rep.ok
+            if not rep.ok:
+                res.mismatches.append("log does not verify: " + "; ".join(rep.lines()[:2]))
+        except Exception as exc:  # noqa: BLE001 - a verifier crash fails this run, not the eval
+            res.mismatches.append(f"verifier crashed: {type(exc).__name__}: {exc}")
         m = case.metrics
         res.wall_seconds = m.get("wall_seconds", round(time.perf_counter() - t0, 2))
         res.credits = m.get("credits_used", 0) or 0

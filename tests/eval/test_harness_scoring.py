@@ -115,3 +115,15 @@ def test_table_renders() -> None:
     tbl = harness.table({"career_overlap": runs}, 3)
     assert "| career_overlap | 1/1, 1/1, 1/1 | 0 | 6/6 | 100% | 100% | 0% | 3/3 | 10.0 |" in tbl
     assert "**pass 3/3**" in tbl
+
+
+def test_unexpected_substantiated_against_unplanted_vendor_fails() -> None:
+    case = case_with(
+        ("H1", "conflict_of_interest", ["S004"], ["V017"], "Substantiated"),
+        ("H2", "shell_company", [], ["V023"], "Unfounded"),
+        ("H3", "kickback", ["S001"], ["V030"], "Substantiated"),  # V030: not planted, not listed
+        ("H4", "kickback", ["S004"], ["V017"], "Substantiated"),  # other typology, planted vendor
+    )
+    r = harness.score(case, SPEC)
+    assert r.mismatches == ["unexpected Substantiated H3 kickback ['S001']['V030']"]
+    assert (r.substantiated_correct, r.substantiated) == (1, 3)

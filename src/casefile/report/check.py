@@ -17,6 +17,7 @@ from casefile.schemas import CaseFile, EvidenceObject, Sentence, SourceKind
 INLINE_ID = re.compile(r"\[(E\d+)\]")
 CRUSTDATA_KINDS = {SourceKind.crustdata_company, SourceKind.crustdata_person}
 CRUSTDATA_REF = re.compile(r"^crustdata:(company|person):[^@\s]+@\S+$")
+MIN_QUOTE_CHARS = 8  # non-whitespace; a quote must be long enough to pin down a record
 
 
 def _short(text: str, n: int = 70) -> str:
@@ -54,8 +55,11 @@ def check_evidence(
 ) -> list[str]:
     errors: list[str] = []
     eid = ev.evidence_id
-    if not ev.quote.strip():
-        errors.append(f"{eid}: empty quote")
+    if len("".join(ev.quote.split())) < MIN_QUOTE_CHARS:
+        errors.append(
+            f"{eid}: quote {ev.quote!r} is under {MIN_QUOTE_CHARS} characters, too short to "
+            "identify a record"
+        )
     payload = _payload(ev, index)
     if payload is None:
         if require_payloads:
@@ -102,9 +106,12 @@ def check_citations(
     for where, s in cited_sentences(case):
         if not s.evidence_ids:
             errors.append(f"{where}: uncited sentence: {_short(s.text)!r}")
-        for eid in [*s.evidence_ids, *INLINE_ID.findall(s.text)]:
+        for eid in s.evidence_ids:
             if eid not in ids:
                 errors.append(f"{where}: cites {eid}, which is not in the exhibits")
+        for eid in INLINE_ID.findall(s.text):
+            if eid not in s.evidence_ids:
+                errors.append(f"{where}: text shows [{eid}] but the sentence does not cite it")
 
     for f in case.findings:
         for eid in [*f.supporting_evidence, *f.counter_evidence]:

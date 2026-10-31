@@ -6,7 +6,9 @@ The template only lays out text that is already in the CaseFile; nothing is gene
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import sys
 from collections.abc import Iterable, Mapping
 from decimal import Decimal
@@ -20,6 +22,7 @@ from casefile.report.redact import NoRedaction, Redactor
 from casefile.schemas import CaseFile, EvidenceObject, Finding, Hypothesis, Sentence, Verdict
 
 TEMPLATES = Path(__file__).parent / "templates"
+RENDERED_FILES = ("case_file.md", "exhibits.md", "evidence.json", "findings.json")
 VERDICT_ORDER = {Verdict.Substantiated: 0, Verdict.Unfounded: 1, Verdict.Unsubstantiated: 2}
 METRIC_LABELS = {
     "wall_seconds": "Wall time (s)",
@@ -74,6 +77,16 @@ def _cell(text: Any) -> str:
     return str(text).replace("|", "\\|").replace("\n", " ")
 
 
+BLOCK_START = re.compile(r"^(#|>|=|\||[-+*](\s|$)|\d+[.)](\s|$)|```|~~~)")
+
+
+def one_line(text: str) -> str:
+    """Collapse whitespace and escape a leading Markdown block marker, so model or data text
+    cannot add headings, rules, quotes or fences to the case file."""
+    text = " ".join(text.split())
+    return "\\" + text if BLOCK_START.match(text) else text
+
+
 def _threshold_meta() -> dict[str, Any]:
     try:
         from casefile.rules.config import THRESHOLDS  # b3; optional until it lands
@@ -102,20 +115,24 @@ def build_view(
     ex_by_id = {e.evidence_id: e for e in case.exhibits}
     tests = _test_names()
 
+    def line(text: str | None) -> str:
+        """Redacted, on one line, and unable to start a Markdown block (heading, rule...)."""
+        return one_line(r(text) or "")
+
     def sentence(s: Sentence) -> str:
         links = " ".join(f"[[{e}]](#{anchor(e)})" for e in s.evidence_ids)
-        return f"{r(s.text)} {links}".rstrip()
+        return f"{line(s.text)} {links}".rstrip()
 
     def ev_ref(eid: str) -> dict[str, str]:
         ev = ex_by_id.get(eid)
-        return {"id": eid, "anchor": anchor(eid), "summary": r(ev.summary) if ev else ""}
+        return {"id": eid, "anchor": anchor(eid), "summary": line(ev.summary) if ev else ""}
 
     def finding(f: Finding) -> dict[str, Any]:
         h = hyps.get(f.hypothesis_id)
         return {
             "id": f.hypothesis_id,
             "typology": h.typology.value if h else "",
-            "statement": r(h.statement) if h else "",
+            "statement": line(h.statement) if h else "",
             "subjects": h.subjects if h else [],
             "objects": h.objects if h else [],
             "origin": h.origin.value if h else "",
@@ -127,12 +144,13 @@ def build_view(
             "rationale": [sentence(s) for s in f.rationale],
             "supporting": [ev_ref(e) for e in f.supporting_evidence],
             "counter": [ev_ref(e) for e in f.counter_evidence],
-            "data_gaps": [r(g) for g in f.data_gaps],
+            "data_gaps": [line(g) for g in f.data_gaps],
         }
 
     def exhibit(e: EvidenceObject) -> dict[str, Any]:
         quote = r(e.quote) or ""
-        fence = "````" if "```" in quote else "```"
+        longest = max((len(m) for m in re.findall(r"`+", quote)), default=0)
+        fence = "`" * max(3, longest + 1)
         return {
             "id": e.evidence_id,
             "anchor": anchor(e.evidence_id),
@@ -140,11 +158,11 @@ def build_view(
             "test_name": tests.get(e.test_id, ""),
             "direction": e.direction.value,
             "strength": f"{e.strength:.2f}",
-            "summary": r(e.summary),
+            "summary": line(e.summary),
             "quote": quote,
             "fence": fence,
             "source_kind": e.source.kind.value,
-            "refs": e.source.refs,
+            "refs": [_cell(r(ref)) for ref in e.source.refs],
             "as_of": e.source.as_of,
             "sha256": e.sha256,
             "log_record_id": e.log_record_id,
@@ -176,18 +194,18 @@ def build_view(
     log_records = case.metrics.get("log_records")
     return {
         "case_id": case.case_id,
-        "company": r(case.company_name),
+        "company": line(case.company_name),
         "generated_at": case.generated_at,
         "merkle_root": case.merkle_root,
         "log_records": log_records,
         "verify_command": case.verify_command,
         "predication": sentence(case.predication),
         "executive_summary": [sentence(s) for s in case.executive_summary],
-        "scope": [r(s) for s in case.scope],
-        "approach": [r(s) for s in case.approach],
+        "scope": [line(s) for s in case.scope],
+        "approach": [line(s) for s in case.approach],
         "findings": [finding(f) for f in findings],
         "counts": {v.value: sum(1 for f in findings if f.verdict == v) for v in Verdict},
-        "data_quality": [r(s) for s in case.data_quality],
+        "data_quality": [line(s) for s in case.data_quality],
         "assumptions": assumptions,
         "metrics": metrics,
         "exhibits": [exhibit(e) for e in case.exhibits],
@@ -228,8 +246,20 @@ def _evidence_json(case: CaseFile, r: Any) -> list[dict]:
     for e in case.exhibits:
         d = json.loads(e.model_dump_json())
         d["quote"], d["summary"] = r(d["quote"]), r(d["summary"])
+        d["source"]["refs"] = [r(ref) for ref in d["source"]["refs"]]
         out.append(d)
     return out
+
+
+def rendered_hashes(out_dir: str | Path) -> dict[str, str]:
+    """sha256 of every file render wrote. Log it as the render post's `outcome["files"]`;
+    verify.py then fails if any of them is edited afterwards."""
+    out = Path(out_dir)
+    return {
+        name: hashlib.sha256((out / name).read_bytes()).hexdigest()
+        for name in RENDERED_FILES
+        if (out / name).is_file()
+    }
 
 
 def render(
@@ -240,13 +270,15 @@ def render(
     hypotheses: Iterable[Hypothesis] | None = None,
     evidence_index: Mapping[str, bytes] | None = None,
     people: Iterable[str] = (),
+    keep: Iterable[str] = (),
     require_payloads: bool = True,
     redaction_map_path: str | Path | None = None,
 ) -> Path:
     """Write case_file.md, exhibits.md, evidence.json, findings.json and root.txt to out_dir.
 
     `hypotheses` defaults to `case.hypotheses` when the schema carries it. `people` are the
-    person names to redact (staff and Crustdata persons). With `redact=True` the name map goes
+    person names to redact (staff and Crustdata persons); `keep` are vendor names that stay
+    whole even if they contain a person's name. With `redact=True` the name map goes
     to `redaction_map_path`, by default `<out_dir>/../.redaction/<out_dir name>.json`, outside
     the rendered files. Returns the path of case_file.md.
     """
@@ -263,7 +295,7 @@ def render(
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     hyps = _hypotheses(case, hypotheses)
-    r: Redactor | NoRedaction = Redactor(people) if redact else NoRedaction()
+    r: Redactor | NoRedaction = Redactor(people, keep) if redact else NoRedaction()
     view = build_view(case, hyps, r)
     env = _env()
 

@@ -211,7 +211,7 @@ def test_unknown_evidence_id(store: PayloadStore) -> None:
     case.executive_summary.append(Sentence(text="See [E9].", evidence_ids=["E99"]))
     errors = check_citations(case, store)
     assert any("cites E99" in e for e in errors)
-    assert any("cites E9," in e for e in errors)
+    assert any("text shows [E9] but the sentence does not cite it" in e for e in errors)
 
 
 def test_quote_must_be_literal_in_payload(store: PayloadStore) -> None:
@@ -352,3 +352,82 @@ def test_index_of_evidence_objects_falls_back_to_default_store() -> None:
     assert check_citations(case, {e.evidence_id: e for e in case.exhibits}) == []
     default_store.clear()
     assert any("no stored payload" in e for e in check_citations(case, {}))
+
+
+# --- review fixes ------------------------------------------------------------------------
+
+
+def test_short_quote_rejected(store: PayloadStore) -> None:
+    case = make_case(store)
+    case.exhibits[1].quote = "a"
+    assert any("too short to identify a record" in e for e in check_citations(case, store))
+
+
+def test_inline_id_must_be_cited(store: PayloadStore) -> None:
+    case = make_case(store)
+    case.executive_summary[0] = Sentence(text="Per [E1], he did it.", evidence_ids=["E2"])
+    errors = check_citations(case, store)
+    assert errors == ["executive_summary[0]: text shows [E1] but the sentence does not cite it"]
+
+
+def test_markdown_injection_neutralised(tmp_path: Path, store: PayloadStore) -> None:
+    case = make_case(store)
+    case.exhibits[0].summary = "Fine.\n## 5.9 Fake finding"
+    case.findings[1].rationale[0] = Sentence(text="# Heading\n---", evidence_ids=["E1"])
+    case.exhibits[1].quote = "L00042 2025-03-14 Orbital Fasteners 4,98,000 approver S004"
+    render(case, tmp_path, evidence_index=store)
+    md = (tmp_path / "case_file.md").read_text(encoding="utf-8")
+    assert "\n## 5.9" not in md
+    assert "Fine. ## 5.9 Fake finding" in md
+    assert "- \\# Heading ---" in md
+
+
+def test_quote_fence_longer_than_any_backtick_run(tmp_path: Path) -> None:
+    store = PayloadStore()
+    case = make_case(store)
+    q = "row L00042 ```` four backticks"
+    case.exhibits[1].quote, case.exhibits[1].sha256 = q, store.put(q)
+    render(case, tmp_path, evidence_index=store)
+    assert "`````text\n" + q + "\n`````" in (tmp_path / "exhibits.md").read_text(encoding="utf-8")
+
+
+def test_redaction_covers_refs_and_keeps_vendor_names(tmp_path: Path) -> None:
+    store = PayloadStore()
+    case = make_case(store)
+    case.exhibits[1].source.refs = ["L00042", "person:name:ravi kumar"]
+    case.exhibits[1].summary = "Ravi Kumar Traders and Ravi Kumar share an address."
+    out = tmp_path / "demo"
+    render(
+        case,
+        out,
+        redact=True,
+        evidence_index=store,
+        people=["Ravi Kumar"],
+        keep=["Ravi Kumar Traders"],
+    )
+    for name in ("case_file.md", "exhibits.md", "evidence.json"):
+        text = (out / name).read_text(encoding="utf-8")
+        assert "ravi kumar" not in text.replace("Ravi Kumar Traders", "").lower(), name
+    md = (out / "case_file.md").read_text(encoding="utf-8")
+    assert "Ravi Kumar Traders and R.K. share an address." in md
+    assert "person:name:R.K." in md
+
+
+def test_rendered_hashes_detect_edits(tmp_path: Path, store: PayloadStore) -> None:
+    from casefile.report.render import rendered_hashes
+
+    log = AuditLog(tmp_path / "log.jsonl")
+    case = make_case(store)
+    case.metrics["log_records"] = log.seq
+    case.merkle_root = log.merkle_root()
+    rid = log.pre("render", {"name": "case_file"})
+    render(case, tmp_path, evidence_index=store)
+    log.post(rid, {"status": "ok", "files": rendered_hashes(tmp_path)})
+    log.seal()
+    log.close()
+    assert verify(tmp_path / "log.jsonl").ok
+    ex = tmp_path / "exhibits.md"
+    ex.write_text(ex.read_text(encoding="utf-8").replace("0.90", "0.99"), encoding="utf-8")
+    rep = verify(tmp_path / "log.jsonl")
+    assert [f.check for f in rep.failures] == ["files"]
+    assert rep.failures[0].message.startswith("exhibits.md sha256")

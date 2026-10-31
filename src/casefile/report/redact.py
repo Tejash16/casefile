@@ -19,7 +19,12 @@ def initials(name: str) -> str:
 
 
 class Redactor:
-    def __init__(self, people: Iterable[str]) -> None:
+    """`keep` are names never to touch (vendor names), even when they contain a person's name,
+    e.g. "Ravi Kumar Traders" stays whole when "Ravi Kumar" is redacted."""
+
+    def __init__(self, people: Iterable[str], keep: Iterable[str] = ()) -> None:
+        kept = sorted({" ".join(k.split()) for k in keep if k and k.strip()}, key=len, reverse=True)
+        self._keep = [re.compile(rf"(?<![\w]){re.escape(k)}(?![\w])", re.I) for k in kept]
         names = sorted({" ".join(p.split()) for p in people if p and len(p.strip()) >= 3}, key=len)
         self.mapping: dict[str, str] = {}  # replacement -> original name
         by_name: dict[str, str] = {}
@@ -46,9 +51,17 @@ class Redactor:
     def __call__(self, text: str | None) -> str | None:
         if not text:
             return text
+        held: list[str] = []
+
+        def hold(m: re.Match[str]) -> str:
+            held.append(m.group(0))
+            return f"\x00{len(held) - 1}\x00"
+
+        for pat in self._keep:
+            text = pat.sub(hold, text)
         for pat, label in self._patterns:
             text = pat.sub(label, text)
-        return text
+        return re.sub("\x00(\\d+)\x00", lambda m: held[int(m.group(1))], text)
 
 
 class NoRedaction:

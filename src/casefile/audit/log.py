@@ -23,6 +23,7 @@ import datetime as dt
 import decimal
 import hashlib
 import json
+import math
 import os
 import subprocess
 import threading
@@ -76,11 +77,29 @@ def merkle_root(record_hashes: list[str]) -> str:
     return level[0].hex()
 
 
+SAFE_INT = 2**53 - 1
+
+
 def jsonable(obj: Any) -> Any:
-    """Coerce Decimals, dates, Paths, Pydantic models and tuples into plain JSON values."""
-    if obj is None or isinstance(obj, (bool, int, str)):
+    """Coerce Decimals, dates, Paths, Pydantic models and tuples into plain JSON values.
+
+    Values RFC 8785 cannot round-trip become strings: NaN/inf, integers beyond 2**53 and floats
+    of that size (JCS prints 1e16 as an integer, which re-reads as an out-of-range int); lone
+    surrogates in strings are replaced so the line is valid UTF-8.
+    """
+    if obj is None or isinstance(obj, bool):
         return obj
+    if isinstance(obj, int):
+        return obj if abs(obj) <= SAFE_INT else str(obj)
+    if isinstance(obj, str):
+        try:
+            obj.encode("utf-8")
+            return obj
+        except UnicodeEncodeError:
+            return obj.encode("utf-8", "replace").decode("utf-8")
     if isinstance(obj, float):
+        if not math.isfinite(obj) or abs(obj) > SAFE_INT:
+            return repr(obj)
         return obj
     if isinstance(obj, decimal.Decimal):
         return str(obj)
@@ -89,7 +108,7 @@ def jsonable(obj: Any) -> Any:
     if isinstance(obj, Path):
         return obj.as_posix()
     if isinstance(obj, dict):
-        return {str(k): jsonable(v) for k, v in obj.items()}
+        return {jsonable(str(k)): jsonable(v) for k, v in obj.items()}
     if isinstance(obj, (list, tuple)):
         return [jsonable(v) for v in obj]
     if isinstance(obj, (set, frozenset)):
@@ -141,9 +160,14 @@ class AuditLog:
 
     def _resume(self) -> None:
         with open(self.path, "rb") as fh:
-            for line in fh:
-                if not line.strip():
-                    continue
+            data = fh.read()
+        if data and not data.endswith(b"\n"):
+            raise ValueError(
+                f"{self.path} ends with a partial record (crash mid-write) and cannot be "
+                "appended to; start a new log"
+            )
+        for line in data.splitlines():
+            if line.strip():
                 rec = json.loads(line)
                 self._hashes.append(rec["record_hash"])
                 if rec["record_phase"] == "pre_execution":
