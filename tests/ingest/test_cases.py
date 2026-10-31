@@ -81,12 +81,15 @@ def test_false_lead_plant():
 
 
 def test_duplicate_plant():
-    _, rows, *_ = _load("duplicate_billing")
-    seen: dict[tuple, int] = {}
+    _, rows, vendors, *_ = _load("duplicate_billing")
+    v3, v44 = (next(v for v in vendors if v.vendor_id == i) for i in ("V003", "V044"))
+    assert v44.website == v3.website and v44.name_norm != v3.name_norm
+    paid: dict[tuple, set[str]] = {}
     for r in rows:
-        if r.vendor_id == "V003":
-            seen[(r.invoice_no, r.amount)] = seen.get((r.invoice_no, r.amount), 0) + 1
-    assert sorted(seen.values())[-1] == 2
+        if r.vendor_id in ("V003", "V044"):
+            paid.setdefault((r.invoice_no, r.amount), set()).add(r.vendor_id)
+    assert [ids for ids in paid.values() if len(ids) == 2] == [{"V003", "V044"}]
+    assert sum(1 for r in rows if r.vendor_id == "V044") == 1
 
 
 def test_shared_office_plant():
