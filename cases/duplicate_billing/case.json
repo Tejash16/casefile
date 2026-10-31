@@ -24,5 +24,5 @@
     "V011",
     "V013"
   ],
-  "notes": "seed 1003. V003 invoice SFL/52429 for 2,85,293.00 paid on 2025-05-01 and again on 2025-05-12; the vendor is real and otherwise clean."
+  "notes": "seed 1003. V003 invoice SFL/52429 for 2,85,293.00 paid on 2025-05-01, then paid again on 2025-05-12 through V044 'Sundram Fastenrs Limited', a look-alike copy of V003's master record (same website) created 2025-05-01. Billing (T04: same number and amount across vendors) and identity (T14: look-alike names under two ids) both fire; V003 itself is real and otherwise clean."
 }

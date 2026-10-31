@@ -58,7 +58,7 @@ Rejected: "Orbital Fasteners" (the brief's example shell name) collides with a r
 
 For `shared_office_honest`: V041 TechLadd (techladd.com → 958646, 11-50) and V042 E Giraffes Digital Pvt Ltd (egiraffes.com → 615149, 11-50). Both are real, unrelated tenants of WeWork Futura, Magarpatta Road, Hadapsar, Pune, found with `POST /company/search` on `locations.street_address` contains "WeWork", city Pune (12.35 credits). Both are 11-50 people on purpose: a 2-10 company could trip `shell_headcount_max`.
 
-Extra clean vendors used by `cases/gen.py` (domain identify, 1.0 each): Forbes Marshall 11834, Praj Industries 3749, Tata Consultancy Services 5057, Persistent Systems 3647. Extra fictional names checked to return no match: Varnetta Industrial Traders, Melkora Tool Supplies (unresolved pool); Oskavi Engineering Works, Trivane Components Trading, Quillmere Fabrication Supplies, Drovanta Supplies (shell pool). Rejected: Cummins India (cumminsindia.com returns two 1.0 matches).
+Extra clean vendors used by `cases/gen.py` (domain identify, 1.0 each): Forbes Marshall 11834, Praj Industries 3749, Tata Consultancy Services 5057, Persistent Systems 3647. Extra fictional names checked to return no match: Varnetta Industrial Traders, Melkora Tool Supplies (unresolved pool); Oskavi Engineering Works, Quillmere Fabrication Supplies, Drovanta Supplies (shell pool); dropped Trivane Components Trading (b2: ends `ambiguous` on a near-identical brand). Rejected: Cummins India (cumminsindia.com returns two 1.0 matches).
 
 ## 4. The tip (fixture version)
 

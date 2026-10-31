@@ -296,7 +296,6 @@ UNRESOLVED_NAMES = [
 SHELL_NAMES = [
     "Brindora Engineering Traders Pvt Ltd",
     "Oskavi Engineering Works",
-    "Trivane Components Trading",
     "Quillmere Fabrication Supplies",
     "Drovanta Supplies",
 ]
@@ -723,17 +722,41 @@ def plant_false_lead(case: Case, vid: str = "V031") -> None:
     )
 
 
-def plant_duplicate(case: Case, vid: str = "V003") -> None:
+def lookalike(rng: random.Random, name: str) -> str:
+    """Drop one interior letter of the longest word, keeping the legal suffix."""
+    words = name.split()
+    i = max(range(len(words)), key=lambda k: len(words[k]))
+    j = rng.randrange(2, len(words[i]) - 2)
+    words[i] = words[i][:j] + words[i][j + 1 :]
+    return " ".join(words)
+
+
+def plant_duplicate(case: Case, vid: str = "V003", dup_vid: str = "V044") -> None:
+    """The same invoice paid again through a look-alike copy of the vendor's master record."""
     rng = case.rng
     rows = sorted((r for r in case.rows if r.vendor.vid == vid), key=lambda r: r.d)
     orig = rows[len(rows) // 2]
     d = weekday_near(rng, orig.d + timedelta(days=rng.randint(6, 14)))
     v, appr = orig.vendor, orig.approver
+    dup = Vendor(
+        "duplicate_record",
+        dup_vid,
+        lookalike(rng, v.name),
+        [],
+        v.website,
+        v.address,
+        v.city,
+        v.state,
+        v.country,
+        desc=v.desc,
+        created_on=d - timedelta(days=rng.randint(10, 30)),
+    )
+    case.vendors[dup_vid] = dup
     case.rows.append(
         Row(
             d,
-            v,
-            rng.choice(v.variants or [v.name]),
+            dup,
+            dup.name,
             orig.invoice,
             orig.amount,
             appr,
@@ -752,8 +775,11 @@ def plant_duplicate(case: Case, vid: str = "V003") -> None:
         "same invoice last year."
     )
     case.notes.append(
-        f"{vid} invoice {orig.invoice} for {lakh(orig.amount, True)} paid on "
-        f"{orig.d} and again on {d}; the vendor is real and otherwise clean."
+        f"{vid} invoice {orig.invoice} for {lakh(orig.amount, True)} paid on {orig.d}, then "
+        f"paid again on {d} through {dup_vid} {dup.name!r}, a look-alike copy of {vid}'s master "
+        f"record (same website) created {dup.created_on}. Billing (T04: same number and amount "
+        f"across vendors) and identity (T14: look-alike names under two ids) both fire; {vid} "
+        "itself is real and otherwise clean."
     )
 
 
