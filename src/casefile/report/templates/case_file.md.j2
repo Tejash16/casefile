@@ -70,7 +70,7 @@
 {% endfor %}
 
 {% if f.supporting %}
-**Supporting evidence:** {% for e in f.supporting %}[{{ e.id }}](#{{ e.anchor }}){{ ", " if not loop.last }}{% endfor %}
+**Supporting evidence:** {% for e in f.supporting %}[{{ e.id }}](#{{ e.anchor }}){{ ", " if not loop.last }}{% endfor +%}
 
 {% endif %}
 **Counter-evidence**

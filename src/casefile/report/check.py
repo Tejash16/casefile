@@ -27,7 +27,9 @@ def cited_sentences(case: CaseFile) -> list[tuple[str, Sentence]]:
     """(location, sentence) for every sentence that must carry evidence ids."""
     out = [(f"executive_summary[{i}]", s) for i, s in enumerate(case.executive_summary)]
     for f in case.findings:
-        out += [(f"findings[{f.hypothesis_id}].rationale[{i}]", s) for i, s in enumerate(f.rationale)]
+        out += [
+            (f"findings[{f.hypothesis_id}].rationale[{i}]", s) for i, s in enumerate(f.rationale)
+        ]
     return out
 
 
@@ -39,7 +41,9 @@ def _payload(ev: EvidenceObject, index: Mapping[str, bytes]) -> bytes | None:
     return None
 
 
-def check_evidence(ev: EvidenceObject, index: Mapping[str, bytes], require_payloads: bool) -> list[str]:
+def check_evidence(
+    ev: EvidenceObject, index: Mapping[str, bytes], require_payloads: bool
+) -> list[str]:
     errors: list[str] = []
     eid = ev.evidence_id
     if not ev.quote.strip():
@@ -47,13 +51,17 @@ def check_evidence(ev: EvidenceObject, index: Mapping[str, bytes], require_paylo
     payload = _payload(ev, index)
     if payload is None:
         if require_payloads:
-            errors.append(f"{eid}: no stored payload for sha256 {ev.sha256[:12]}..., quote unverifiable")
+            errors.append(
+                f"{eid}: no stored payload for sha256 {ev.sha256[:12]}..., quote unverifiable"
+            )
     else:
         actual = hashlib.sha256(payload).hexdigest()
         if actual != ev.sha256:
             errors.append(f"{eid}: payload sha256 {actual[:12]}... != recorded {ev.sha256[:12]}...")
         elif ev.quote not in payload.decode("utf-8", errors="replace"):
-            errors.append(f"{eid}: quote not found literally in its source payload: {_short(ev.quote)!r}")
+            errors.append(
+                f"{eid}: quote not found literally in its source payload: {_short(ev.quote)!r}"
+            )
     if ev.source.kind in CRUSTDATA_KINDS:
         if not ev.source.as_of:
             errors.append(f"{eid}: Crustdata source without updated_at (source.as_of)")
@@ -93,7 +101,9 @@ def check_citations(
     for f in case.findings:
         for eid in [*f.supporting_evidence, *f.counter_evidence]:
             if eid not in ids:
-                errors.append(f"findings[{f.hypothesis_id}]: lists {eid}, which is not in the exhibits")
+                errors.append(
+                    f"findings[{f.hypothesis_id}]: lists {eid}, which is not in the exhibits"
+                )
 
     for ev in case.exhibits:
         errors += check_evidence(ev, evidence_index, require_payloads)

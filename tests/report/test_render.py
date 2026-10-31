@@ -27,12 +27,10 @@ LEDGER = (
     "L00042 2025-03-14 Orbital Fasteners 4,98,000 approver S004\n"
     "L00057 2025-04-02 Orbital Fasteners 4,95,500 approver S004\n"
 )
-PERSON = json.dumps(
-    {
-        "name": "Ravi Kumar",
-        "profile_url": "https://www.linkedin.com/in/ravi-kumar-1234",
-        "employment[2]": "Orbital Fasteners, Analyst, 2021-06-01 to 2024-11-30",
-    }
+PERSON = (
+    "name: Ravi Kumar\n"
+    "profile_url: https://www.linkedin.com/in/ravi-kumar-1234\n"
+    "employment[2]: Orbital Fasteners, Analyst, 2021-06-01 to 2024-11-30\n"
 )
 COMPANY = "headcount_total: 2; website: none; year_founded: 2024"
 
@@ -46,7 +44,7 @@ def make_case(store: PayloadStore) -> CaseFile:
         object_ids=["V017"],
         direction="supports",
         strength=0.9,
-        summary="Ravi Kumar worked at Orbital Fasteners until three months before the first payment.",
+        summary="Ravi Kumar worked at Orbital Fasteners until 2024-11-30.",
         quote="employment[2]: Orbital Fasteners, Analyst, 2021-06-01 to 2024-11-30",
         source=Source(
             kind="crustdata_person",
@@ -91,9 +89,14 @@ def make_case(store: PayloadStore) -> CaseFile:
         case_id="career_overlap",
         company_name="Acme Components Pvt Ltd",
         generated_at="2026-10-31T13:00:00Z",
-        predication=Sentence(text="A tip alleges that Ravi Kumar steers orders to Orbital Fasteners."),
+        predication=Sentence(
+            text="A tip alleges that Ravi Kumar steers orders to Orbital Fasteners."
+        ),
         executive_summary=[
-            Sentence(text="Ravi Kumar approved payments to his former employer.", evidence_ids=["E1", "E2"]),
+            Sentence(
+                text="Ravi Kumar approved payments to his former employer.",
+                evidence_ids=["E1", "E2"],
+            ),
         ],
         scope=["Ledger 2025-01-01 to 2025-12-31, 412 rows."],
         approach=["Six stages; Crustdata person/search x3, company/enrich x1."],
@@ -101,7 +104,7 @@ def make_case(store: PayloadStore) -> CaseFile:
             Hypothesis(
                 hypothesis_id="H1",
                 typology="conflict_of_interest",
-                statement="Ravi Kumar (S004) steered payments to Orbital Fasteners (V017), his former employer.",
+                statement="Ravi Kumar (S004) steered payments to his ex-employer V017.",
                 subjects=["S004"],
                 objects=["V017"],
             ),
@@ -185,7 +188,11 @@ def test_render_writes_all_files(tmp_path: Path, store: PayloadStore) -> None:
     assert "crustdata:person:987@2026-10-01T00:00:00Z" in md
     findings = json.loads((tmp_path / "findings.json").read_text(encoding="utf-8"))
     h1 = next(f for f in findings if f["hypothesis_id"] == "H1")
-    assert (h1["typology"], h1["subjects"], h1["objects"]) == ("conflict_of_interest", ["S004"], ["V017"])
+    assert (h1["typology"], h1["subjects"], h1["objects"]) == (
+        "conflict_of_interest",
+        ["S004"],
+        ["V017"],
+    )
 
 
 def test_uncited_sentence_blocks_render(tmp_path: Path, store: PayloadStore) -> None:
@@ -215,7 +222,8 @@ def test_quote_must_be_literal_in_payload(store: PayloadStore) -> None:
         "E2: quote not found literally in its source payload: "
         "'L00042 2025-03-14 Orbital Fasteners 9,98,000 approver S004'"
     ]
-    assert citation_validity(case, store) == pytest.approx(1 / 4)
+    # exec summary (E1, E2) and H1 rationale[1] (E2) lose validity; H1 rationale[0], H2 keep it
+    assert citation_validity(case, store) == pytest.approx(2 / 4)
 
 
 def test_tampered_payload_fails_hash(store: PayloadStore) -> None:
@@ -260,7 +268,10 @@ def test_redactor_variants() -> None:
     r = Redactor(["Ravi Kumar", "Rahul Kapoor", "Anita Desai"])
     assert r("RAVI KUMAR and ravi-kumar-1234 and Kumar, Ravi") == "R.K. and R.K.-1234 and R.K."
     assert r("Rahul Kapoor") == "R.K.2"
-    assert r("Orbital Fasteners S004 crustdata:person:987") == "Orbital Fasteners S004 crustdata:person:987"
+    assert (
+        r("Orbital Fasteners S004 crustdata:person:987")
+        == "Orbital Fasteners S004 crustdata:person:987"
+    )
     assert r.mapping == {"R.K.": "Ravi Kumar", "R.K.2": "Rahul Kapoor", "A.D.": "Anita Desai"}
 
 
@@ -313,7 +324,20 @@ def test_case_file_root_checked_by_verifier(tmp_path: Path, store: PayloadStore)
     assert verify(tmp_path / "log.jsonl").ok
 
     md = tmp_path / "case_file.md"
-    md.write_text(md.read_text(encoding="utf-8").replace(case.merkle_root, "cd" * 32), encoding="utf-8")
+    md.write_text(
+        md.read_text(encoding="utf-8").replace(case.merkle_root, "cd" * 32), encoding="utf-8"
+    )
     rep = verify(tmp_path / "log.jsonl")
     assert [f.check for f in rep.failures] == ["root"]
     assert "case_file.md Merkle root" in rep.failures[0].message
+
+
+def test_metrics_panel(store: PayloadStore) -> None:
+    from rich.console import Console
+
+    from casefile.report.metrics import print_metrics
+
+    console = Console(record=True, width=120)
+    print_metrics(make_case(store), console)
+    text = console.export_text()
+    assert "Substantiated" in text and "Crustdata credits used" in text and "INR 9,93,500" in text
