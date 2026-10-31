@@ -300,7 +300,8 @@ def run(
             n_ref = sum(e.direction == Direction.refutes for e in evidence)
             stage(
                 "test",
-                f"{len(test_ids)} tests, {len(evidence)} evidence ({n_sup} support, {n_ref} refute)",
+                f"{len(test_ids)} tests, {len(evidence)} evidence "
+                f"({n_sup} support, {n_ref} refute)",
             )
 
         # 5. critique and gate
